@@ -58,12 +58,6 @@
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# Redirect trailing slashes
-[[redirects]]
-  from = "/*/"
-  to = "/:splat"
-  status = 301
-
 # 404 fallback
 [[redirects]]
   from = "/*"
