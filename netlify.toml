@@ -58,9 +58,27 @@
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# 404 fallback
+# Redirects for SPA behavior (if needed)
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Redirect trailing slashes
+[[redirects]]
+  from = "/*/"
+  to = "/:splat"
+  status = 301
+
 [[redirects]]
   from = "/*"
+  to = "/index.html"
+  status = 200
+
+
+# 404 fallback
+[[redirects]]
+  from = "/404.html"
   to = "/404.html"
   status = 404
 
