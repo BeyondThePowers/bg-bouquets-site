@@ -18,9 +18,9 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=(self), payment=(self)"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(self), payment=()"
 
-# Cache static assets
+# Cache static assets for long periods
 [[headers]]
   for = "/assets/*"
   [headers.values]
@@ -46,43 +46,43 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# HTML caching
+# Cache HTML for shorter time
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=3600, must-revalidate"
 
-# API routes caching
+# Disable caching for API routes
 [[headers]]
   for = "/api/*"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# Redirects for SPA behavior (if needed)
+# Redirect API calls to Netlify Functions
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Redirect trailing slashes
-[[redirects]]
-  from = "/*/"
-  to = "/:splat"
-  status = 301
+# OPTIONAL: Redirect trailing slashes to no trailing slash (uncomment if you want this behavior)
+# [[redirects]]
+#   from = "/*/"
+#   to = "/:splat"
+#   status = 301
 
+# SPA fallback to index.html for client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-
-# 404 fallback
+# Optional 404 page (only if you have a 404.html)
 [[redirects]]
   from = "/404.html"
   to = "/404.html"
   status = 404
 
-# Form handling (if using Netlify Forms)
+# Build processing settings
 [build.processing]
   skip_processing = false
 
@@ -96,7 +96,3 @@
 
 [build.processing.html]
   pretty_urls = true
-
-# Environment variables (these will be set in Netlify dashboard)
-# PUBLIC_SUPABASE_URL = "your_supabase_url"
-# PUBLIC_SUPABASE_ANON_KEY = "your_supabase_anon_key"
