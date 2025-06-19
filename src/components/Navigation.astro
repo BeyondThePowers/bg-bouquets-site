@@ -1,0 +1,271 @@
+---
+// Navigation component with responsive design and accessibility features
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 nav-backdrop border-b-2 border-shabby-pink transition-transform duration-300 ease-in-out" id="main-nav">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+
+      <!-- Logo Section -->
+      <div class="flex-shrink-0">
+        <a href="#home" class="flex items-center space-x-3 nav-link group">
+          <div class="">
+            <span class="text-charcoal font-playfair font-bold text-[2rem] leading-[2.25rem]">BG</span>
+          </div>
+          <span class="font-allura font-bold text-charcoal text-[2.25rem] leading-[2.25rem]">Bouquet</span>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:block">
+        <div class="ml-10 flex items-baseline space-x-6">
+          <a href="#home" class="nav-link text-charcoal hover:text-dusty-rose px-3 py-2 font-playfair font-medium transition-all duration-300 relative group">
+            <span>Book Visit</span>
+            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-dusty-rose group-hover:w-full transition-all duration-300"></div>
+          </a>
+            <a href="#what-to-expect" class="nav-link text-charcoal hover:text-dusty-rose px-3 py-2 font-playfair font-medium transition-all duration-300 relative group">
+            <span>What to Expect</span>
+            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-dusty-rose group-hover:w-full transition-all duration-300"></div>
+          </a>
+          <a href="#flowers" class="nav-link text-charcoal hover:text-dusty-rose px-3 py-2 font-playfair font-medium transition-all duration-300 relative group">
+            <span>Flowers</span>
+            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-dusty-rose group-hover:w-full transition-all duration-300"></div>
+          </a>
+          <a href="#about" class="nav-link text-charcoal hover:text-dusty-rose px-3 py-2 font-playfair font-medium transition-all duration-300 relative group">
+            <span>About</span>
+            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-dusty-rose group-hover:w-full transition-all duration-300"></div>
+          </a>
+          <a href="#location" class="nav-link text-charcoal hover:text-dusty-rose px-3 py-2 font-playfair font-medium transition-all duration-300 relative group">
+            <span>Location</span>
+            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-dusty-rose group-hover:w-full transition-all duration-300"></div>
+          </a>
+
+          <a href="#contact" class="nav-link text-charcoal hover:text-dusty-rose px-3 py-2 font-playfair font-medium transition-all duration-300 relative group">
+            <span>Contact</span>
+            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-dusty-rose group-hover:w-full transition-all duration-300"></div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button
+          type="button"
+          class="hamburger inline-flex items-center justify-center p-2 rounded-lg text-charcoal hover:text-dusty-rose hover:bg-shabby-pink focus:outline-none focus:ring-2 focus:ring-inset focus:ring-dusty-rose vintage-border"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+          id="mobile-menu-button"
+        >
+          <span class="sr-only">Open main menu</span>
+          <div class="w-6 h-6 flex flex-col justify-center items-center">
+            <span class="hamburger-line block w-5 h-0.5 bg-current mb-1"></span>
+            <span class="hamburger-line block w-5 h-0.5 bg-current mb-1"></span>
+            <span class="hamburger-line block w-5 h-0.5 bg-current"></span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu backdrop -->
+  <div class="md:hidden fixed inset-0 bg-black bg-opacity-50 hidden z-40" id="mobile-backdrop"></div>
+
+  <!-- Mobile menu -->
+  <div class="md:hidden mobile-menu fixed top-0 left-0 w-full bg-cream z-50 lace-pattern" id="mobile-menu" style="height: 100vh; height: 100dvh;">
+    <div class="flex flex-col bg-cream" style="height: 100vh; height: 100dvh;">
+      <!-- Mobile menu header -->
+      <div class="flex items-center justify-between p-6 border-b-2 border-shabby-pink bg-cream min-h-[80px]">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-dusty-rose rounded-lg flex items-center justify-center vintage-border relative">
+            <span class="text-white font-playfair font-bold text-lg">BG</span>
+            <svg class="absolute -top-1 -right-1 w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+          </div>
+          <span class="font-playfair font-bold text-charcoal text-xl">Bouquet Garden</span>
+        </div>
+        <button
+          type="button"
+          class="p-3 rounded-lg text-charcoal hover:text-dusty-rose hover:bg-shabby-pink min-w-[48px] min-h-[48px] flex items-center justify-center vintage-border"
+          id="mobile-menu-close"
+        >
+          <span class="sr-only">Close menu</span>
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile menu items -->
+      <div class="flex-1 px-6 py-8 bg-cream overflow-y-auto">
+        <nav class="space-y-3">
+          <a href="#home" class="mobile-nav-link flex items-center px-4 py-4 text-lg font-playfair font-medium text-charcoal hover:text-dusty-rose hover:bg-shabby-pink rounded-lg transition-all duration-300 min-h-[56px] vintage-border">
+            <svg class="mr-4 w-5 h-5 text-dusty-rose" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+            </svg>
+            Book Visit
+          </a>
+          <a href="#about" class="mobile-nav-link flex items-center px-4 py-4 text-lg font-playfair font-medium text-charcoal hover:text-dusty-rose hover:bg-shabby-pink rounded-lg transition-all duration-300 min-h-[56px] vintage-border">
+            <svg class="mr-4 w-5 h-5 text-dusty-rose" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            About
+          </a>
+          <a href="#flowers" class="mobile-nav-link flex items-center px-4 py-4 text-lg font-playfair font-medium text-charcoal hover:text-dusty-rose hover:bg-shabby-pink rounded-lg transition-all duration-300 min-h-[56px] vintage-border">
+            <svg class="mr-4 w-5 h-5 text-dusty-rose" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+            Flowers
+          </a>
+          <a href="#location" class="mobile-nav-link flex items-center px-4 py-4 text-lg font-playfair font-medium text-charcoal hover:text-dusty-rose hover:bg-shabby-pink rounded-lg transition-all duration-300 min-h-[56px] vintage-border">
+            <svg class="mr-4 w-5 h-5 text-dusty-rose" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+            </svg>
+            Location
+          </a>
+          <a href="#what-to-expect" class="mobile-nav-link flex items-center px-4 py-4 text-lg font-playfair font-medium text-charcoal hover:text-dusty-rose hover:bg-shabby-pink rounded-lg transition-all duration-300 min-h-[56px] vintage-border">
+            <svg class="mr-4 w-5 h-5 text-dusty-rose" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            What to Expect
+          </a>
+          <a href="#contact" class="mobile-nav-link flex items-center px-4 py-4 text-lg font-playfair font-medium text-charcoal hover:text-dusty-rose hover:bg-shabby-pink rounded-lg transition-all duration-300 min-h-[56px] vintage-border">
+            <svg class="mr-4 w-5 h-5 text-dusty-rose" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+            </svg>
+            Contact
+          </a>
+        </nav>
+
+        <!-- Optional footer section in mobile menu -->
+        <div class="mt-12 pt-8 border-t-2 border-shabby-pink">
+          <div class="text-center font-roboto">
+            <p class="text-charcoal font-medium">Visit us daily 9AM - 6PM</p>
+            <p class="mt-1 text-dusty-rose font-playfair">(555) 123-4567</p>
+            <div class="mt-3 flex justify-center space-x-2">
+              <div class="w-2 h-2 bg-dusty-rose rounded-full"></div>
+              <div class="w-2 h-2 bg-sage-green rounded-full"></div>
+              <div class="w-2 h-2 bg-dusty-rose rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu functionality
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuClose = document.getElementById('mobile-menu-close');
+  const mobileBackdrop = document.getElementById('mobile-backdrop');
+  const hamburger = document.querySelector('.hamburger');
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+  // Fix viewport height for mobile devices
+  function setViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+    // Set mobile menu height directly
+    if (mobileMenu) {
+      (mobileMenu as HTMLElement).style.height = `${window.innerHeight}px`;
+      const menuContent = mobileMenu.querySelector('.flex.flex-col') as HTMLElement;
+      if (menuContent) {
+        menuContent.style.height = `${window.innerHeight}px`;
+      }
+    }
+  }
+
+  // Set initial viewport height
+  setViewportHeight();
+
+  // Smart sticky navigation for mobile
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+  const nav = document.getElementById('main-nav');
+
+  function updateNavVisibility() {
+    const currentScrollY = window.scrollY;
+    const isMobileMenuOpen = mobileMenu?.classList.contains('open');
+
+    // Only apply smart hiding on mobile devices and when mobile menu is closed
+    if (window.innerWidth < 768 && !isMobileMenuOpen) {
+      if (currentScrollY < lastScrollY || currentScrollY < 100) {
+        // Scrolling up or near top - show nav
+        nav?.classList.remove('-translate-y-full');
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and not near top - hide nav
+        nav?.classList.add('-translate-y-full');
+      }
+    } else {
+      // Desktop or mobile menu open - always show nav
+      nav?.classList.remove('-translate-y-full');
+    }
+
+    lastScrollY = currentScrollY;
+    ticking = false;
+  }
+
+  function requestTick() {
+    if (!ticking) {
+      requestAnimationFrame(updateNavVisibility);
+      ticking = true;
+    }
+  }
+
+  // Throttled scroll listener
+  window.addEventListener('scroll', requestTick, { passive: true });
+
+  function openMobileMenu() {
+    mobileMenu?.classList.add('open');
+    mobileBackdrop?.classList.remove('hidden');
+    hamburger?.classList.add('open');
+    mobileMenuButton?.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileMenu() {
+    mobileMenu?.classList.remove('open');
+    mobileBackdrop?.classList.add('hidden');
+    hamburger?.classList.remove('open');
+    mobileMenuButton?.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  // Event listeners
+  mobileMenuButton?.addEventListener('click', openMobileMenu);
+  mobileMenuClose?.addEventListener('click', closeMobileMenu);
+  mobileBackdrop?.addEventListener('click', closeMobileMenu);
+
+  // Close mobile menu when clicking on nav links
+  mobileNavLinks.forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
+  });
+
+  // Close mobile menu on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu?.classList.contains('open')) {
+      closeMobileMenu();
+    }
+  });
+
+  // Handle window resize and orientation change
+  window.addEventListener('resize', () => {
+    setViewportHeight();
+    if (window.innerWidth >= 768) {
+      closeMobileMenu();
+      // Ensure nav is visible on desktop
+      nav?.classList.remove('-translate-y-full');
+    } else {
+      // Reset mobile nav visibility based on current scroll position
+      updateNavVisibility();
+    }
+  });
+
+  // Handle orientation change on mobile devices
+  window.addEventListener('orientationchange', () => {
+    setTimeout(setViewportHeight, 100);
+  });
+</script>

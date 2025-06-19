@@ -1,0 +1,521 @@
+@import "tailwindcss";
+
+/* Shabby Chic Fonts */
+@font-face {
+  font-family: 'Allura';
+  src: url('/fonts/Allura-Regular.woff2') format('woff2'),
+       url('/fonts/Allura-Regular.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfairdisplay-variablefont.woff2') format('woff2'),
+       url('/fonts/playfairdisplay-variablefont.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/roboto-variable.woff2') format('woff2'),
+       url('/fonts/roboto-variable.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Abril Fatface';
+  src: url('/fonts/AbrilFatface-Regular.woff2') format('woff2'),
+       url('/fonts/AbrilFatface-Regular.woff') format('woff');
+  font-display: swap;
+}
+
+/* Shabby Chic CSS Variables */
+:root {
+  --color-shabby-pink: #F8E7E8;
+  --color-shabby-blue: #EFF9FA;
+  --color-dusty-rose: #E8B4B8;
+  --color-sage-green: #B8C5B8;
+  --color-lavender: #E8E0F0;
+  --color-cream: #FAF7F4;
+  --color-charcoal: #333333;
+  --color-soft-white: #FEFEFE;
+
+  /* Font stacks with fallbacks for immediate use */
+  --font-allura: 'Allura', 'Dancing Script', 'Brush Script MT', cursive;
+  --font-playfair: 'Playfair Display', 'Times New Roman', 'Georgia', serif;
+  --font-abril-fatface: 'Abril Fatface', 'Playfair Display', 'Times New Roman', 'Georgia', serif;
+  --font-roboto: 'Roboto','comic sans ms', 'Helvetica Neue', 'Arial', sans-serif;
+}
+
+/* Base Typography */
+body {
+  font-family: var(--font-roboto);
+  font-weight: 300;
+  color: var(--color-charcoal);
+  background-color: var(--color-soft-white);
+}
+
+/* Smooth scrolling for jump links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* CSS Custom Properties for viewport height */
+:root {
+  --vh: 1vh;
+}
+
+/* Set viewport height custom property */
+@media screen and (max-width: 768px) {
+  :root {
+    --vh: 1vh;
+  }
+}
+
+/* Mobile menu animations and sizing */
+.mobile-menu {
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: white !important;
+  /* Ensure full height on all mobile devices */
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+/* Fix for iOS Safari viewport issues */
+@supports (-webkit-touch-callout: none) {
+  .mobile-menu {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Mobile menu touch targets */
+.mobile-nav-link {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  touch-action: manipulation;
+}
+
+/* Improved mobile menu backdrop */
+#mobile-backdrop {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smart sticky navigation */
+#main-nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 60 !important;
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#main-nav.-translate-y-full {
+  transform: translateY(-100%);
+}
+
+/* Ensure smooth transitions on mobile */
+@media (max-width: 767px) {
+  #main-nav {
+    will-change: transform;
+  }
+}
+
+/* Hamburger menu animation */
+.hamburger-line {
+  transition: all 0.3s ease-in-out;
+  transform-origin: center;
+}
+
+.hamburger.open .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Focus styles for accessibility */
+.nav-link:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Shabby Chic Typography Classes */
+
+.font-abril-fatface {
+  font-family: var(--font-abril-fatface);
+}
+
+.font-allura {
+  font-family: var(--font-allura);
+}
+
+.font-playfair {
+  font-family: var(--font-playfair);
+}
+
+.font-roboto {
+  font-family: var(--font-roboto);
+  font-weight: 300;
+}
+
+/* Shabby Chic Backgrounds */
+.bg-shabby-pink {
+  background-color: var(--color-shabby-pink);
+}
+
+.bg-shabby-blue {
+  background-color: var(--color-shabby-blue);
+}
+
+.bg-dusty-rose {
+  background-color: var(--color-dusty-rose);
+}
+
+.bg-sage-green {
+  background-color: var(--color-sage-green);
+}
+
+.bg-lavender {
+  background-color: var(--color-lavender);
+}
+
+.bg-cream {
+  background-color: var(--color-cream);
+}
+
+/* Shabby Chic Text Colors */
+.text-dusty-rose {
+  color: var(--color-dusty-rose);
+}
+
+.text-sage-green {
+  color: var(--color-sage-green);
+}
+
+.text-charcoal {
+  color: var(--color-charcoal);
+}
+
+.border-charcoal {
+  border: 1px solid var(--color-charcoal);
+}
+
+/* Shabby Chic Decorative Elements */
+.vintage-border {
+  border: 1px solid var(--color-dusty-rose);
+  border-radius: 4px;
+  position: relative;
+}
+
+.vintage-border::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 1px solid var(--color-shabby-pink);
+  border-radius: 12px;
+  z-index: -1;
+}
+
+.lace-pattern {
+  /* Solid background - distressed wood texture will be added via overlay */
+  background-color: var(--color-cream);
+}
+
+.distressed-shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(232, 180, 184, 0.3),
+    0 2px 4px -1px rgba(232, 180, 184, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.vintage-button {
+  background: linear-gradient(135deg, var(--color-charcoal) 0%, #2a2a2a 100%);
+  border: 1px solid var(--color-charcoal);
+  color: white;
+  font-family: var(--font-playfair);
+  font-weight: 600;
+  text-shadow: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor:pointer;
+}
+
+.vintage-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.vintage-button:hover::before {
+  left: 100%;
+}
+
+.vintage-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(51, 51, 51, 0.3);
+  background: linear-gradient(135deg, #2a2a2a 0%, var(--color-charcoal) 100%);
+}
+
+.vintage-button:active {
+  transform: translateY(0);
+}
+
+/* Floral Accent */
+.floral-accent::after {
+  content: '🌸';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+/* Shabby Chic Form Styling */
+.shabby-input {
+  border: 2px solid var(--color-shabby-pink);
+  background-color: var(--color-cream);
+  font-family: var(--font-roboto);
+  transition: all 0.3s ease;
+}
+
+.shabby-input:focus {
+  outline: none;
+  border-color: var(--color-dusty-rose);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.1);
+}
+
+.shabby-card {
+  /*background: linear-gradient(135deg, var(--color-cream) 0%, white 100%);*/
+  background-color: var(--color-soft-white);
+
+  border: 1px solid var(--color-shabby-pink);
+  /*
+  border-radius: var(--radius-md);
+  box-shadow:
+  0 10px 25px rgba(232, 180, 184, 0.15),
+  0 4px 10px rgba(232, 180, 184, 0.1);
+  */
+}
+
+.shabby-card-blue {
+  /*background: linear-gradient(135deg, var(--color-cream) 0%, white 100%);*/
+  background-color: var(--color-soft-white);
+  border: 1px solid #C9EDF0;
+}
+
+/* Backdrop blur support with shabby chic colors */
+.nav-backdrop {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(250, 247, 244, 0.9) !important;
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(10px)) {
+  .nav-backdrop {
+    background-color: var(--color-cream) !important;
+  }
+}
+
+.wheel-barrow {
+  background-image: url('/src/assets/images/bg-bouquet-vintage-flower-wheelbarrow.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 2rem;
+}
+
+.texture-background-home {
+  background-color: #F8E7E8;
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+}
+
+
+
+.texture-background-home::before {
+  content:'';
+  opacity: 0.13;
+  z-index: -1;
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/src/assets/images/distressed-background.webp');
+  background-repeat: no-repeat;
+  background-size:cover; 
+  background-blend-mode: multiply;
+}
+
+.hero-decorative-flower-left-bottom {
+  position: absolute;
+  z-index: -1;
+  bottom: -140px;
+  left: -180px;
+  height: 62vh;
+  width: auto;
+  pointer-events: none;
+}
+
+.hero-decorative-flower-right-bottom {
+  position: absolute;
+  z-index: -1;
+  bottom: -90px;
+  right: -140px;
+  pointer-events: none;
+  height: 40vh;
+  width: auto;
+}
+
+.hero-decorative-flower-right-top {
+  position: absolute;
+  z-index: -1;
+  top: -20vh;
+  right: -240px;
+  height: 100vh;
+  width: auto;
+  pointer-events: none;
+  transform: scaleX(-1) rotate(-20deg);
+}
+
+.hero-decorative-flower-right-top-2 {
+  position: absolute;
+  z-index: -1;
+  top: -20vh;
+  right: -140px;
+  height: 80vh;
+  width: auto;
+  pointer-events: none;
+  transform: scaleX(-1) rotate(-20deg);
+}
+
+
+.hero-decorative-flower-left-top {
+  position: absolute;
+  z-index: -1;
+  top: -20vh;
+  left: -240px;
+  height: 100vh;
+  width: auto;
+  pointer-events: none;
+  transform: rotate(-20deg);
+}
+
+.hero-decorative-flower-left-top-2 {
+  position: absolute;
+  z-index: -1;
+  top: -20vh;
+  left: -140px;
+  height: 80vh;
+  width: auto;
+  pointer-events: none;
+
+}
+
+.what-to-expect-card-decorative-flower {
+  width: 200px;
+  height: 83px;
+  pointer-events: none;
+  margin: 1.75rem auto
+}
+
+#home {
+  padding-bottom: 12rem
+}
+
+#wood-background-container,
+#pink-background-container,
+#white-background-container {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  padding-top: 7rem;
+  height: calc(100% + 4rem);
+  width:100%;
+  -webkit-mask-image: url('/src/assets/images/distressed-section-edge-3.svg');
+  -webkit-mask-size: 100vw;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: top;
+  mask-image: url('/src/assets/images/distressed-section-edge-3.svg');
+  mask-size: cover;
+  mask-repeat: no-repeat;
+  mask-position: top;
+  background: inherit; /* So it blends in */
+  pointer-events: none; /* Don’t block clicks */
+}
+
+#what-to-expect,
+#flowers,
+#about {
+ margin-top:-5.25rem;
+ padding-top: 8rem;
+ padding-bottom: 8rem;
+}
+
+.texture-background-wood::before {
+  content:'';
+  opacity: 0.1;
+  z-index: -1;
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/src/assets/images/distressed-wood-background.webp');
+  background-repeat: no-repeat;
+  background-size: cover; 
+  background-position: center;
+  background-blend-mode: multiply;
+}
+
+@media (max-width: 767px) {
+  .desktop-decoration {
+    display: none !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-header-text {
+    font-size: 64px;
+  }
+  .center-mobile-text,
+  .center-text-card {
+    text-align: center;
+  }
+  .wheel-barrow {
+    height:100px;
+  }
+}
+
+.shabby-card-blue strong {
+  font-weight: 500;
+}

@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://bgbouquet.com/sitemap.xml
+
+# Block access to admin areas
+Disallow: /api/
+Disallow: /.env
+Disallow: /database-*
+
+# Allow search engines to crawl images
+Allow: /src/assets/images/
+Allow: /fonts/
+
+# Crawl delay (optional - be respectful)
+Crawl-delay: 1

@@ -1,0 +1,22 @@
+{
+  "name": "BG Bouquet Garden",
+  "short_name": "BG Bouquet",
+  "description": "Cut-your-own bouquet farm in Southern Alberta near Waterton National Park",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8E7E8",
+  "theme_color": "#F8E7E8",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "business", "shopping"],
+  "lang": "en-CA",
+  "scope": "/",
+  "id": "bg-bouquet-garden"
+}

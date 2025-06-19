@@ -1,0 +1,162 @@
+---
+import "../styles/global.css";
+import Navigation from "../components/Navigation.astro";
+import CriticalCSS from "../components/CriticalCSS.astro";
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+  type?: 'website' | 'article';
+}
+
+const {
+  title = "Bouquet Garden",
+  description = "Visit BG Bouquet Garden in Southern Alberta - a cut-your-own bouquet farm near Waterton National Park. Create beautiful bouquets from our seasonal flower fields.",
+  image = "/og-image.jpg",
+  canonical = Astro.url.href,
+  type = "website"
+} = Astro.props;
+
+const siteName = "BG Bouquet Garden";
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="canonical" href={canonical} />
+		<meta name="generator" content={Astro.generator} />
+
+		<!-- Critical CSS for immediate rendering -->
+		<CriticalCSS />
+
+		<!-- Primary Meta Tags -->
+		<title>{fullTitle}</title>
+		<meta name="title" content={fullTitle} />
+		<meta name="description" content={description} />
+		<meta name="keywords" content="bouquet garden, cut your own flowers, Southern Alberta, Waterton, flower farm, seasonal blooms, wedding flowers" />
+		<meta name="author" content="BG Bouquet Garden" />
+		<meta name="robots" content="index, follow" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content={type} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={new URL(image, Astro.url).href} />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:locale" content="en_CA" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={canonical} />
+		<meta property="twitter:title" content={fullTitle} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={new URL(image, Astro.url).href} />
+
+		<!-- Preload critical fonts -->
+		<link rel="preload" href="/fonts/Allura-Regular.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="/fonts/playfairdisplay-variablefont.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="/fonts/roboto-variable.woff2" as="font" type="font/woff2" crossorigin />
+
+		<!-- Performance hints -->
+		<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+
+		<!-- Theme color -->
+		<meta name="theme-color" content="#F8E7E8" />
+
+		<!-- PWA Manifest -->
+		<link rel="manifest" href="/manifest.json" />
+
+		<!-- Performance monitoring -->
+		<script type="module" is:inline>
+			import('../scripts/performance.js').catch(() => {
+				console.log('Performance monitoring not available');
+			});
+		</script>
+
+		<!-- Structured Data -->
+		<script type="application/ld+json" is:inline>
+		{
+			"@context": "https://schema.org",
+			"@type": "LocalBusiness",
+			"name": "BG Bouquet Garden",
+			"description": "Cut-your-own bouquet farm in Southern Alberta near Waterton National Park",
+			"url": "https://bgbouquet.com",
+			"telephone": "+1-555-123-4567",
+			"address": {
+				"@type": "PostalAddress",
+				"streetAddress": "Rural Route, Hill Spring Area",
+				"addressLocality": "Hill Spring",
+				"addressRegion": "Alberta",
+				"addressCountry": "CA"
+			},
+			"geo": {
+				"@type": "GeoCoordinates",
+				"latitude": "49.0",
+				"longitude": "-113.0"
+			},
+			"openingHours": "Mo-Su 09:00-18:00",
+			"priceRange": "$35-$105",
+			"image": "https://bgbouquet.com/og-image.jpg",
+			"sameAs": []
+		}
+		</script>
+	</head>
+	<body>
+		<!-- Skip to main content link for accessibility -->
+		<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-dusty-rose text-white px-4 py-2 rounded z-50">
+			Skip to main content
+		</a>
+		<Navigation />
+		<main id="main-content" class="pt-16">
+			<slot />
+		</main>
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	/* Hide scrollbar for carousel */
+	.scrollbar-hide {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Smooth touch scrolling */
+	.touch-scroll {
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior-x: contain;
+	}
+
+	/* Center mobile text utility */
+	.center-mobile-text {
+		text-align: center;
+	}
+
+	@media (min-width: 768px) {
+		.center-mobile-text {
+			text-align: left;
+		}
+	}
+
+	/* Flower navigation dropdown */
+	.hover\:bg-shabby-pink:hover {
+		background-color: #F8E7E8;
+	}
+</style>
