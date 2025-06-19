@@ -58,12 +58,6 @@
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# Redirects for SPA behavior (if needed)
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
 # Redirect trailing slashes
 [[redirects]]
   from = "/*/"
