@@ -1,3 +1,0 @@
-# Netlify function redirects for Astro SSR
-/api/* /.netlify/functions/ssr 200
-/* /.netlify/functions/ssr 200
