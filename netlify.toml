@@ -1,15 +1,9 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
-
-# Remove the custom functions directory - let Astro handle it
-# [functions]
-#   directory = "netlify/functions"
-#   node_bundler = "esbuild"
 
 # Headers for security and performance
 [[headers]]
@@ -59,17 +53,7 @@
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# Fixed redirect for Astro API routes - use 'entry' function name
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/entry"
-  status = 200
-
-# Optional 404 page (only if you have a 404.html)
-[[redirects]]
-  from = "/404.html"
-  to = "/404.html"
-  status = 404
+# Let Astro handle API routing automatically
 
 # Build processing settings
 [build.processing]

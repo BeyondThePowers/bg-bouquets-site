@@ -31,3 +31,5 @@ Thumbs.db
 *.tmp
 *.sqlite
 .env.example
+# Local Netlify folder
+.netlify

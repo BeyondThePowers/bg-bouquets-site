@@ -1,0 +1,5 @@
+# API routes to SSR function
+/api/* /.netlify/functions/ssr 200
+
+# SPA fallback for dynamic routes
+/* /.netlify/functions/ssr 200
