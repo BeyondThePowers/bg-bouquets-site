@@ -5,10 +5,10 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Netlify Functions configuration for API routes
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+# Remove the custom functions directory - let Astro handle it
+# [functions]
+#   directory = "netlify/functions"
+#   node_bundler = "esbuild"
 
 # Headers for security and performance
 [[headers]]
@@ -58,23 +58,11 @@
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# Redirect API calls to Netlify Functions
+# Fixed redirect for Astro API routes - use 'entry' function name
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/.netlify/functions/entry"
   status = 200
-
-# OPTIONAL: Redirect trailing slashes to no trailing slash (uncomment if you want this behavior)
-# [[redirects]]
-#   from = "/*/"
-#   to = "/:splat"
-#   status = 301
-
-# SPA fallback to index.html for client-side routing
-# [[redirects]]
-#  from = "/*"
-#  to = "/index.html"
-#  status = 200
 
 # Optional 404 page (only if you have a 404.html)
 [[redirects]]
