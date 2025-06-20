@@ -1,5 +1,3 @@
-# API routes to SSR function
+# Netlify function redirects for Astro SSR
 /api/* /.netlify/functions/ssr 200
-
-# SPA fallback for dynamic routes
 /* /.netlify/functions/ssr 200
