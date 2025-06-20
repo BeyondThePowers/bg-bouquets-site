@@ -146,10 +146,23 @@ html {
   transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* Focus styles for accessibility */
-.nav-link:focus {
-  outline: 2px solid #3b82f6;
+/* Modern focus styles - differentiate between input methods */
+/* Hide focus outline for mouse clicks, keep for keyboard navigation */
+.nav-link:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Show focus outline only for keyboard navigation (Tab, arrow keys) */
+.nav-link:focus-visible {
+  outline: 2px solid var(--color-dusty-rose);
   outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Brief touch feedback for mobile users */
+.nav-link:active {
+  background-color: rgba(232, 180, 184, 0.1);
+  transition: background-color 0.1s ease;
 }
 
 /* Shabby Chic Typography Classes */
@@ -282,6 +295,16 @@ html {
   transform: translateY(0);
 }
 
+/* Modern focus styles for buttons */
+.vintage-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.vintage-button:focus-visible {
+  outline: 2px solid var(--color-dusty-rose);
+  outline-offset: 2px;
+}
+
 /* Floral Accent */
 .floral-accent::after {
   content: '🌸';
@@ -305,6 +328,12 @@ html {
   border-color: var(--color-dusty-rose);
   background-color: white;
   box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.1);
+}
+
+/* Modern focus styles for form inputs */
+.shabby-input:focus-visible {
+  outline: 2px solid var(--color-dusty-rose);
+  outline-offset: 2px;
 }
 
 .shabby-card {

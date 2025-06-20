@@ -470,8 +470,8 @@ import Layout from '../layouts/Layout.astro';
 
 				<!-- Filter Controls -->
 				<div class="flex flex-wrap justify-center gap-4 mb-6">
-					<!-- View Toggle (Mobile/Desktop) -->
-					<div class="flex items-center space-x-2 lg:hidden">
+					<!-- View Toggle (Mobile Only) -->
+					<div class="mobile-view-toggle flex items-center space-x-2">
 						<button id="carouselView" class="px-4 py-2 rounded-lg font-playfair font-medium transition-all duration-200 vintage-button text-sm">
 							Carousel
 						</button>
@@ -479,33 +479,34 @@ import Layout from '../layouts/Layout.astro';
 							List
 						</button>
 					</div>
-					<div>
-					<!-- Filters -->
-					<div>
-						<label for="colorFilter" class="sr-only">Filter by color</label>
-						<select id="colorFilter" name="colorFilter" class="px-4 py-2 rounded-lg shabby-input font-roboto text-sm" aria-label="Filter flowers by color">
-							<option value="">All Colors</option>
-							<option value="red">Red</option>
-							<option value="pink">Pink</option>
-							<option value="white">White</option>
-							<option value="yellow">Yellow</option>
-							<option value="purple">Purple</option>
-							<option value="orange">Orange</option>
-							<option value="blue">Blue</option>
-						</select>
-					</div>
 
-					<div>
-						<label for="occasionFilter" class="sr-only">Filter by occasion</label>
-						<select id="occasionFilter" name="occasionFilter" class="px-4 py-2 rounded-lg shabby-input font-roboto text-sm" aria-label="Filter flowers by occasion">
-							<option value="">All Occasions</option>
-							<option value="wedding">Wedding</option>
-							<option value="birthday">Birthday</option>
-							<option value="anniversary">Anniversary</option>
-							<option value="sympathy">Sympathy</option>
-							<option value="everyday">Everyday</option>
-						</select>
-					</div>
+					<!-- Filters -->
+					<div class="flex items-center space-x-4">
+						<div>
+							<label for="colorFilter" class="sr-only">Filter by color</label>
+							<select id="colorFilter" name="colorFilter" class="px-4 py-2 rounded-lg shabby-input font-roboto text-sm" aria-label="Filter flowers by color">
+								<option value="">All Colors</option>
+								<option value="red">Red</option>
+								<option value="pink">Pink</option>
+								<option value="white">White</option>
+								<option value="yellow">Yellow</option>
+								<option value="purple">Purple</option>
+								<option value="orange">Orange</option>
+								<option value="blue">Blue</option>
+							</select>
+						</div>
+
+						<div>
+							<label for="occasionFilter" class="sr-only">Filter by occasion</label>
+							<select id="occasionFilter" name="occasionFilter" class="px-4 py-2 rounded-lg shabby-input font-roboto text-sm" aria-label="Filter flowers by occasion">
+								<option value="">All Occasions</option>
+								<option value="wedding">Wedding</option>
+								<option value="birthday">Birthday</option>
+								<option value="anniversary">Anniversary</option>
+								<option value="sympathy">Sympathy</option>
+								<option value="everyday">Everyday</option>
+							</select>
+						</div>
 					</div>
 
 				</div>
@@ -796,6 +797,19 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 		</div>
 	</section>
 </Layout>
+
+<style>
+  /* Mobile View Toggle - Hide on desktop, show on mobile */
+  .mobile-view-toggle {
+    display: flex;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-view-toggle {
+      display: none !important;
+    }
+  }
+</style>
 
 <script>
 	// Booking form functionality

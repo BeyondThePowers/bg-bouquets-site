@@ -17,8 +17,8 @@
       </div>
 
       <!-- Desktop Navigation -->
-      <div class="hidden md:block">
-        <div class="ml-10 flex items-baseline space-x-6">
+      <div class="desktop-nav flex items-center">
+        <div class="flex items-baseline space-x-6">
           <a href="#home" class="nav-link text-charcoal hover:text-dusty-rose px-3 py-2 font-playfair font-medium transition-all duration-300 relative group">
             <span>Book Visit</span>
             <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-dusty-rose group-hover:w-full transition-all duration-300"></div>
@@ -48,7 +48,7 @@
       </div>
 
       <!-- Mobile menu button -->
-      <div class="md:hidden">
+      <div class="mobile-menu-button">
         <button
           type="button"
           class="hamburger inline-flex items-center justify-center p-2 rounded-lg text-charcoal hover:text-dusty-rose hover:bg-shabby-pink focus:outline-none focus:ring-2 focus:ring-inset focus:ring-dusty-rose vintage-border"
@@ -57,9 +57,9 @@
           id="mobile-menu-button"
         >
           <span class="sr-only">Open main menu</span>
-          <div class="w-6 h-6 flex flex-col justify-center items-center">
-            <span class="hamburger-line block w-5 h-0.5 bg-current mb-1"></span>
-            <span class="hamburger-line block w-5 h-0.5 bg-current mb-1"></span>
+          <div class="w-6 h-6 flex flex-col justify-center items-center space-y-1">
+            <span class="hamburger-line block w-5 h-0.5 bg-current"></span>
+            <span class="hamburger-line block w-5 h-0.5 bg-current"></span>
             <span class="hamburger-line block w-5 h-0.5 bg-current"></span>
           </div>
         </button>
@@ -98,7 +98,7 @@
 
       <!-- Mobile menu items -->
       <div class="flex-1 px-6 py-8 bg-cream overflow-y-auto">
-        <nav class="space-y-3">
+        <div class="mobile-nav-container space-y-3">
           <a href="#home" class="mobile-nav-link flex items-center px-4 py-4 text-lg font-playfair font-medium text-charcoal hover:text-dusty-rose hover:bg-shabby-pink rounded-lg transition-all duration-300 min-h-[56px] vintage-border">
             <svg class="mr-4 w-5 h-5 text-dusty-rose" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
@@ -135,7 +135,7 @@
             </svg>
             Contact
           </a>
-        </nav>
+        </div>
 
         <!-- Optional footer section in mobile menu -->
         <div class="mt-12 pt-8 border-t-2 border-shabby-pink">
@@ -153,6 +153,37 @@
     </div>
   </div>
 </nav>
+
+<style>
+  /* Desktop Navigation - Show on desktop, hide on mobile */
+  .desktop-nav {
+    display: flex;
+  }
+
+  @media (max-width: 767px) {
+    .desktop-nav {
+      display: none !important;
+    }
+  }
+
+  /* Mobile Menu Button - Hide on desktop, show on mobile */
+  .mobile-menu-button {
+    display: none;
+  }
+
+  @media (max-width: 767px) {
+    .mobile-menu-button {
+      display: block !important;
+    }
+  }
+
+  /* Mobile navigation container - ensure no positioning conflicts */
+  .mobile-nav-container {
+    position: static !important;
+    transform: none !important;
+    z-index: auto !important;
+  }
+</style>
 
 <script>
   // Mobile menu functionality
