@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   time TEXT NOT NULL,
   number_of_visitors INTEGER NOT NULL DEFAULT 1,
   total_amount DECIMAL(10,2),
+  payment_method TEXT DEFAULT 'pay_on_arrival' CHECK (payment_method IN ('pay_now', 'pay_on_arrival')),
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed')),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -128,3 +130,17 @@ ORDER BY b.date, b.time, b.created_at;
 
 -- Grant necessary permissions
 GRANT SELECT ON booking_summary TO anon, authenticated;
+
+-- Migration: Add payment fields to existing bookings table (safe to run multiple times)
+DO $$
+BEGIN
+  -- Add payment_method column if it doesn't exist
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'bookings' AND column_name = 'payment_method') THEN
+    ALTER TABLE bookings ADD COLUMN payment_method TEXT DEFAULT 'pay_on_arrival' CHECK (payment_method IN ('pay_now', 'pay_on_arrival'));
+  END IF;
+
+  -- Add payment_status column if it doesn't exist
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'bookings' AND column_name = 'payment_status') THEN
+    ALTER TABLE bookings ADD COLUMN payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed'));
+  END IF;
+END $$;

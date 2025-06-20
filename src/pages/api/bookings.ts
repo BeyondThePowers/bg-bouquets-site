@@ -37,10 +37,11 @@ export const POST: APIRoute = async ({ request }) => {
       visitDate,
       preferredTime,
       numberOfVisitors,
-      totalAmount
+      totalAmount,
+      paymentMethod = 'pay_on_arrival'
     } = body;
 
-    console.log('Extracted fields:', { fullName, email, phone, visitDate, preferredTime, numberOfVisitors, totalAmount });
+    console.log('Extracted fields:', { fullName, email, phone, visitDate, preferredTime, numberOfVisitors, totalAmount, paymentMethod });
 
     // Basic server-side validation
     if (!fullName || !email || !phone || !visitDate || !preferredTime || !numberOfVisitors) {
@@ -159,6 +160,9 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // 5. Insert new booking (both limits passed)
+    // Determine payment status based on payment method
+    const paymentStatus = paymentMethod === 'pay_now' ? 'paid' : 'pending';
+
     console.log('Inserting booking with data:', {
       full_name: fullName,
       email,
@@ -167,6 +171,8 @@ export const POST: APIRoute = async ({ request }) => {
       time: preferredTime,
       number_of_visitors: numberOfVisitors,
       total_amount: totalAmount,
+      payment_method: paymentMethod,
+      payment_status: paymentStatus,
     });
 
     const { error: insertError } = await supabase.from('bookings').insert({
@@ -177,6 +183,8 @@ export const POST: APIRoute = async ({ request }) => {
       time: preferredTime,
       number_of_visitors: numberOfVisitors,
       total_amount: totalAmount,
+      payment_method: paymentMethod,
+      payment_status: paymentStatus,
     });
 
     console.log('Insert result:', { insertError });
@@ -189,9 +197,14 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Create appropriate success message based on payment method
+    const successMessage = paymentMethod === 'pay_now'
+      ? 'You\'re all set! We\'ve received your payment. You\'ll receive a confirmation email shortly.'
+      : 'Thanks for booking! You can pay when you arrive. You\'ll receive a confirmation email shortly.';
+
     return new Response(JSON.stringify({
       success: true,
-      message: 'Booking confirmed! You will receive a confirmation email shortly.'
+      message: successMessage
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

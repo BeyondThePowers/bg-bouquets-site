@@ -48,7 +48,8 @@ import Layout from '../layouts/Layout.astro';
 								</div>
 								<div>
 									<p class="font-playfair font-semibold" style="color: #333333;">Hours</p>
-									<p class="font-roboto" style="color: #333333;">Daily 9AM-6PM, Closed Mondays</p>
+									<p class="font-roboto" style="color: #333333;">Open Thursday, Friday & Saturday</p>
+									<p class="text-gray-600">10:00 AM - 1:00 PM & 6:00 PM - 9:00 PM</p>
 								</div>
 							</div>
 							<div class="flex items-top space-x-3">
@@ -90,8 +91,8 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 
 						<!-- Vintage Wheelbarrow Illustration Placeholder - Smaller on desktop -->
-						<div class="wheel-barrow">
-						</div>
+						<!--<div class="wheel-barrow">
+						</div> -->
 
 						<!-- Booking Form -->
 						<form id="booking-form" class="space-y-3">
@@ -178,6 +179,51 @@ import Layout from '../layouts/Layout.astro';
 										<option value="9">9 bouquets $315</option>
 										<option value="10+">10+ bouquets (call us)</option>
 									</select>
+								</div>
+							</div>
+
+							<!-- Payment Method Choice -->
+							<div class="space-y-4 pt-4 border-t border-shabby-pink">
+
+								<div class="space-y-3">
+									<label class="block text-sm font-playfair font-medium text-charcoal mb-3">How would you like to pay?</label>
+
+									<!-- Payment Options -->
+									<div class="space-y-2">
+										<label class="flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:bg-shabby-pink" style="border-color: #E8B4B8;">
+											<input
+												type="radio"
+												name="paymentMethod"
+												value="pay_on_arrival"
+												checked
+												class="sr-only"
+											>
+											<div class="payment-radio-custom mr-3"></div>
+											<div class="flex-1">
+												<div class="flex items-center">
+													<span class="font-playfair font-semibold text-charcoal">Pay on Arrival</span>
+												</div>
+												<p class="text-xs font-roboto text-charcoal mt-1">Cash or card accepted</p>
+											</div>
+										</label>
+
+										<label class="flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:bg-shabby-pink payment-now-option" style="border-color: #E8B4B8;">
+											<input
+												type="radio"
+												name="paymentMethod"
+												value="pay_now"
+												class="sr-only"
+											>
+											<div class="payment-radio-custom mr-3"></div>
+											<div class="flex-1">
+												<div class="flex items-center">
+													<span class="font-playfair font-semibold text-charcoal">Pay Now</span>
+													<span class="ml-2 px-2 py-1 text-xs rounded-full font-roboto" style="background-color: #F8E7E8; color: #333">Recommended</span>
+												</div>
+												<p class="text-xs font-roboto text-charcoal mt-1">Secure online payment for faster check-in</p>
+											</div>
+										</label>
+									</div>
 								</div>
 							</div>
 
@@ -709,8 +755,8 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 							</div>
 							<div>
 								<p class="font-semibold text-gray-900">Hours</p>
-								<p class="text-gray-600">Daily: 9:00 AM - 6:00 PM</p>
-								<p class="text-gray-600">Closed Mondays (except holidays)</p>
+								<p class="text-gray-600">Thursday, Friday, Saturday: 10:00 AM - 1:00 PM & 6:00 PM - 9:00 PM</p>
+								<p class="text-gray-600">Closed Monday, Tuesday, Wednesday, Sunday</p>
 							</div>
 						</div>
 						<div class="flex items-start space-x-3">
@@ -868,6 +914,27 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 
 		visitorsSelect?.addEventListener('change', updateTotalPrice);
 
+		// Payment method selection handling
+		const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]') as NodeListOf<HTMLInputElement>;
+		paymentRadios.forEach(radio => {
+			radio.addEventListener('change', function() {
+				// Update visual state of payment options
+				const allLabels = document.querySelectorAll('label') as NodeListOf<HTMLLabelElement>;
+				allLabels.forEach(label => {
+					const input = label.querySelector('input[name="paymentMethod"]') as HTMLInputElement;
+					if (input) {
+						if (input.checked) {
+							label.style.borderColor = '#E8B4B8';
+							label.style.backgroundColor = 'rgba(232, 180, 184, 0.1)';
+						} else {
+							label.style.borderColor = '#E8B4B8';
+							label.style.backgroundColor = 'transparent';
+						}
+					}
+				});
+			});
+		});
+
 		// Form validation
 		function validateForm(): boolean {
 			let valid = true;
@@ -899,6 +966,7 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 
 			const formData = new FormData(bookingForm);
 			const numberOfVisitors = parseInt(formData.get('numberOfVisitors') as string) || 1;
+			const paymentMethod = formData.get('paymentMethod') as string || 'pay_on_arrival';
 
 			const booking = {
 				fullName: formData.get('fullName'),
@@ -907,7 +975,8 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 				visitDate: formData.get('visitDate'),
 				preferredTime: formData.get('preferredTime'),
 				numberOfVisitors,
-				totalAmount: numberOfVisitors * PRICE_PER_BOUQUET
+				totalAmount: numberOfVisitors * PRICE_PER_BOUQUET,
+				paymentMethod
 			};
 
 			// Loading state
@@ -929,6 +998,8 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 					alert(result.error || 'There was an error with your booking. Please try again.');
 					return;
 				}
+
+				// Success - use message from server (which is already conditional based on payment method)
 
 				// Success
 				alert(result.message || 'Booking successful! You’ll receive a confirmation email.');
