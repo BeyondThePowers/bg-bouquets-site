@@ -32,10 +32,5 @@ export default defineConfig({
       include: ['@supabase/supabase-js']
     }
   },
-  build: {
-    inlineStylesheets: 'auto',
-    assets: 'assets',
-    format: 'directory'
-  },
   compressHTML: true
 });
