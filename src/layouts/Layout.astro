@@ -74,13 +74,6 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 		<!-- PWA Manifest -->
 		<link rel="manifest" href="/manifest.json" />
 
-		<!-- Performance monitoring -->
-		<script type="module" is:inline>
-			import('../scripts/performance.js').catch(() => {
-				console.log('Performance monitoring not available');
-			});
-		</script>
-
 		<!-- Structured Data -->
 		<script type="application/ld+json" is:inline>
 		{
