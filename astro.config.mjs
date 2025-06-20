@@ -20,8 +20,6 @@ export default defineConfig({
             booking: ['./src/scripts/booking.js'],
             // Split flower functionality
             flowers: ['./src/scripts/flowers.js'],
-            // Split utilities
-            // utils: ['./src/scripts/performance.js', './src/utils/imageOptimization.js']
           }
         }
       },
