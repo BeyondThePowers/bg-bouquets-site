@@ -131,15 +131,70 @@ import Layout from '../layouts/Layout.astro';
 										placeholder="(555) 123-4567"
 									>
 								</div>
-								<div>
+								<div class="relative">
 									<label for="visitDate" class="block text-sm font-playfair font-medium text-charcoal mb-1">Visit Date *</label>
 									<input
-										type="date"
+										type="text"
 										id="visitDate"
 										name="visitDate"
 										required
-										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm"
+										readonly
+										placeholder="Select a date"
+										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm cursor-pointer"
 									>
+									<!-- Custom Calendar Dropdown -->
+									<div id="customCalendar" class="hidden absolute top-full left-0 right-0 bg-white border border-dusty-rose rounded-lg shadow-xl z-50 mt-2 min-w-80">
+										<div class="p-5">
+											<!-- Month Navigation Header -->
+											<div class="flex items-center justify-between mb-6">
+												<button type="button" id="prevMonth" class="p-2 hover:bg-dusty-rose hover:bg-opacity-20 rounded-full transition-colors duration-200">
+													<svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+													</svg>
+												</button>
+												<h3 id="currentMonth" class="font-playfair font-semibold text-xl text-charcoal"></h3>
+												<button type="button" id="nextMonth" class="p-2 hover:bg-dusty-rose hover:bg-opacity-20 rounded-full transition-colors duration-200">
+													<svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+													</svg>
+												</button>
+											</div>
+
+											<!-- Day Headers -->
+											<div class="grid grid-cols-7 mb-3">
+												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Sun</div>
+												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Mon</div>
+												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Tue</div>
+												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Wed</div>
+												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Thu</div>
+												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Fri</div>
+												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Sat</div>
+											</div>
+
+											<!-- Calendar Days Grid -->
+											<div id="calendarDays" class="grid grid-cols-7">
+												<!-- Days will be populated by JavaScript -->
+											</div>
+
+											<!-- Legend -->
+											<div class="mt-4 pt-4 border-t border-gray-200">
+												<div class="flex items-center justify-center space-x-4 text-xs font-roboto">
+													<div class="flex items-center space-x-2">
+														<div class="w-3 h-3 border-2 border-charcoal rounded"></div>
+														<span class="text-gray-600">Available</span>
+													</div>
+													<div class="flex items-center space-x-2">
+														<div class="w-3 h-3 bg-dusty-rose rounded"></div>
+														<span class="text-gray-600">Selected</span>
+													</div>
+													<div class="flex items-center space-x-2">
+														<div class="w-3 h-3 bg-gray-200 rounded"></div>
+														<span class="text-gray-600">Unavailable</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 								<div>
 									<label for="preferredTime" class="block text-sm font-playfair font-medium text-charcoal mb-1">Preferred Time *</label>
@@ -844,18 +899,7 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 	</section>
 </Layout>
 
-<style>
-  /* Mobile View Toggle - Hide on desktop, show on mobile */
-  .mobile-view-toggle {
-    display: flex;
-  }
-
-  @media (min-width: 768px) {
-    .mobile-view-toggle {
-      display: none !important;
-    }
-  }
-</style>
+<!-- Calendar styles moved to global.css for better organization -->
 
 <script>
 	// Booking form functionality
@@ -868,30 +912,333 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 		const preferredTimeSelect = document.getElementById('preferredTime') as HTMLSelectElement;
 		const visitorsSelect = document.getElementById('numberOfVisitors') as HTMLSelectElement;
 
+		// Custom calendar elements
+		const customCalendar = document.getElementById('customCalendar') as HTMLElement;
+		const currentMonthEl = document.getElementById('currentMonth') as HTMLElement;
+		const calendarDays = document.getElementById('calendarDays') as HTMLElement;
+		const prevMonthBtn = document.getElementById('prevMonth') as HTMLButtonElement;
+		const nextMonthBtn = document.getElementById('nextMonth') as HTMLButtonElement;
+
 		const PRICE_PER_BOUQUET = 35;
 
-		// Fetch availability from API
+		// Global variables for availability data
+		let availabilityData: Record<string, string[]> = {};
+		let currentDate = new Date();
+		let selectedDate = '';
+		let isInitializing = false;
+
+		// Fetch availability from API and initialize custom calendar
 		async function loadAvailability() {
-			const response = await fetch('/api/availability');
-			const availability = await response.json(); // { "2025-06-22": ["9:00 AM", "10:00 AM", ...], ... }
+			try {
+				console.log('Loading availability...');
+				const response = await fetch('/api/availability');
+				availabilityData = await response.json();
+				console.log('Availability data loaded:', availabilityData);
 
-			// Clear & repopulate visitDateInput options
-			const validDates = Object.keys(availability);
-			visitDateInput.min = validDates[0] ?? new Date().toISOString().split('T')[0];
-			visitDateInput.max = validDates.at(-1) ?? '';
+				// Get available dates
+				const validDates = Object.keys(availabilityData);
+				console.log('Valid dates:', validDates);
 
-			visitDateInput.addEventListener('change', (e) => {
-				const selected = (e.target as HTMLInputElement).value;
-				populateTimes(availability[selected] || []);
+				// Initialize custom calendar
+				initializeCustomCalendar();
+
+				// Auto-select first available date
+				const today = new Date().toISOString().split('T')[0];
+				const firstValid = validDates.find(d => d >= today);
+				if (firstValid) {
+					isInitializing = true;
+					selectDate(firstValid);
+					isInitializing = false;
+				}
+
+			} catch (error) {
+				console.error('Error loading availability:', error);
+			}
+		}
+
+		// Initialize custom calendar
+		function initializeCustomCalendar() {
+			// Start with a month that has available dates
+			const validDates = Object.keys(availabilityData);
+			if (validDates.length > 0) {
+				const firstValidDate = new Date(validDates[0]);
+				currentDate = new Date(firstValidDate.getFullYear(), firstValidDate.getMonth(), 1);
+			}
+
+			// Show current month
+			renderCalendar();
+
+			// Event listeners
+			visitDateInput.addEventListener('click', () => {
+				customCalendar.classList.toggle('hidden');
 			});
 
-			// Auto-populate time for the first valid day
-			const today = new Date().toISOString().split('T')[0];
-			const firstValid = validDates.find(d => d >= today);
-			if (firstValid) {
-				visitDateInput.value = firstValid;
-				populateTimes(availability[firstValid] || []);
+			prevMonthBtn.addEventListener('click', () => {
+				navigateToMonth(-1);
+			});
+
+			nextMonthBtn.addEventListener('click', () => {
+				navigateToMonth(1);
+			});
+
+			// Close calendar when clicking outside
+			document.addEventListener('click', (e) => {
+				if (!visitDateInput.contains(e.target as Node) && !customCalendar.contains(e.target as Node)) {
+					customCalendar.classList.add('hidden');
+				}
+			});
+		}
+
+		// Render calendar for current month
+		function renderCalendar() {
+			const year = currentDate.getFullYear();
+			const month = currentDate.getMonth();
+
+			// Update month header
+			currentMonthEl.textContent = new Date(year, month).toLocaleDateString('en-US', {
+				month: 'long',
+				year: 'numeric'
+			});
+
+			// Update navigation button states
+			updateNavigationButtons();
+
+			// Clear previous days
+			calendarDays.innerHTML = '';
+
+			// Get first day of month and number of days
+			const firstDay = new Date(year, month, 1).getDay();
+			const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+			// Add empty cells for days before month starts
+			for (let i = 0; i < firstDay; i++) {
+				const emptyDay = document.createElement('div');
+				emptyDay.className = 'w-10 h-10 flex items-center justify-center';
+				calendarDays.appendChild(emptyDay);
 			}
+
+			// Add days of the month
+			for (let day = 1; day <= daysInMonth; day++) {
+				const dayEl = document.createElement('button');
+				dayEl.type = 'button';
+				dayEl.textContent = day.toString();
+
+				const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+				// Base styling for all day buttons
+				dayEl.className = 'calendar-day-btn w-10 h-10 flex items-center justify-center text-sm font-roboto rounded-lg';
+
+				// Check if date is available
+				if (availabilityData[dateStr]) {
+					// Available date styling - gets border and interactive styling from CSS
+					dayEl.className += ' available cursor-pointer';
+					dayEl.addEventListener('click', () => selectDate(dateStr));
+
+					// Highlight selected date
+					if (dateStr === selectedDate) {
+						dayEl.className += ' selected';
+					}
+				} else {
+					// Unavailable date styling - minimal, no border, faded
+					dayEl.className += ' unavailable';
+					dayEl.disabled = true;
+				}
+
+				calendarDays.appendChild(dayEl);
+			}
+		}
+
+		// Navigate to next/previous month with available dates
+		function navigateToMonth(direction: number) {
+			const maxAttempts = 24; // Prevent infinite loops (2 years)
+			let attempts = 0;
+
+			do {
+				currentDate.setMonth(currentDate.getMonth() + direction);
+				attempts++;
+
+				// Check if this month has any available dates
+				if (monthHasAvailableDates(currentDate) || attempts >= maxAttempts) {
+					break;
+				}
+			} while (attempts < maxAttempts);
+
+			renderCalendar();
+		}
+
+		// Check if a month has any available dates
+		function monthHasAvailableDates(date: Date): boolean {
+			const year = date.getFullYear();
+			const month = date.getMonth();
+			const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+			// Check each day of the month
+			for (let day = 1; day <= daysInMonth; day++) {
+				const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+				if (availabilityData[dateStr]) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		// Update navigation button states
+		function updateNavigationButtons() {
+			const validDates = Object.keys(availabilityData);
+			if (validDates.length === 0) {
+				prevMonthBtn.disabled = true;
+				nextMonthBtn.disabled = true;
+				return;
+			}
+
+			// Get the range of available months
+			const firstDate = new Date(validDates[0]);
+			const lastDate = new Date(validDates[validDates.length - 1]);
+
+			const currentYear = currentDate.getFullYear();
+			const currentMonth = currentDate.getMonth();
+
+			// Check if we can go to previous month
+			const canGoPrev = currentYear > firstDate.getFullYear() ||
+							 (currentYear === firstDate.getFullYear() && currentMonth > firstDate.getMonth());
+
+			// Check if we can go to next month
+			const canGoNext = currentYear < lastDate.getFullYear() ||
+							 (currentYear === lastDate.getFullYear() && currentMonth < lastDate.getMonth());
+
+			prevMonthBtn.disabled = !canGoPrev;
+			nextMonthBtn.disabled = !canGoNext;
+
+			// Update visual styling
+			if (canGoPrev) {
+				prevMonthBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+				prevMonthBtn.classList.add('cursor-pointer');
+			} else {
+				prevMonthBtn.classList.add('opacity-50', 'cursor-not-allowed');
+				prevMonthBtn.classList.remove('cursor-pointer');
+			}
+
+			if (canGoNext) {
+				nextMonthBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+				nextMonthBtn.classList.add('cursor-pointer');
+			} else {
+				nextMonthBtn.classList.add('opacity-50', 'cursor-not-allowed');
+				nextMonthBtn.classList.remove('cursor-pointer');
+			}
+		}
+
+		// Select a date
+		function selectDate(dateStr: string) {
+			selectedDate = dateStr;
+			visitDateInput.value = dateStr;
+			customCalendar.classList.add('hidden');
+			handleDateChange(dateStr);
+			renderCalendar(); // Re-render to update selection
+		}
+
+		function handleDateChange(selectedDateStr: string) {
+			console.log('handleDateChange called with:', selectedDateStr);
+
+			// Check if date is provided
+			if (!selectedDateStr) {
+				populateTimes([]);
+				return;
+			}
+
+			// Parse the selected date - use a more reliable method
+			const [year, month, day] = selectedDateStr.split('-').map(Number);
+			const selectedDateObj = new Date(year, month - 1, day); // month is 0-indexed
+			const selectedYear = selectedDateObj.getFullYear();
+			const currentYear = new Date().getFullYear();
+
+			// Create today's date for comparison
+			const today = new Date();
+			const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+			// Create selected date for comparison (date only, no time)
+			const selectedDateOnly = new Date(year, month - 1, day);
+
+			console.log('Date comparison debug:', {
+				selectedDateStr,
+				selectedDateOnly: selectedDateOnly.toISOString().split('T')[0],
+				todayDateOnly: todayDateOnly.toISOString().split('T')[0],
+				isPast: selectedDateOnly < todayDateOnly,
+				isToday: selectedDateOnly.getTime() === todayDateOnly.getTime()
+			});
+
+			// Check if date is in the past (skip alert during initialization)
+			if (selectedDateOnly < todayDateOnly) {
+				if (!isInitializing) {
+					alert('You cannot book a date in the past. Please select a future date.');
+				}
+				visitDateInput.value = '';
+				selectedDate = '';
+				populateTimes([]);
+				return;
+			}
+
+			// Check if date is in the past (before current year) - skip alert during initialization
+			if (selectedYear < currentYear) {
+				if (!isInitializing) {
+					const yearDiff = currentYear - selectedYear;
+					const message = `You've selected a date from ${yearDiff} year${yearDiff > 1 ? 's' : ''} ago (${selectedYear}). Please select a date from the current flower season.`;
+					alert(message);
+				}
+				visitDateInput.value = '';
+				selectedDate = '';
+				populateTimes([]);
+				return;
+			}
+
+			// Check if date is too far in the future (more than next year) - skip alert during initialization
+			if (selectedYear > currentYear + 1) {
+				if (!isInitializing) {
+					const yearDiff = selectedYear - currentYear;
+					const message = `You've selected a date ${yearDiff} year${yearDiff > 1 ? 's' : ''} in the future (${selectedYear}). Bookings are only available for the current and next flower season.`;
+					alert(message);
+				}
+				visitDateInput.value = '';
+				selectedDate = '';
+				populateTimes([]);
+				return;
+			}
+
+			// Check if date is in next year - ask for confirmation (skip during initialization)
+			if (selectedYear > currentYear && !isInitializing) {
+				const confirmed = confirm(
+					`You've selected a date in ${selectedYear}, which is next year's flower season.\n\n` +
+					`Are you sure you want to book for ${selectedDateOnly.toLocaleDateString('en-US', {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric'
+					})}?\n\n` +
+					`Click OK to confirm, or Cancel to select a different date.`
+				);
+
+				if (!confirmed) {
+					visitDateInput.value = '';
+					selectedDate = '';
+					populateTimes([]);
+					return;
+				}
+			}
+
+			// Check if the selected date is available in our system (skip alert during initialization)
+			if (!availabilityData[selectedDateStr]) {
+				// Date is not available - show error and clear selection
+				if (!isInitializing) {
+					alert('Sorry, this date is not available for bookings. Please select a different date.');
+				}
+				visitDateInput.value = '';
+				selectedDate = '';
+				populateTimes([]);
+				return;
+			}
+
+			// Date is valid - populate times
+			populateTimes(availabilityData[selectedDateStr] || []);
 		}
 
 		function populateTimes(times: string[]) {
@@ -938,6 +1285,8 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 		// Form validation
 		function validateForm(): boolean {
 			let valid = true;
+
+			// Check required fields
 			['fullName', 'email', 'phone', 'visitDate', 'preferredTime'].forEach(id => {
 				const el = document.getElementById(id) as HTMLInputElement | HTMLSelectElement;
 				if (!el.value.trim()) {
@@ -947,6 +1296,70 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 					el.classList.remove('border-red-500');
 				}
 			});
+
+			// Additional validation for visit date
+			const selectedDateStr = visitDateInput.value;
+
+			if (selectedDateStr) {
+				const selectedDateObj = new Date(selectedDateStr);
+				const currentYear = new Date().getFullYear();
+				const selectedYear = selectedDateObj.getFullYear();
+
+				// Create today's date with time reset for accurate comparison
+				const today = new Date();
+				today.setHours(0, 0, 0, 0);
+
+				// Reset time on selected date for fair comparison
+				const selectedDateForComparison = new Date(selectedDateObj);
+				selectedDateForComparison.setHours(0, 0, 0, 0);
+
+				// Check if date is in the past
+				if (selectedDateForComparison < today) {
+					alert('You cannot book a date in the past. Please select a future date.');
+					visitDateInput.classList.add('border-red-500');
+					valid = false;
+				}
+				// Check if date is in the past (before current year)
+				else if (selectedYear < currentYear) {
+					const yearDiff = currentYear - selectedYear;
+					const message = `You've selected a date from ${yearDiff} year${yearDiff > 1 ? 's' : ''} ago (${selectedYear}). Please select a date from the current flower season.`;
+					alert(message);
+					visitDateInput.classList.add('border-red-500');
+					valid = false;
+				}
+				// Check if date is too far in the future (more than next year)
+				else if (selectedYear > currentYear + 1) {
+					const yearDiff = selectedYear - currentYear;
+					const message = `You've selected a date ${yearDiff} year${yearDiff > 1 ? 's' : ''} in the future (${selectedYear}). Bookings are only available for the current and next flower season.`;
+					alert(message);
+					visitDateInput.classList.add('border-red-500');
+					valid = false;
+				}
+				// Check if date is in next year - ask for confirmation (but don't block submission if already confirmed)
+				else if (selectedYear > currentYear) {
+					// Note: If we reach this point during form submission, the user has already
+					// confirmed the next year date during selection, so we allow it to proceed
+					console.log(`Proceeding with next year booking for ${selectedYear}`);
+				}
+				// Check if date is available in our system
+				else if (!availabilityData[selectedDateStr]) {
+					alert('The selected date is not available for bookings. Please choose a different date.');
+					visitDateInput.classList.add('border-red-500');
+					valid = false;
+				}
+			}
+
+			// Additional validation for time slot
+			const selectedTime = preferredTimeSelect.value;
+			if (selectedDate && selectedTime && availabilityData[selectedDate]) {
+				const availableTimes = availabilityData[selectedDate];
+				if (!availableTimes.includes(selectedTime)) {
+					alert('The selected time is not available for the chosen date. Please select a different time.');
+					preferredTimeSelect.classList.add('border-red-500');
+					valid = false;
+				}
+			}
+
 			return valid;
 		}
 

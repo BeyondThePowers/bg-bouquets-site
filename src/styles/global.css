@@ -595,3 +595,106 @@ input[name="paymentMethod"] {
 .shabby-card-blue strong {
   font-weight: 500;
 }
+
+/* ============================================================================
+   CUSTOM CALENDAR STYLING
+   ============================================================================ */
+
+/* Mobile View Toggle - Hide on desktop, show on mobile */
+.mobile-view-toggle {
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .mobile-view-toggle {
+    display: none !important;
+  }
+}
+
+/* Custom Calendar Container */
+#customCalendar {
+  font-family: var(--font-roboto);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--color-dusty-rose);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+/* Calendar Days Grid */
+#calendarDays {
+  gap: 4px;
+  padding: 2px;
+}
+
+/* Month Navigation Buttons */
+#prevMonth, #nextMonth {
+  background: rgba(248, 231, 232, 0.1);
+  border: 1px solid transparent;
+}
+
+#prevMonth:hover, #nextMonth:hover {
+  background: var(--color-dusty-rose);
+  border-color: var(--color-dusty-rose);
+}
+
+#prevMonth:hover svg, #nextMonth:hover svg {
+  color: white;
+}
+
+/* Calendar Day Buttons Base */
+.calendar-day-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  margin:2px;
+}
+
+/* Available Date Styling */
+.calendar-day-btn.available {
+  background: white;
+  color: var(--color-charcoal);
+  /*border: 1px solid var(--color-charcoal);*/
+}
+
+/* Available Date Hover Effect - Faint Pink */
+.calendar-day-btn.available:hover {
+  background: rgba(248, 231, 232, 1) !important;
+  color: var(--color-charcoal) !important;
+  border-color: rgba(232, 180, 184, 1) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 8px rgba(232, 180, 184, 0.3) !important;
+  z-index: 10;
+}
+
+/* Selected Date Styling - Solid Pink */
+.calendar-day-btn.selected {
+  background: var(--color-dusty-rose) !important;
+  color: #fff;
+  border-color: var(--color-dusty-rose) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Unavailable Date Styling - Very Faint */
+.calendar-day-btn.unavailable {
+  background: transparent !important;
+  color: #babdc4!important;
+  cursor: not-allowed !important;
+  border: none !important;
+  font-weight: 200 !important;
+  opacity: 1 !important;
+}
+
+.calendar-day-btn.unavailable:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Responsive Calendar */
+@media (max-width: 640px) {
+  #customCalendar {
+    left: -1rem;
+    right: -1rem;
+    min-width: auto;
+  }
+}

@@ -1,0 +1,594 @@
+---
+// Garden management interface for booking schedule and holidays
+// Moved from /admin to /garden-mgmt for security
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Garden Management - Bouquet Garden</title>
+	<link rel="stylesheet" href="/src/styles/global.css">
+	<style>
+		.admin-container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 2rem;
+			font-family: 'Roboto', sans-serif;
+		}
+		
+		.admin-header {
+			text-align: center;
+			margin-bottom: 3rem;
+			padding-bottom: 2rem;
+			border-bottom: 2px solid var(--color-dusty-rose);
+		}
+		
+		.admin-header h1 {
+			font-family: 'Allura', cursive;
+			font-size: 3rem;
+			color: var(--color-charcoal);
+			margin-bottom: 0.5rem;
+		}
+		
+		.login-section {
+			max-width: 400px;
+			margin: 0 auto;
+			padding: 2rem;
+			background: rgba(248, 231, 232, 0.1);
+			border-radius: 8px;
+			border: 1px solid var(--color-dusty-rose);
+		}
+		
+		.admin-sections {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 2rem;
+			margin-top: 2rem;
+		}
+		
+		.admin-section {
+			background: rgba(248, 231, 232, 0.05);
+			border: 1px solid var(--color-dusty-rose);
+			border-radius: 8px;
+			padding: 1.5rem;
+		}
+		
+		.admin-section h2 {
+			font-family: 'Playfair Display', serif;
+			color: var(--color-charcoal);
+			margin-bottom: 1rem;
+			font-size: 1.5rem;
+		}
+		
+		.form-group {
+			margin-bottom: 1rem;
+		}
+		
+		.form-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+			color: var(--color-charcoal);
+		}
+		
+		.form-group input, .form-group select, .form-group textarea {
+			width: 100%;
+			padding: 0.75rem;
+			border: 1px solid var(--color-dusty-rose);
+			border-radius: 4px;
+			font-size: 1rem;
+		}
+		
+		.btn {
+			background: var(--color-dusty-rose);
+			color: var(--color-charcoal);
+			border: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 1rem;
+			font-weight: 500;
+			transition: all 0.2s ease;
+		}
+		
+		.btn:hover {
+			background: #d49ca0;
+			transform: translateY(-1px);
+		}
+		
+		.btn-secondary {
+			background: transparent;
+			border: 1px solid var(--color-dusty-rose);
+		}
+		
+		.btn-danger {
+			background: #dc3545;
+			color: white;
+		}
+		
+		.btn-danger:hover {
+			background: #c82333;
+		}
+		
+		.holiday-list, .settings-list {
+			max-height: 300px;
+			overflow-y: auto;
+			border: 1px solid var(--color-dusty-rose);
+			border-radius: 4px;
+			padding: 1rem;
+			margin-top: 1rem;
+		}
+		
+		.holiday-item, .setting-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.5rem 0;
+			border-bottom: 1px solid rgba(232, 180, 184, 0.3);
+		}
+		
+		.holiday-item:last-child, .setting-item:last-child {
+			border-bottom: none;
+		}
+		
+		.holiday-info {
+			flex: 1;
+		}
+		
+		.holiday-date {
+			font-weight: 500;
+			color: var(--color-charcoal);
+		}
+		
+		.holiday-name {
+			font-size: 0.9rem;
+			color: #666;
+		}
+		
+		.holiday-badge {
+			font-size: 0.8rem;
+			padding: 0.2rem 0.5rem;
+			border-radius: 12px;
+			background: rgba(232, 180, 184, 0.2);
+			color: var(--color-charcoal);
+			margin-left: 0.5rem;
+		}
+		
+		.error-message {
+			background: #f8d7da;
+			color: #721c24;
+			padding: 0.75rem;
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			border: 1px solid #f5c6cb;
+		}
+		
+		.success-message {
+			background: #d4edda;
+			color: #155724;
+			padding: 0.75rem;
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			border: 1px solid #c3e6cb;
+		}
+		
+		.hidden {
+			display: none;
+		}
+		
+		.checkbox-group {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+		
+		.checkbox-item {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+		
+		.checkbox-item input[type="checkbox"] {
+			width: auto;
+		}
+		
+		@media (max-width: 768px) {
+			.admin-sections {
+				grid-template-columns: 1fr;
+			}
+			
+			.admin-container {
+				padding: 1rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="admin-container">
+		<div class="admin-header">
+			<h1>Garden Management</h1>
+			<p>Manage booking schedule, holidays, and settings</p>
+		</div>
+
+		<!-- Login Section -->
+		<div id="loginSection" class="login-section">
+			<h2>Management Login</h2>
+			<div class="form-group">
+				<label for="adminPassword">Password:</label>
+				<input type="password" id="adminPassword" placeholder="Enter management password">
+			</div>
+			<button class="btn" onclick="login()">Login</button>
+			<div id="loginError" class="error-message hidden">Invalid password</div>
+		</div>
+
+		<!-- Admin Interface (hidden until login) -->
+		<div id="adminInterface" class="hidden">
+			<div class="admin-sections">
+				<!-- Holiday Management -->
+				<div class="admin-section">
+					<h2>Holiday Management</h2>
+					
+					<div class="form-group">
+						<label for="holidayDate">Add Holiday Date:</label>
+						<input type="date" id="holidayDate">
+					</div>
+					
+					<div class="form-group">
+						<label for="holidayName">Holiday Name:</label>
+						<input type="text" id="holidayName" placeholder="e.g., Custom Closure">
+					</div>
+					
+					<button class="btn" onclick="addHoliday()">Add Holiday</button>
+					
+					<div id="holidayMessage" class="hidden"></div>
+					
+					<div class="holiday-list" id="holidayList">
+						<p>Loading holidays...</p>
+					</div>
+				</div>
+
+				<!-- Schedule Settings -->
+				<div class="admin-section">
+					<h2>Schedule Settings</h2>
+					
+					<div class="form-group">
+						<label>Operating Days:</label>
+						<div class="checkbox-group" id="operatingDays">
+							<div class="checkbox-item">
+								<input type="checkbox" id="monday" value="monday">
+								<label for="monday">Monday</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="tuesday" value="tuesday">
+								<label for="tuesday">Tuesday</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="wednesday" value="wednesday">
+								<label for="wednesday">Wednesday</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="thursday" value="thursday">
+								<label for="thursday">Thursday</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="friday" value="friday">
+								<label for="friday">Friday</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="saturday" value="saturday">
+								<label for="saturday">Saturday</label>
+							</div>
+							<div class="checkbox-item">
+								<input type="checkbox" id="sunday" value="sunday">
+								<label for="sunday">Sunday</label>
+							</div>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label for="timeSlots">Time Slots (one per line):</label>
+						<textarea id="timeSlots" rows="8" placeholder="10:00 AM&#10;11:00 AM&#10;12:00 PM&#10;1:00 PM&#10;6:00 PM&#10;7:00 PM&#10;8:00 PM"></textarea>
+					</div>
+					
+					<div class="form-group">
+						<label for="maxBookings">Max Bookings per Slot:</label>
+						<input type="number" id="maxBookings" min="1" max="20" value="3">
+					</div>
+					
+					<div class="form-group">
+						<label for="maxVisitors">Max Visitors per Slot:</label>
+						<input type="number" id="maxVisitors" min="1" max="50" value="10">
+					</div>
+					
+					<button class="btn" onclick="updateScheduleSettings()">Update Schedule</button>
+					
+					<div id="scheduleMessage" class="hidden"></div>
+				</div>
+			</div>
+			
+			<div style="text-align: center; margin-top: 2rem;">
+				<button class="btn btn-secondary" id="logoutButton">Logout</button>
+				<a href="/" class="btn btn-secondary" style="margin-left: 1rem; text-decoration: none;">Back to Booking</a>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		let isLoggedIn = false;
+
+		async function login() {
+			const password = document.getElementById('adminPassword').value;
+			const errorDiv = document.getElementById('loginError');
+			
+			try {
+				// Get admin password from settings
+				const response = await fetch('/api/admin/verify-password', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ password })
+				});
+				
+				const result = await response.json();
+				
+				if (result.success) {
+					isLoggedIn = true;
+					document.getElementById('loginSection').classList.add('hidden');
+					document.getElementById('adminInterface').classList.remove('hidden');
+					loadHolidays();
+					loadScheduleSettings();
+				} else {
+					errorDiv.classList.remove('hidden');
+				}
+			} catch (error) {
+				console.error('Login error:', error);
+				errorDiv.textContent = 'Login failed. Please try again.';
+				errorDiv.classList.remove('hidden');
+			}
+		}
+
+		function logout() {
+			console.log('Logout function called');
+			isLoggedIn = false;
+			
+			try {
+				// Show login section, hide admin interface
+				const loginSection = document.getElementById('loginSection');
+				const adminInterface = document.getElementById('adminInterface');
+				
+				if (loginSection && adminInterface) {
+					loginSection.classList.remove('hidden');
+					adminInterface.classList.add('hidden');
+					console.log('Sections toggled successfully');
+				} else {
+					console.error('Could not find login or admin sections');
+				}
+				
+				// Clear password field
+				const passwordField = document.getElementById('adminPassword');
+				if (passwordField) {
+					passwordField.value = '';
+				}
+				
+				// Hide any error messages
+				const loginError = document.getElementById('loginError');
+				if (loginError) {
+					loginError.classList.add('hidden');
+				}
+				
+				// Clear any success/error messages in admin sections
+				const messageElements = document.querySelectorAll('#holidayMessage, #scheduleMessage');
+				messageElements.forEach(el => el.classList.add('hidden'));
+				
+				// Reset form fields to defaults
+				const holidayDate = document.getElementById('holidayDate');
+				const holidayName = document.getElementById('holidayName');
+				if (holidayDate) holidayDate.value = '';
+				if (holidayName) holidayName.value = '';
+				
+				console.log('Logged out successfully');
+				
+				// Visual confirmation
+				alert('Logged out successfully!');
+				
+			} catch (error) {
+				console.error('Error during logout:', error);
+				alert('Error during logout: ' + error.message);
+			}
+		}
+
+		async function loadHolidays() {
+			try {
+				const response = await fetch('/api/admin/holidays');
+				const holidays = await response.json();
+
+				const holidayList = document.getElementById('holidayList');
+
+				if (holidays.length === 0) {
+					holidayList.innerHTML = '<p>No holidays configured.</p>';
+					return;
+				}
+
+				holidayList.innerHTML = holidays.map(holiday => `
+					<div class="holiday-item">
+						<div class="holiday-info">
+							<div class="holiday-date">${new Date(holiday.date).toLocaleDateString()}</div>
+							<div class="holiday-name">${holiday.name}
+								${holiday.is_auto_generated ? '<span class="holiday-badge">Auto</span>' : '<span class="holiday-badge">Manual</span>'}
+								${holiday.is_override_allowed ? '<span class="holiday-badge">Override</span>' : ''}
+							</div>
+						</div>
+						<button class="btn btn-danger" onclick="removeHoliday('${holiday.id}')">Remove</button>
+					</div>
+				`).join('');
+			} catch (error) {
+				console.error('Error loading holidays:', error);
+				document.getElementById('holidayList').innerHTML = '<p>Error loading holidays.</p>';
+			}
+		}
+
+		async function addHoliday() {
+			const date = document.getElementById('holidayDate').value;
+			const name = document.getElementById('holidayName').value;
+			const messageDiv = document.getElementById('holidayMessage');
+
+			if (!date || !name) {
+				showMessage(messageDiv, 'Please enter both date and name.', 'error');
+				return;
+			}
+
+			try {
+				const response = await fetch('/api/admin/holidays', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ date, name })
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					showMessage(messageDiv, 'Holiday added successfully!', 'success');
+					document.getElementById('holidayDate').value = '';
+					document.getElementById('holidayName').value = '';
+					loadHolidays();
+				} else {
+					showMessage(messageDiv, result.error || 'Failed to add holiday.', 'error');
+				}
+			} catch (error) {
+				console.error('Error adding holiday:', error);
+				showMessage(messageDiv, 'Error adding holiday.', 'error');
+			}
+		}
+
+		async function removeHoliday(holidayId) {
+			if (!confirm('Are you sure you want to remove this holiday?')) return;
+
+			try {
+				const response = await fetch(`/api/admin/holidays/${holidayId}`, {
+					method: 'DELETE'
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					loadHolidays();
+				} else {
+					alert('Failed to remove holiday: ' + (result.error || 'Unknown error'));
+				}
+			} catch (error) {
+				console.error('Error removing holiday:', error);
+				alert('Error removing holiday.');
+			}
+		}
+
+		async function loadScheduleSettings() {
+			try {
+				const response = await fetch('/api/admin/settings');
+				const settings = await response.json();
+
+				// Load operating days
+				const operatingDays = JSON.parse(settings.operating_days || '[]');
+				const dayCheckboxes = document.querySelectorAll('#operatingDays input[type="checkbox"]');
+				dayCheckboxes.forEach(checkbox => {
+					checkbox.checked = operatingDays.includes(checkbox.value);
+				});
+
+				// Load time slots
+				const timeSlots = JSON.parse(settings.time_slots || '[]');
+				document.getElementById('timeSlots').value = timeSlots.join('\n');
+
+				// Load capacity settings
+				document.getElementById('maxBookings').value = settings.max_bookings_per_slot || '3';
+				document.getElementById('maxVisitors').value = settings.max_visitors_per_slot || '10';
+
+			} catch (error) {
+				console.error('Error loading settings:', error);
+			}
+		}
+
+		async function updateScheduleSettings() {
+			const messageDiv = document.getElementById('scheduleMessage');
+
+			try {
+				// Get operating days
+				const operatingDays = Array.from(document.querySelectorAll('#operatingDays input[type="checkbox"]:checked'))
+					.map(cb => cb.value);
+
+				// Get time slots
+				const timeSlots = document.getElementById('timeSlots').value
+					.split('\n')
+					.map(slot => slot.trim())
+					.filter(slot => slot.length > 0);
+
+				const maxBookings = document.getElementById('maxBookings').value;
+				const maxVisitors = document.getElementById('maxVisitors').value;
+
+				if (operatingDays.length === 0) {
+					showMessage(messageDiv, 'Please select at least one operating day.', 'error');
+					return;
+				}
+
+				if (timeSlots.length === 0) {
+					showMessage(messageDiv, 'Please enter at least one time slot.', 'error');
+					return;
+				}
+
+				const response = await fetch('/api/admin/settings', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						operating_days: operatingDays,
+						time_slots: timeSlots,
+						max_bookings_per_slot: parseInt(maxBookings),
+						max_visitors_per_slot: parseInt(maxVisitors)
+					})
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					showMessage(messageDiv, 'Schedule settings updated successfully! Future bookings will use the new schedule.', 'success');
+				} else {
+					showMessage(messageDiv, result.error || 'Failed to update settings.', 'error');
+				}
+			} catch (error) {
+				console.error('Error updating settings:', error);
+				showMessage(messageDiv, 'Error updating settings.', 'error');
+			}
+		}
+
+		function showMessage(element, message, type) {
+			element.textContent = message;
+			element.className = type === 'error' ? 'error-message' : 'success-message';
+			element.classList.remove('hidden');
+
+			setTimeout(() => {
+				element.classList.add('hidden');
+			}, 5000);
+		}
+
+		// Allow Enter key to login
+		document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') {
+				login();
+			}
+		});
+
+		// Add logout button event listener
+		const logoutBtn = document.getElementById('logoutButton');
+		if (logoutBtn) {
+			logoutBtn.addEventListener('click', function() {
+				console.log('Logout button clicked');
+				logout();
+			});
+			console.log('Logout button event listener attached');
+		} else {
+			console.error('Logout button not found!');
+		}
+
+		console.log('Garden management page JavaScript loaded');
+	</script>
+</body>
+</html>

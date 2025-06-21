@@ -1,16 +1,34 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 
-
 export const GET: APIRoute = async () => {
   try {
     console.log('Availability API called');
 
-    // Step 1: Get open days
+    // Step 1: Get schedule settings
+    const { data: settings, error: settingsError } = await supabase
+      .from('schedule_settings')
+      .select('setting_key, setting_value')
+      .in('setting_key', ['max_bookings_per_slot', 'max_visitors_per_slot']);
+
+    if (settingsError) {
+      console.error('Settings error:', settingsError);
+      return new Response(JSON.stringify({ error: settingsError.message }), { status: 500 });
+    }
+
+    // Parse settings
+    const settingsMap = new Map(settings?.map(s => [s.setting_key, s.setting_value]) || []);
+    const maxBookingsPerSlot = parseInt(settingsMap.get('max_bookings_per_slot') as string || '3');
+    const maxVisitorsPerSlot = parseInt(settingsMap.get('max_visitors_per_slot') as string || '10');
+
+    console.log('Schedule settings:', { maxBookingsPerSlot, maxVisitorsPerSlot });
+
+    // Step 2: Get open days
     const { data: openDays, error: openError } = await supabase
       .from('open_days')
       .select('date')
       .eq('is_open', true)
+      .gte('date', new Date().toISOString().split('T')[0]) // Only future dates
       .order('date', { ascending: true });
 
     console.log('Open days query result:', { openDays, openError });
@@ -25,81 +43,81 @@ export const GET: APIRoute = async () => {
       return new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
 
-  // Step 2: Get time slots for open days (including booking limits)
-  const { data: slots, error: slotError } = await supabase
-    .from('time_slots')
-    .select('id, date, time, max_capacity, max_bookings')
-    .in('date', openDays.map(d => d.date));
+    // Step 3: Get time slots for open days
+    const { data: slots, error: slotError } = await supabase
+      .from('time_slots')
+      .select('id, date, time, max_capacity')
+      .in('date', openDays.map(d => d.date));
 
-  if (slotError || !slots) {
-    return new Response(JSON.stringify({ error: slotError?.message }), { status: 500 });
-  }
-
-  // Step 3: Get bookings to count both booking count and visitor count
-  const { data: bookings, error: bookingError } = await supabase
-    .from('bookings')
-    .select('id, date, time, number_of_visitors');
-
-  if (bookingError || !bookings) {
-    return new Response(JSON.stringify({ error: bookingError?.message }), { status: 500 });
-  }
-
-  // Step 4: Organize availability - count both bookings and visitors per slot
-  const slotUsageMap = new Map<string, { bookingCount: number; visitorCount: number }>();
-
-  for (const b of bookings) {
-    const key = `${b.date}|${b.time}`;
-    const current = slotUsageMap.get(key) || { bookingCount: 0, visitorCount: 0 };
-
-    current.bookingCount += 1;
-    current.visitorCount += (b.number_of_visitors || 1);
-
-    slotUsageMap.set(key, current);
-  }
-
-  console.log('Slot usage map:', Object.fromEntries(slotUsageMap));
-
-  // Step 5: Convert to frontend expected format, checking both limits
-  const availability: Record<string, string[]> = {};
-
-  for (const day of openDays) {
-    const availableTimes = slots
-      .filter(slot => slot.date === day.date)
-      .filter(slot => {
-        const key = `${slot.date}|${slot.time}`;
-        const usage = slotUsageMap.get(key) || { bookingCount: 0, visitorCount: 0 };
-
-        // Check both limits
-        const bookingLimitReached = usage.bookingCount >= slot.max_bookings;
-        const visitorLimitReached = usage.visitorCount >= slot.max_capacity;
-
-        console.log(`Slot ${key}:`, {
-          currentBookings: usage.bookingCount,
-          maxBookings: slot.max_bookings,
-          currentVisitors: usage.visitorCount,
-          maxCapacity: slot.max_capacity,
-          bookingLimitReached,
-          visitorLimitReached,
-          available: !bookingLimitReached && !visitorLimitReached
-        });
-
-        return !bookingLimitReached && !visitorLimitReached;
-      })
-      .map(slot => slot.time);
-
-    if (availableTimes.length > 0) {
-      availability[day.date] = availableTimes;
+    if (slotError || !slots) {
+      return new Response(JSON.stringify({ error: slotError?.message }), { status: 500 });
     }
-  }
 
-  console.log('Final availability result:', availability);
+    // Step 4: Get bookings to count both booking count and visitor count
+    const { data: bookings, error: bookingError } = await supabase
+      .from('bookings')
+      .select('id, date, time, number_of_visitors');
 
-  return new Response(JSON.stringify(availability), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+    if (bookingError || !bookings) {
+      return new Response(JSON.stringify({ error: bookingError?.message }), { status: 500 });
+    }
+
+    // Step 5: Organize availability - count both bookings and visitors per slot
+    const slotUsageMap = new Map<string, { bookingCount: number; visitorCount: number }>();
+
+    for (const b of bookings) {
+      const key = `${b.date}|${b.time}`;
+      const current = slotUsageMap.get(key) || { bookingCount: 0, visitorCount: 0 };
+
+      current.bookingCount += 1;
+      current.visitorCount += (b.number_of_visitors || 1);
+
+      slotUsageMap.set(key, current);
+    }
+
+    console.log('Slot usage map:', Object.fromEntries(slotUsageMap));
+
+    // Step 6: Convert to frontend expected format, checking both limits
+    const availability: Record<string, string[]> = {};
+
+    for (const day of openDays) {
+      const availableTimes = slots
+        .filter(slot => slot.date === day.date)
+        .filter(slot => {
+          const key = `${slot.date}|${slot.time}`;
+          const usage = slotUsageMap.get(key) || { bookingCount: 0, visitorCount: 0 };
+
+          // Check both limits using settings
+          const bookingLimitReached = usage.bookingCount >= maxBookingsPerSlot;
+          const visitorLimitReached = usage.visitorCount >= maxVisitorsPerSlot;
+
+          console.log(`Slot ${key}:`, {
+            currentBookings: usage.bookingCount,
+            maxBookings: maxBookingsPerSlot,
+            currentVisitors: usage.visitorCount,
+            maxCapacity: maxVisitorsPerSlot,
+            bookingLimitReached,
+            visitorLimitReached,
+            available: !bookingLimitReached && !visitorLimitReached
+          });
+
+          return !bookingLimitReached && !visitorLimitReached;
+        })
+        .map(slot => slot.time);
+
+      if (availableTimes.length > 0) {
+        availability[day.date] = availableTimes;
+      }
+    }
+
+    console.log('Final availability result:', availability);
+
+    return new Response(JSON.stringify(availability), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
   } catch (error) {
     console.error('Availability API error:', error);
