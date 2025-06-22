@@ -107,7 +107,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         paymentMethod: bookingData.payment_method,
         originalDate: bookingData.original_date,
         originalTime: bookingData.original_time,
-        rescheduleReason: reason
+        rescheduleReason: reason,
+        cancellationToken: bookingData.cancellation_token
       };
 
       // Send reschedule confirmation webhook

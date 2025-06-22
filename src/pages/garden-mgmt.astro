@@ -319,10 +319,17 @@
 	<script>
 		let isLoggedIn = false;
 
-		async function login() {
-			const password = document.getElementById('adminPassword').value;
-			const errorDiv = document.getElementById('loginError');
-			
+		async function login(): Promise<void> {
+			const passwordElement = document.getElementById('adminPassword') as HTMLInputElement;
+			const errorDiv = document.getElementById('loginError') as HTMLElement;
+
+			if (!passwordElement || !errorDiv) {
+				console.error('Required elements not found');
+				return;
+			}
+
+			const password = passwordElement.value;
+
 			try {
 				// Get admin password from settings
 				const response = await fetch('/api/admin/verify-password', {
@@ -330,13 +337,19 @@
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ password })
 				});
-				
+
 				const result = await response.json();
-				
+
 				if (result.success) {
 					isLoggedIn = true;
-					document.getElementById('loginSection').classList.add('hidden');
-					document.getElementById('adminInterface').classList.remove('hidden');
+					const loginSection = document.getElementById('loginSection');
+					const adminInterface = document.getElementById('adminInterface');
+
+					if (loginSection && adminInterface) {
+						loginSection.classList.add('hidden');
+						adminInterface.classList.remove('hidden');
+					}
+
 					loadHolidays();
 					loadScheduleSettings();
 				} else {
@@ -349,15 +362,15 @@
 			}
 		}
 
-		function logout() {
+		function logout(): void {
 			console.log('Logout function called');
 			isLoggedIn = false;
-			
+
 			try {
 				// Show login section, hide admin interface
 				const loginSection = document.getElementById('loginSection');
 				const adminInterface = document.getElementById('adminInterface');
-				
+
 				if (loginSection && adminInterface) {
 					loginSection.classList.remove('hidden');
 					adminInterface.classList.add('hidden');
@@ -365,53 +378,59 @@
 				} else {
 					console.error('Could not find login or admin sections');
 				}
-				
+
 				// Clear password field
-				const passwordField = document.getElementById('adminPassword');
+				const passwordField = document.getElementById('adminPassword') as HTMLInputElement;
 				if (passwordField) {
 					passwordField.value = '';
 				}
-				
+
 				// Hide any error messages
 				const loginError = document.getElementById('loginError');
 				if (loginError) {
 					loginError.classList.add('hidden');
 				}
-				
+
 				// Clear any success/error messages in admin sections
 				const messageElements = document.querySelectorAll('#holidayMessage, #scheduleMessage');
-				messageElements.forEach(el => el.classList.add('hidden'));
-				
+				messageElements.forEach((el: Element) => el.classList.add('hidden'));
+
 				// Reset form fields to defaults
-				const holidayDate = document.getElementById('holidayDate');
-				const holidayName = document.getElementById('holidayName');
+				const holidayDate = document.getElementById('holidayDate') as HTMLInputElement;
+				const holidayName = document.getElementById('holidayName') as HTMLInputElement;
 				if (holidayDate) holidayDate.value = '';
 				if (holidayName) holidayName.value = '';
-				
+
 				console.log('Logged out successfully');
-				
+
 				// Visual confirmation
 				alert('Logged out successfully!');
-				
-			} catch (error) {
+
+			} catch (error: unknown) {
 				console.error('Error during logout:', error);
-				alert('Error during logout: ' + error.message);
+				const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+				alert('Error during logout: ' + errorMessage);
 			}
 		}
 
-		async function loadHolidays() {
+		async function loadHolidays(): Promise<void> {
 			try {
 				const response = await fetch('/api/admin/holidays');
 				const holidays = await response.json();
 
 				const holidayList = document.getElementById('holidayList');
 
+				if (!holidayList) {
+					console.error('Holiday list element not found');
+					return;
+				}
+
 				if (holidays.length === 0) {
 					holidayList.innerHTML = '<p>No holidays configured.</p>';
 					return;
 				}
 
-				holidayList.innerHTML = holidays.map(holiday => `
+				holidayList.innerHTML = holidays.map((holiday: any) => `
 					<div class="holiday-item">
 						<div class="holiday-info">
 							<div class="holiday-date">${new Date(holiday.date).toLocaleDateString()}</div>
@@ -425,14 +444,25 @@
 				`).join('');
 			} catch (error) {
 				console.error('Error loading holidays:', error);
-				document.getElementById('holidayList').innerHTML = '<p>Error loading holidays.</p>';
+				const holidayList = document.getElementById('holidayList');
+				if (holidayList) {
+					holidayList.innerHTML = '<p>Error loading holidays.</p>';
+				}
 			}
 		}
 
-		async function addHoliday() {
-			const date = document.getElementById('holidayDate').value;
-			const name = document.getElementById('holidayName').value;
+		async function addHoliday(): Promise<void> {
+			const dateElement = document.getElementById('holidayDate') as HTMLInputElement;
+			const nameElement = document.getElementById('holidayName') as HTMLInputElement;
 			const messageDiv = document.getElementById('holidayMessage');
+
+			if (!dateElement || !nameElement || !messageDiv) {
+				console.error('Required elements not found');
+				return;
+			}
+
+			const date = dateElement.value;
+			const name = nameElement.value;
 
 			if (!date || !name) {
 				showMessage(messageDiv, 'Please enter both date and name.', 'error');
@@ -450,8 +480,8 @@
 
 				if (result.success) {
 					showMessage(messageDiv, 'Holiday added successfully!', 'success');
-					document.getElementById('holidayDate').value = '';
-					document.getElementById('holidayName').value = '';
+					dateElement.value = '';
+					nameElement.value = '';
 					loadHolidays();
 				} else {
 					showMessage(messageDiv, result.error || 'Failed to add holiday.', 'error');
@@ -462,7 +492,7 @@
 			}
 		}
 
-		async function removeHoliday(holidayId) {
+		async function removeHoliday(holidayId: string): Promise<void> {
 			if (!confirm('Are you sure you want to remove this holiday?')) return;
 
 			try {
@@ -483,7 +513,7 @@
 			}
 		}
 
-		async function loadScheduleSettings() {
+		async function loadScheduleSettings(): Promise<void> {
 			try {
 				const response = await fetch('/api/admin/settings');
 				const settings = await response.json();
@@ -491,39 +521,69 @@
 				// Load operating days
 				const operatingDays = JSON.parse(settings.operating_days || '[]');
 				const dayCheckboxes = document.querySelectorAll('#operatingDays input[type="checkbox"]');
-				dayCheckboxes.forEach(checkbox => {
-					checkbox.checked = operatingDays.includes(checkbox.value);
+				dayCheckboxes.forEach((checkbox: Element) => {
+					const checkboxElement = checkbox as HTMLInputElement;
+					checkboxElement.checked = operatingDays.includes(checkboxElement.value);
 				});
 
 				// Load time slots
 				const timeSlots = JSON.parse(settings.time_slots || '[]');
-				document.getElementById('timeSlots').value = timeSlots.join('\n');
+				const timeSlotsElement = document.getElementById('timeSlots') as HTMLTextAreaElement;
+				if (timeSlotsElement) {
+					timeSlotsElement.value = timeSlots.join('\n');
+				}
 
 				// Load capacity settings
-				document.getElementById('maxBookings').value = settings.max_bookings_per_slot || '3';
-				document.getElementById('maxVisitors').value = settings.max_visitors_per_slot || '10';
+				const maxBookingsElement = document.getElementById('maxBookings') as HTMLInputElement;
+				const maxVisitorsElement = document.getElementById('maxVisitors') as HTMLInputElement;
+
+				if (maxBookingsElement) {
+					maxBookingsElement.value = settings.max_bookings_per_slot || '3';
+				}
+				if (maxVisitorsElement) {
+					maxVisitorsElement.value = settings.max_visitors_per_slot || '10';
+				}
 
 			} catch (error) {
 				console.error('Error loading settings:', error);
 			}
 		}
 
-		async function updateScheduleSettings() {
+		async function updateScheduleSettings(): Promise<void> {
 			const messageDiv = document.getElementById('scheduleMessage');
+
+			if (!messageDiv) {
+				console.error('Schedule message element not found');
+				return;
+			}
 
 			try {
 				// Get operating days
 				const operatingDays = Array.from(document.querySelectorAll('#operatingDays input[type="checkbox"]:checked'))
-					.map(cb => cb.value);
+					.map((cb: Element) => (cb as HTMLInputElement).value);
 
 				// Get time slots
-				const timeSlots = document.getElementById('timeSlots').value
-					.split('\n')
-					.map(slot => slot.trim())
-					.filter(slot => slot.length > 0);
+				const timeSlotsElement = document.getElementById('timeSlots') as HTMLTextAreaElement;
+				if (!timeSlotsElement) {
+					showMessage(messageDiv, 'Time slots element not found.', 'error');
+					return;
+				}
 
-				const maxBookings = document.getElementById('maxBookings').value;
-				const maxVisitors = document.getElementById('maxVisitors').value;
+				const timeSlots = timeSlotsElement.value
+					.split('\n')
+					.map((slot: string) => slot.trim())
+					.filter((slot: string) => slot.length > 0);
+
+				const maxBookingsElement = document.getElementById('maxBookings') as HTMLInputElement;
+				const maxVisitorsElement = document.getElementById('maxVisitors') as HTMLInputElement;
+
+				if (!maxBookingsElement || !maxVisitorsElement) {
+					showMessage(messageDiv, 'Capacity elements not found.', 'error');
+					return;
+				}
+
+				const maxBookings = maxBookingsElement.value;
+				const maxVisitors = maxVisitorsElement.value;
 
 				if (operatingDays.length === 0) {
 					showMessage(messageDiv, 'Please select at least one operating day.', 'error');
@@ -559,7 +619,7 @@
 			}
 		}
 
-		function showMessage(element, message, type) {
+		function showMessage(element: HTMLElement, message: string, type: 'error' | 'success'): void {
 			element.textContent = message;
 			element.className = type === 'error' ? 'error-message' : 'success-message';
 			element.classList.remove('hidden');
@@ -570,11 +630,14 @@
 		}
 
 		// Allow Enter key to login
-		document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-			if (e.key === 'Enter') {
-				login();
-			}
-		});
+		const adminPasswordElement = document.getElementById('adminPassword');
+		if (adminPasswordElement) {
+			adminPasswordElement.addEventListener('keypress', function(e: KeyboardEvent) {
+				if (e.key === 'Enter') {
+					login();
+				}
+			});
+		}
 
 		// Add logout button event listener
 		const logoutBtn = document.getElementById('logoutButton');
@@ -587,6 +650,12 @@
 		} else {
 			console.error('Logout button not found!');
 		}
+
+		// Make functions globally available for onclick handlers
+		(window as any).login = login;
+		(window as any).addHoliday = addHoliday;
+		(window as any).removeHoliday = removeHoliday;
+		(window as any).updateScheduleSettings = updateScheduleSettings;
 
 		console.log('Garden management page JavaScript loaded');
 	</script>

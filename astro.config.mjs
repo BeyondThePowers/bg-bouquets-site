@@ -16,7 +16,7 @@ export default defineConfig({
             // Split vendor code for better caching
             vendor: ['@supabase/supabase-js'],
             // Split booking functionality
-            booking: ['./src/scripts/booking.js'],
+            booking: ['./src/scripts/booking.ts'],
             // Split flower functionality
             flowers: ['./src/scripts/flowers.js'],
           }

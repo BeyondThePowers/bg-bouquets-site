@@ -3,6 +3,22 @@
  * Handles sending booking confirmations and error notifications
  */
 
+// Webhook configuration for easy future modifications
+// Consolidated to 2 scenarios for Make.com free plan (2 scenario limit)
+const WEBHOOK_CONFIG = {
+  booking_confirmed: 'MAKE_BOOKING_WEBHOOK_URL',        // Scenario 1: Confirmations + Errors
+  booking_error: 'MAKE_BOOKING_WEBHOOK_URL',            // Scenario 1: Confirmations + Errors
+  booking_cancelled: 'MAKE_CANCELLATION_WEBHOOK_URL',   // Scenario 2: Cancellations + Reschedules + Admin
+  booking_rescheduled: 'MAKE_CANCELLATION_WEBHOOK_URL', // Scenario 2: Cancellations + Reschedules + Admin
+  booking_cancelled_admin: 'MAKE_CANCELLATION_WEBHOOK_URL' // Scenario 2: Cancellations + Reschedules + Admin
+} as const;
+
+// Helper function to get webhook URL for event type
+function getWebhookUrl(eventType: keyof typeof WEBHOOK_CONFIG): string | undefined {
+  const envVarName = WEBHOOK_CONFIG[eventType];
+  return import.meta.env[envVarName];
+}
+
 interface BookingData {
   id: string;
   fullName: string;
@@ -18,12 +34,14 @@ interface BookingData {
 
 interface CancellationData extends BookingData {
   cancellationReason?: string;
+  cancellationToken?: string;
 }
 
 interface RescheduleData extends BookingData {
   originalDate: string;
   originalTime: string;
   rescheduleReason?: string;
+  cancellationToken?: string;
 }
 
 interface WebhookPayload {
@@ -76,8 +94,8 @@ interface ErrorPayload {
  * Send booking confirmation webhook to Make.com
  */
 export async function sendBookingConfirmation(bookingData: BookingData, cancellationToken?: string): Promise<boolean> {
-  const webhookUrl = import.meta.env.MAKE_BOOKING_WEBHOOK_URL;
-  
+  const webhookUrl = getWebhookUrl('booking_confirmed');
+
   if (!webhookUrl) {
     console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
     return false;
@@ -145,11 +163,11 @@ export async function sendBookingConfirmation(bookingData: BookingData, cancella
  * Send error notification webhook to Make.com
  */
 export async function sendErrorNotification(
-  bookingData: BookingData, 
+  bookingData: BookingData,
   errorInfo: { message: string; type: string }
 ): Promise<boolean> {
-  const webhookUrl = import.meta.env.MAKE_ERROR_WEBHOOK_URL;
-  
+  const webhookUrl = getWebhookUrl('booking_error');
+
   if (!webhookUrl) {
     console.error('MAKE_ERROR_WEBHOOK_URL not configured');
     return false;
@@ -233,10 +251,10 @@ export async function sendWebhookWithRetry(
  * Send cancellation confirmation webhook to Make.com (for customer)
  */
 export async function sendCancellationConfirmation(cancellationData: CancellationData): Promise<boolean> {
-  const webhookUrl = import.meta.env.MAKE_BOOKING_WEBHOOK_URL;
+  const webhookUrl = getWebhookUrl('booking_cancelled');
 
   if (!webhookUrl) {
-    console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
+    console.error('MAKE_CANCELLATION_WEBHOOK_URL not configured');
     return false;
   }
 
@@ -266,6 +284,7 @@ export async function sendCancellationConfirmation(cancellationData: Cancellatio
       metadata: {
         source: 'website',
         emailType: 'customer_cancellation_confirmation',
+        cancellationToken: cancellationData.cancellationToken,
       },
     },
   };
@@ -298,7 +317,7 @@ export async function sendCancellationConfirmation(cancellationData: Cancellatio
  * Send cancellation notification webhook to Make.com (for admin)
  */
 export async function sendCancellationNotification(cancellationData: CancellationData): Promise<boolean> {
-  const webhookUrl = import.meta.env.MAKE_ERROR_WEBHOOK_URL; // Using error webhook for admin notifications
+  const webhookUrl = getWebhookUrl('booking_cancelled_admin');
 
   if (!webhookUrl) {
     console.error('MAKE_ERROR_WEBHOOK_URL not configured');
@@ -332,6 +351,7 @@ export async function sendCancellationNotification(cancellationData: Cancellatio
         source: 'website',
         emailType: 'admin_cancellation_notification',
         adminEmail: import.meta.env.ADMIN_EMAIL,
+        cancellationToken: cancellationData.cancellationToken,
       },
     },
   };
@@ -364,10 +384,10 @@ export async function sendCancellationNotification(cancellationData: Cancellatio
  * Send reschedule confirmation webhook to Make.com
  */
 export async function sendRescheduleConfirmation(rescheduleData: RescheduleData): Promise<boolean> {
-  const webhookUrl = import.meta.env.MAKE_BOOKING_WEBHOOK_URL;
+  const webhookUrl = getWebhookUrl('booking_rescheduled');
 
   if (!webhookUrl) {
-    console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
+    console.error('MAKE_RESCHEDULE_WEBHOOK_URL not configured');
     return false;
   }
 
@@ -401,6 +421,7 @@ export async function sendRescheduleConfirmation(rescheduleData: RescheduleData)
       metadata: {
         source: 'website',
         emailType: 'booking_updated',
+        cancellationToken: rescheduleData.cancellationToken,
       },
     },
   };

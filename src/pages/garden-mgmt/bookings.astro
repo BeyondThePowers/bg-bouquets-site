@@ -96,42 +96,46 @@
 
 	<script>
 		// Global variables
-		let adminToken = null;
+		let adminToken: string | null = null;
 		let currentPage = 0;
 		let currentFilters = { status: 'all', search: '' };
 		const pageSize = 20;
 
 		// DOM elements
-		const loginContainer = document.getElementById('login-container');
-		const adminInterface = document.getElementById('admin-interface');
-		const loginForm = document.getElementById('login-form');
-		const loginError = document.getElementById('login-error');
-		const adminPassword = document.getElementById('admin-password');
-		const logoutBtn = document.getElementById('logout-btn');
-		const statusFilter = document.getElementById('status-filter');
-		const searchInput = document.getElementById('search-input');
-		const searchBtn = document.getElementById('search-btn');
-		const refreshBtn = document.getElementById('refresh-btn');
-		const loading = document.getElementById('loading');
-		const errorContainer = document.getElementById('error-container');
-		const bookingsContainer = document.getElementById('bookings-container');
-		const bookingsGrid = document.getElementById('bookings-grid');
-		const pagination = document.getElementById('pagination');
+		const loginContainer = document.getElementById('login-container') as HTMLElement;
+		const adminInterface = document.getElementById('admin-interface') as HTMLElement;
+		const loginForm = document.getElementById('login-form') as HTMLFormElement;
+		const loginError = document.getElementById('login-error') as HTMLElement;
+		const adminPassword = document.getElementById('admin-password') as HTMLInputElement;
+		const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
+		const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+		const searchInput = document.getElementById('search-input') as HTMLInputElement;
+		const searchBtn = document.getElementById('search-btn') as HTMLButtonElement;
+		const refreshBtn = document.getElementById('refresh-btn') as HTMLButtonElement;
+		const loading = document.getElementById('loading') as HTMLElement;
+		const errorContainer = document.getElementById('error-container') as HTMLElement;
+		const bookingsContainer = document.getElementById('bookings-container') as HTMLElement;
+		const bookingsGrid = document.getElementById('bookings-grid') as HTMLElement;
+		const pagination = document.getElementById('pagination') as HTMLElement;
 
 		// Event listeners
-		loginForm.addEventListener('submit', handleLogin);
-		logoutBtn.addEventListener('click', handleLogout);
-		searchBtn.addEventListener('click', handleSearch);
-		refreshBtn.addEventListener('click', () => loadBookings());
-		statusFilter.addEventListener('change', handleSearch);
-		searchInput.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') handleSearch();
-		});
+		if (loginForm) loginForm.addEventListener('submit', handleLogin);
+		if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+		if (searchBtn) searchBtn.addEventListener('click', handleSearch);
+		if (refreshBtn) refreshBtn.addEventListener('click', () => loadBookings());
+		if (statusFilter) statusFilter.addEventListener('change', handleSearch);
+		if (searchInput) {
+			searchInput.addEventListener('keypress', (e: KeyboardEvent) => {
+				if (e.key === 'Enter') handleSearch();
+			});
+		}
 
 		// Login handler
-		async function handleLogin(e) {
+		async function handleLogin(e: Event): Promise<void> {
 			e.preventDefault();
-			
+
+			if (!adminPassword) return;
+
 			const password = adminPassword.value;
 			if (!password) return;
 
@@ -145,8 +149,8 @@
 
 				if (response.ok) {
 					adminToken = password;
-					loginContainer.style.display = 'none';
-					adminInterface.style.display = 'block';
+					if (loginContainer) loginContainer.style.display = 'none';
+					if (adminInterface) adminInterface.style.display = 'block';
 					loadBookings();
 				} else {
 					showLoginError('Invalid password');
@@ -157,40 +161,42 @@
 		}
 
 		// Logout handler
-		function handleLogout() {
+		function handleLogout(): void {
 			adminToken = null;
-			adminInterface.style.display = 'none';
-			loginContainer.style.display = 'flex';
-			adminPassword.value = '';
-			loginError.style.display = 'none';
+			if (adminInterface) adminInterface.style.display = 'none';
+			if (loginContainer) loginContainer.style.display = 'flex';
+			if (adminPassword) adminPassword.value = '';
+			if (loginError) loginError.style.display = 'none';
 		}
 
 		// Show login error
-		function showLoginError(message) {
-			loginError.textContent = message;
-			loginError.style.display = 'block';
+		function showLoginError(message: string): void {
+			if (loginError) {
+				loginError.textContent = message;
+				loginError.style.display = 'block';
+			}
 		}
 
 		// Search handler
-		function handleSearch() {
-			currentFilters.status = statusFilter.value;
-			currentFilters.search = searchInput.value.trim();
+		function handleSearch(): void {
+			if (statusFilter) currentFilters.status = statusFilter.value;
+			if (searchInput) currentFilters.search = searchInput.value.trim();
 			currentPage = 0;
 			loadBookings();
 		}
 
 		// Load bookings
-		async function loadBookings() {
+		async function loadBookings(): Promise<void> {
 			if (!adminToken) return;
 
 			try {
-				loading.style.display = 'block';
-				errorContainer.style.display = 'none';
-				bookingsContainer.style.display = 'none';
+				if (loading) loading.style.display = 'block';
+				if (errorContainer) errorContainer.style.display = 'none';
+				if (bookingsContainer) bookingsContainer.style.display = 'none';
 
 				const params = new URLSearchParams({
-					limit: pageSize,
-					offset: currentPage * pageSize,
+					limit: pageSize.toString(),
+					offset: (currentPage * pageSize).toString(),
 					status: currentFilters.status
 				});
 
@@ -216,28 +222,30 @@
 				console.error('Error loading bookings:', error);
 				showError('Failed to load bookings. Please try again.');
 			} finally {
-				loading.style.display = 'none';
+				if (loading) loading.style.display = 'none';
 			}
 		}
 
 		// Render bookings cards
-		function renderBookings(bookings) {
+		function renderBookings(bookings: any[]): void {
+			if (!bookingsGrid) return;
+
 			bookingsGrid.innerHTML = '';
 
 			if (bookings.length === 0) {
 				bookingsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #6c757d; font-style: italic;">No bookings found</div>';
 			} else {
-				bookings.forEach(booking => {
+				bookings.forEach((booking: any) => {
 					const card = createBookingCard(booking);
-					bookingsGrid.appendChild(card);
+					if (bookingsGrid) bookingsGrid.appendChild(card);
 				});
 			}
 
-			bookingsContainer.style.display = 'block';
+			if (bookingsContainer) bookingsContainer.style.display = 'block';
 		}
 
 		// Create booking card with professional horizontal layout
-		function createBookingCard(booking) {
+		function createBookingCard(booking: any): HTMLElement {
 			const card = document.createElement('div');
 			card.className = 'booking-card';
 
@@ -261,7 +269,7 @@
 			// Get customer initials for avatar
 			const initials = booking.full_name
 				.split(' ')
-				.map(name => name.charAt(0))
+				.map((name: string) => name.charAt(0))
 				.join('')
 				.toUpperCase()
 				.substring(0, 2);
@@ -309,6 +317,7 @@
 					<!-- Actions -->
 					<div class="booking-actions">
 						${booking.status === 'confirmed' ? `<button class="btn btn-small btn-danger" onclick="cancelBooking('${booking.id}')">Cancel</button>` : ''}
+						${booking.status === 'confirmed' ? `<button class="btn btn-small btn-info" onclick="rescheduleBooking('${booking.id}')">Reschedule</button>` : ''}
 						${booking.status === 'confirmed' && booking.payment_method === 'pay_on_arrival' ?
 							`<button class="btn btn-small ${booking.payment_status === 'paid' ? 'btn-warning' : 'btn-success'}"
 								onclick="showPaymentToggleModal('${booking.id}', '${booking.payment_status}', '${booking.full_name}')">
@@ -334,7 +343,9 @@
 		}
 
 		// Render pagination
-		function renderPagination(total) {
+		function renderPagination(total: number): void {
+			if (!pagination) return;
+
 			const totalPages = Math.ceil(total / pageSize);
 			pagination.innerHTML = '';
 
@@ -358,7 +369,7 @@
 			// Page numbers
 			for (let i = 0; i < totalPages; i++) {
 				const pageBtn = document.createElement('button');
-				pageBtn.textContent = i + 1;
+				pageBtn.textContent = (i + 1).toString();
 				pageBtn.className = i === currentPage ? 'active' : '';
 				pageBtn.onclick = () => {
 					currentPage = i;
@@ -383,13 +394,15 @@
 		}
 
 		// Show error
-		function showError(message) {
-			errorContainer.innerHTML = `<div class="error">${message}</div>`;
-			errorContainer.style.display = 'block';
+		function showError(message: string): void {
+			if (errorContainer) {
+				errorContainer.innerHTML = `<div class="error">${message}</div>`;
+				errorContainer.style.display = 'block';
+			}
 		}
 
 		// Admin action functions - make them global so onclick can access them
-		window.cancelBooking = async function(bookingId) {
+		(window as any).cancelBooking = async function(bookingId: string): Promise<void> {
 			const reason = prompt('Reason for cancellation (optional):');
 			if (reason === null) return; // User cancelled
 
@@ -429,30 +442,111 @@
 			}
 		};
 
-		window.showPaymentToggleModal = function(bookingId, currentStatus, customerName) {
+		(window as any).rescheduleBooking = async function(bookingId: string): Promise<void> {
+			const newDate = prompt('New date (YYYY-MM-DD):');
+			if (!newDate) return;
+
+			// Validate date format
+			const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+			if (!dateRegex.test(newDate)) {
+				alert('Invalid date format. Please use YYYY-MM-DD');
+				return;
+			}
+
+			// Check if date is not in the past
+			const newDateObj = new Date(newDate);
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			if (newDateObj < today) {
+				alert('Cannot reschedule to past dates');
+				return;
+			}
+
+			const newTime = prompt('New time (e.g., 10:00 AM):');
+			if (!newTime) return;
+
+			const reason = prompt('Reason for reschedule (optional):');
+			if (reason === null) return; // User cancelled
+
+			const adminUser = prompt('Your admin name:');
+			if (!adminUser) {
+				alert('Admin name is required');
+				return;
+			}
+
+			const notifyCustomer = confirm('Send confirmation email to customer?');
+
+			if (!confirm(`Reschedule booking to ${newDate} at ${newTime}?`)) return;
+
+			try {
+				const response = await fetch('/api/garden-mgmt/reschedule-booking', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${adminToken}`
+					},
+					body: JSON.stringify({
+						bookingId,
+						newDate,
+						newTime,
+						reason,
+						adminUser,
+						notifyCustomer
+					})
+				});
+
+				const data = await response.json();
+
+				if (response.ok) {
+					alert('Booking rescheduled successfully');
+					loadBookings(); // Refresh the list
+				} else {
+					alert(`Failed to reschedule booking: ${data.error}`);
+				}
+			} catch (error) {
+				alert('Error rescheduling booking. Please try again.');
+			}
+		};
+
+		(window as any).showPaymentToggleModal = function(bookingId: string, currentStatus: string, customerName: string): void {
 			const newStatus = currentStatus === 'paid' ? 'pending' : 'paid';
 			const action = newStatus === 'paid' ? 'mark as paid' : 'mark as unpaid';
 
 			// Populate modal
-			document.getElementById('paymentCustomerName').textContent = customerName;
-			document.getElementById('paymentAction').textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} this booking`;
-			document.getElementById('paymentBookingId').value = bookingId;
-			document.getElementById('paymentNewStatus').value = newStatus;
+			const customerNameEl = document.getElementById('paymentCustomerName');
+			const actionEl = document.getElementById('paymentAction');
+			const bookingIdEl = document.getElementById('paymentBookingId') as HTMLInputElement;
+			const statusEl = document.getElementById('paymentNewStatus') as HTMLInputElement;
+			const modalEl = document.getElementById('paymentToggleModal');
 
-			// Show modal
-			document.getElementById('paymentToggleModal').style.display = 'block';
+			if (customerNameEl) customerNameEl.textContent = customerName;
+			if (actionEl) actionEl.textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} this booking`;
+			if (bookingIdEl) bookingIdEl.value = bookingId;
+			if (statusEl) statusEl.value = newStatus;
+			if (modalEl) modalEl.style.display = 'block';
 		};
 
-		window.closePaymentToggleModal = function() {
-			document.getElementById('paymentToggleModal').style.display = 'none';
-			// Clear the admin name field
-			document.getElementById('paymentAdminName').value = '';
+		(window as any).closePaymentToggleModal = function(): void {
+			const modalEl = document.getElementById('paymentToggleModal');
+			const adminNameEl = document.getElementById('paymentAdminName') as HTMLInputElement;
+
+			if (modalEl) modalEl.style.display = 'none';
+			if (adminNameEl) adminNameEl.value = '';
 		};
 
-		window.confirmPaymentToggle = async function() {
-			const bookingId = document.getElementById('paymentBookingId').value;
-			const newStatus = document.getElementById('paymentNewStatus').value;
-			const adminUser = document.getElementById('paymentAdminName').value.trim();
+		(window as any).confirmPaymentToggle = async function(): Promise<void> {
+			const bookingIdEl = document.getElementById('paymentBookingId') as HTMLInputElement;
+			const statusEl = document.getElementById('paymentNewStatus') as HTMLInputElement;
+			const adminUserEl = document.getElementById('paymentAdminName') as HTMLInputElement;
+
+			if (!bookingIdEl || !statusEl || !adminUserEl) {
+				alert('Required form elements not found');
+				return;
+			}
+
+			const bookingId = bookingIdEl.value;
+			const newStatus = statusEl.value;
+			const adminUser = adminUserEl.value.trim();
 
 			// Validation
 			if (!adminUser) {
@@ -477,7 +571,7 @@
 				const data = await response.json();
 
 				if (response.ok) {
-					closePaymentToggleModal();
+					(window as any).closePaymentToggleModal();
 					loadBookings(); // Refresh the list
 				} else {
 					alert(`Failed to update payment status: ${data.error}`);
@@ -488,7 +582,7 @@
 			}
 		};
 
-		window.documentRefund = async function(bookingId) {
+		(window as any).documentRefund = async function(bookingId: string): Promise<void> {
 			try {
 				// Fetch current refund data from the API
 				const response = await fetch(`/api/garden-mgmt/document-refund?bookingId=${bookingId}`, {
@@ -506,35 +600,51 @@
 				const existingRefund = booking.refund;
 
 				// Populate modal with booking information
-				document.getElementById('refundCustomerName').textContent = booking.customerName;
-				document.getElementById('refundBookingDetails').textContent = `${booking.date} at ${booking.time}`;
-				document.getElementById('refundOriginalAmount').textContent = booking.totalAmount.toFixed(2);
-				document.getElementById('refundMaxAmount').textContent = booking.totalAmount.toFixed(2);
-				document.getElementById('refundBookingId').value = bookingId;
+				const customerNameEl = document.getElementById('refundCustomerName');
+				const bookingDetailsEl = document.getElementById('refundBookingDetails');
+				const originalAmountEl = document.getElementById('refundOriginalAmount');
+				const maxAmountEl = document.getElementById('refundMaxAmount');
+				const bookingIdEl = document.getElementById('refundBookingId') as HTMLInputElement;
+				const refundAmountEl = document.getElementById('refundAmount') as HTMLInputElement;
+
+				if (customerNameEl) customerNameEl.textContent = booking.customerName;
+				if (bookingDetailsEl) bookingDetailsEl.textContent = `${booking.date} at ${booking.time}`;
+				if (originalAmountEl) originalAmountEl.textContent = booking.totalAmount.toFixed(2);
+				if (maxAmountEl) maxAmountEl.textContent = booking.totalAmount.toFixed(2);
+				if (bookingIdEl) bookingIdEl.value = bookingId;
 
 				// Set max amount validation
-				document.getElementById('refundAmount').max = booking.totalAmount;
+				if (refundAmountEl) refundAmountEl.max = booking.totalAmount.toString();
 
 				// Update modal title based on whether refund exists
 				const modalTitle = document.querySelector('#refundModal .modal-header h3');
 				if (existingRefund) {
-					modalTitle.textContent = 'Update Refund Documentation';
+					if (modalTitle) modalTitle.textContent = 'Update Refund Documentation';
 
 					// Pre-populate form with existing refund data
-					document.getElementById('refundAmount').value = existingRefund.amount;
-					document.getElementById('refundMethod').value = existingRefund.method;
-					document.getElementById('refundNotes').value = existingRefund.notes || '';
-					document.getElementById('refundAdminName').value = existingRefund.processedBy || '';
+					const amountEl = document.getElementById('refundAmount') as HTMLInputElement;
+					const methodEl = document.getElementById('refundMethod') as HTMLSelectElement;
+					const notesEl = document.getElementById('refundNotes') as HTMLTextAreaElement;
+					const adminNameEl = document.getElementById('refundAdminName') as HTMLInputElement;
+
+					if (amountEl) amountEl.value = existingRefund.amount.toString();
+					if (methodEl) methodEl.value = existingRefund.method;
+					if (notesEl) notesEl.value = existingRefund.notes || '';
+					if (adminNameEl) adminNameEl.value = existingRefund.processedBy || '';
 				} else {
-					modalTitle.textContent = 'Document Refund';
+					if (modalTitle) modalTitle.textContent = 'Document Refund';
 
 					// Clear form for new refund
-					document.getElementById('refundForm').reset();
-					document.getElementById('refundBookingId').value = bookingId;
+					const formEl = document.getElementById('refundForm') as HTMLFormElement;
+					const bookingIdInputEl = document.getElementById('refundBookingId') as HTMLInputElement;
+
+					if (formEl) formEl.reset();
+					if (bookingIdInputEl) bookingIdInputEl.value = bookingId;
 				}
 
 				// Show modal
-				document.getElementById('refundModal').style.display = 'block';
+				const modalEl = document.getElementById('refundModal');
+				if (modalEl) modalEl.style.display = 'block';
 
 			} catch (error) {
 				console.error('Error loading refund data:', error);
@@ -542,19 +652,29 @@
 			}
 		};
 
-		window.closeRefundModal = function() {
-			document.getElementById('refundModal').style.display = 'none';
+		(window as any).closeRefundModal = function(): void {
+			const modalEl = document.getElementById('refundModal');
+			if (modalEl) modalEl.style.display = 'none';
 		};
 
-		window.submitRefund = async function() {
-			const form = document.getElementById('refundForm');
+		(window as any).submitRefund = async function(): Promise<void> {
+			const bookingIdEl = document.getElementById('refundBookingId') as HTMLInputElement;
+			const refundAmountEl = document.getElementById('refundAmount') as HTMLInputElement;
+			const refundMethodEl = document.getElementById('refundMethod') as HTMLSelectElement;
+			const refundNotesEl = document.getElementById('refundNotes') as HTMLTextAreaElement;
+			const adminUserEl = document.getElementById('refundAdminName') as HTMLInputElement;
 
-			const bookingId = document.getElementById('refundBookingId').value;
-			const refundAmount = parseFloat(document.getElementById('refundAmount').value);
-			const refundMethod = document.getElementById('refundMethod').value;
-			const refundNotes = document.getElementById('refundNotes').value;
-			const adminUser = document.getElementById('refundAdminName').value;
-			const maxAmount = parseFloat(document.getElementById('refundAmount').max);
+			if (!bookingIdEl || !refundAmountEl || !refundMethodEl || !refundNotesEl || !adminUserEl) {
+				alert('Required form elements not found');
+				return;
+			}
+
+			const bookingId = bookingIdEl.value;
+			const refundAmount = parseFloat(refundAmountEl.value);
+			const refundMethod = refundMethodEl.value;
+			const refundNotes = refundNotesEl.value;
+			const adminUser = adminUserEl.value;
+			const maxAmount = parseFloat(refundAmountEl.max);
 
 			// Validation
 			if (!refundAmount || refundAmount <= 0) {
@@ -611,7 +731,7 @@
 				const data = await response.json();
 
 				if (response.ok) {
-					closeRefundModal();
+					(window as any).closeRefundModal();
 					loadBookings(); // Refresh the list
 				} else {
 					alert(`Failed to document refund: ${data.error}`);
@@ -623,20 +743,20 @@
 		};
 
 		// Close modals when clicking outside
-		window.onclick = function(event) {
+		window.onclick = function(event: Event): void {
 			const refundModal = document.getElementById('refundModal');
 			const paymentModal = document.getElementById('paymentToggleModal');
 
 			if (event.target === refundModal) {
-				closeRefundModal();
+				(window as any).closeRefundModal();
 			}
 
 			if (event.target === paymentModal) {
-				closePaymentToggleModal();
+				(window as any).closePaymentToggleModal();
 			}
 		};
 
-		window.viewBookingHistory = async function(bookingId) {
+		(window as any).viewBookingHistory = async function(bookingId: string): Promise<void> {
 			try {
 				// Fetch booking history from the database
 				const response = await fetch(`/api/garden-mgmt/booking-history?bookingId=${bookingId}`, {
@@ -652,8 +772,11 @@
 				const data = await response.json();
 
 				// Populate modal header info
-				document.getElementById('historyCustomerName').textContent = data.booking.customerName;
-				document.getElementById('historyBookingDetails').textContent = `${data.booking.date} at ${data.booking.time}`;
+				const customerNameEl = document.getElementById('historyCustomerName');
+				const bookingDetailsEl = document.getElementById('historyBookingDetails');
+
+				if (customerNameEl) customerNameEl.textContent = data.booking.customerName;
+				if (bookingDetailsEl) bookingDetailsEl.textContent = `${data.booking.date} at ${data.booking.time}`;
 
 				const historyContent = document.getElementById('historyContent');
 
@@ -661,7 +784,7 @@
 					// Create history items
 					let historyHTML = '';
 
-					data.actions.forEach((action, index) => {
+					data.actions.forEach((action: any) => {
 						const date = new Date(action.action_timestamp).toLocaleDateString('en-US', {
 							weekday: 'short',
 							year: 'numeric',
@@ -675,7 +798,7 @@
 						});
 
 						// Format action type, with special handling for payment and refund actions
-						let actionType;
+						let actionType: string;
 						if (action.reason && action.reason.includes('Payment marked as')) {
 							// Extract the payment action from the reason
 							if (action.reason.includes('Payment marked as PAID')) {
@@ -683,7 +806,7 @@
 							} else if (action.reason.includes('Payment marked as UNPAID')) {
 								actionType = 'Payment Marked Unpaid';
 							} else {
-								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 							}
 						} else if (action.reason && action.reason.includes('Refund document')) {
 							// Extract the refund action from the reason
@@ -692,10 +815,10 @@
 							} else if (action.reason.includes('Refund document updated')) {
 								actionType = 'Refund Updated';
 							} else {
-								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 							}
 						} else {
-							actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+							actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 						}
 
 						historyHTML += `
@@ -720,18 +843,21 @@
 						`;
 					});
 
-					historyContent.innerHTML = historyHTML;
+					if (historyContent) historyContent.innerHTML = historyHTML;
 				} else {
-					historyContent.innerHTML = `
-						<div class="no-history">
-							<p>No history found for this booking.</p>
-							<p><small>Booking ID: ${bookingId}</small></p>
-						</div>
-					`;
+					if (historyContent) {
+						historyContent.innerHTML = `
+							<div class="no-history">
+								<p>No history found for this booking.</p>
+								<p><small>Booking ID: ${bookingId}</small></p>
+							</div>
+						`;
+					}
 				}
 
 				// Show the modal
-				document.getElementById('historyModal').style.display = 'block';
+				const modalEl = document.getElementById('historyModal');
+				if (modalEl) modalEl.style.display = 'block';
 
 			} catch (error) {
 				console.error('Error fetching booking history:', error);
@@ -739,15 +865,16 @@
 			}
 		};
 
-		window.closeHistoryModal = function() {
-			document.getElementById('historyModal').style.display = 'none';
+		(window as any).closeHistoryModal = function(): void {
+			const modalEl = document.getElementById('historyModal');
+			if (modalEl) modalEl.style.display = 'none';
 		};
 
 		// Close history modal when clicking outside of it
-		window.addEventListener('click', function(event) {
+		window.addEventListener('click', function(event: Event): void {
 			const historyModal = document.getElementById('historyModal');
 			if (event.target === historyModal) {
-				window.closeHistoryModal();
+				(window as any).closeHistoryModal();
 			}
 		});
 	</script>

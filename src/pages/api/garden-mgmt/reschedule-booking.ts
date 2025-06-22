@@ -1,7 +1,7 @@
-// src/pages/api/garden-mgmt/cancel-booking.ts
+// src/pages/api/garden-mgmt/reschedule-booking.ts
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../../lib/supabase';
-import { sendCancellationConfirmation, sendCancellationNotification } from '../../../utils/webhookService';
+import { sendRescheduleConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../../utils/webhookService';
 
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {
@@ -48,22 +48,46 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     const body = await request.json();
-    const { bookingId, reason, adminUser, notifyCustomer = true } = body;
+    const { bookingId, newDate, newTime, reason, adminUser, notifyCustomer = true } = body;
 
     // Validate required fields
-    if (!bookingId || !adminUser) {
+    if (!bookingId || !newDate || !newTime || !adminUser) {
       return new Response(JSON.stringify({ 
-        error: 'Booking ID and admin user are required' 
+        error: 'Booking ID, new date, new time, and admin user are required' 
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Get booking details first for cancellation token
+    // Validate date format
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(newDate)) {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid date format. Use YYYY-MM-DD' 
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Validate new date is not in the past
+    const newDateObj = new Date(newDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (newDateObj < today) {
+      return new Response(JSON.stringify({ 
+        error: 'Cannot reschedule to past dates' 
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Get booking details first
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
-      .select('cancellation_token, full_name, email, phone, date, time, number_of_visitors, total_amount, payment_method, status')
+      .select('id, cancellation_token, status, full_name, email')
       .eq('id', bookingId)
       .single();
 
@@ -78,40 +102,41 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     if (booking.status === 'cancelled') {
       return new Response(JSON.stringify({ 
-        error: 'Booking is already cancelled' 
+        error: 'Cannot reschedule cancelled booking' 
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    console.log('Admin cancelling booking:', { bookingId, adminUser, reason });
+    console.log('Admin rescheduling booking:', { bookingId, adminUser, newDate, newTime });
 
-    // Call the database function to cancel booking (with admin flag)
-    const { data, error } = await supabase.rpc('cancel_booking', {
+    // Call the database function to reschedule booking
+    const { data, error } = await supabase.rpc('reschedule_booking', {
       p_cancellation_token: booking.cancellation_token,
-      p_cancellation_reason: reason || 'Cancelled by admin',
-      p_customer_ip: clientAddress || null,
-      p_admin_user: adminUser
+      p_new_date: newDate,
+      p_new_time: newTime,
+      p_reschedule_reason: reason || `Rescheduled by admin: ${adminUser}`,
+      p_customer_ip: clientAddress || null
     });
 
-    console.log('Admin cancellation result:', { data, error });
+    console.log('Admin reschedule result:', { data, error });
 
     if (error) {
-      console.error('Database error during admin cancellation:', error);
+      console.error('Database error during admin reschedule:', error);
       return new Response(JSON.stringify({ 
-        error: 'Failed to process cancellation. Please try again.' 
+        error: 'Failed to process reschedule. Please try again.' 
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Check if cancellation was successful
+    // Check if reschedule was successful
     const result = data?.[0];
     if (!result?.success) {
       return new Response(JSON.stringify({ 
-        error: result?.message || 'Cancellation failed' 
+        error: result?.message || 'Reschedule failed' 
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -119,54 +144,62 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     const bookingData = result.booking_data;
-    console.log('Admin booking cancelled successfully:', bookingData);
+    console.log('Booking rescheduled successfully by admin:', bookingData);
 
-    // Send cancellation emails if requested (async, don't block response)
+    // Send reschedule confirmation email if requested (async, don't block response)
     if (notifyCustomer && bookingData) {
-      // Send confirmation to customer
-      sendCancellationConfirmation({
+      // Prepare data for webhook
+      const webhookData = {
         id: bookingData.id,
         fullName: bookingData.full_name,
         email: bookingData.email,
         phone: bookingData.phone,
-        visitDate: bookingData.date,
-        preferredTime: bookingData.time,
+        visitDate: bookingData.new_date,
+        preferredTime: bookingData.new_time,
         numberOfVisitors: bookingData.number_of_visitors,
         totalAmount: bookingData.total_amount,
         paymentMethod: bookingData.payment_method,
-        cancellationReason: `Cancelled by admin: ${reason || 'No reason provided'}`,
+        originalDate: bookingData.original_date,
+        originalTime: bookingData.original_time,
+        rescheduleReason: `Rescheduled by admin: ${reason || 'No reason provided'}`,
         cancellationToken: bookingData.cancellation_token
-      }).catch(error => {
-        console.error('Failed to send customer cancellation confirmation:', error);
-      });
+      };
 
-      // Send notification to admin
-      sendCancellationNotification({
-        id: bookingData.id,
-        fullName: bookingData.full_name,
-        email: bookingData.email,
-        phone: bookingData.phone,
-        visitDate: bookingData.date,
-        preferredTime: bookingData.time,
-        numberOfVisitors: bookingData.number_of_visitors,
-        totalAmount: bookingData.total_amount,
-        paymentMethod: bookingData.payment_method,
-        cancellationReason: `Admin cancellation by ${adminUser}: ${reason || 'No reason provided'}`,
-        cancellationToken: bookingData.cancellation_token
+      // Send reschedule confirmation webhook
+      sendWebhookWithRetry(
+        () => sendRescheduleConfirmation(webhookData),
+        3, // max retries
+        2000 // initial delay
+      ).then(success => {
+        logWebhookAttempt(
+          bookingData.id,
+          'admin_reschedule',
+          success,
+          success ? undefined : 'Failed after retries'
+        );
       }).catch(error => {
-        console.error('Failed to send admin cancellation notification:', error);
+        console.error('Admin reschedule webhook sending failed:', error);
+        logWebhookAttempt(
+          bookingData.id,
+          'admin_reschedule',
+          false,
+          error.message
+        );
       });
     }
 
     return new Response(JSON.stringify({
       success: true,
-      message: 'Booking cancelled successfully by admin',
+      message: `Booking rescheduled successfully by ${adminUser}. ${notifyCustomer ? 'Customer will receive confirmation email.' : 'No email sent to customer.'}`,
       booking: {
         id: bookingData.id,
         customerName: bookingData.full_name,
-        date: bookingData.date,
-        time: bookingData.time,
-        visitors: bookingData.number_of_visitors
+        originalDate: bookingData.original_date,
+        originalTime: bookingData.original_time,
+        newDate: bookingData.new_date,
+        newTime: bookingData.new_time,
+        visitors: bookingData.number_of_visitors,
+        amount: bookingData.total_amount
       }
     }), {
       status: 200,
@@ -174,7 +207,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     });
 
   } catch (error) {
-    console.error('Admin cancellation API error:', error);
+    console.error('Admin reschedule API error:', error);
     return new Response(JSON.stringify({ 
       error: 'Internal server error. Please try again.' 
     }), {

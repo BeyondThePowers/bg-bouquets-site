@@ -36,9 +36,24 @@ Netlify should auto-detect these settings from `netlify.toml`:
 
 ### **4. Set Environment Variables**
 In Netlify Dashboard → Site Settings → Environment Variables, add:
+
+**Required Variables:**
 ```
 PUBLIC_SUPABASE_URL = https://jgoucxlacofztynmgbeb.supabase.co
 PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impnb3VjeGxhY29menR5bm1nYmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTE2NjcsImV4cCI6MjA2NTc2NzY2N30.dMfIzNZaYi5EdFUFIh3-jDUdX5wkbkKo5v63yLlu9-Y
+```
+
+**Email Automation Variables (Required for Make.com Integration):**
+```
+MAKE_BOOKING_WEBHOOK_URL = https://hook.make.com/your-booking-webhook-id
+MAKE_CANCELLATION_WEBHOOK_URL = https://hook.make.com/your-cancellation-webhook-id
+ADMIN_EMAIL = admin@bgbouquet.com
+```
+
+**Optional Variables:**
+```
+SUPABASE_SERVICE_ROLE_KEY = your_service_role_key_here
+NODE_ENV = production
 ```
 
 ### **5. Deploy**

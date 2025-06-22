@@ -510,36 +510,46 @@
 		const cancellationToken = urlParams.get('token');
 
 		// DOM elements
-		const loadingState = document.getElementById('loading-state');
-		const errorState = document.getElementById('error-state');
-		const errorMessage = document.getElementById('error-message');
-		const actionSelection = document.getElementById('action-selection');
-		const cancellationForm = document.getElementById('cancellation-form');
-		const rescheduleForm = document.getElementById('reschedule-form');
-		const successState = document.getElementById('success-state');
-		const headerSubtitle = document.getElementById('header-subtitle');
+		const loadingState = document.getElementById('loading-state') as HTMLElement;
+		const errorState = document.getElementById('error-state') as HTMLElement;
+		const errorMessage = document.getElementById('error-message') as HTMLElement;
+		const actionSelection = document.getElementById('action-selection') as HTMLElement;
+		const cancellationForm = document.getElementById('cancellation-form') as HTMLElement;
+		const rescheduleForm = document.getElementById('reschedule-form') as HTMLElement;
+		const successState = document.getElementById('success-state') as HTMLElement;
+		const headerSubtitle = document.getElementById('header-subtitle') as HTMLElement;
 
 		// Action buttons
-		const rescheduleBtn = document.getElementById('reschedule-btn');
-		const cancelBtn = document.getElementById('cancel-btn');
-		const confirmCancelBtn = document.getElementById('confirm-cancel');
-		const confirmRescheduleBtn = document.getElementById('confirm-reschedule');
-		const backToSelectionBtn = document.getElementById('back-to-selection');
-		const backToSelection2Btn = document.getElementById('back-to-selection-2');
+		const rescheduleBtn = document.getElementById('reschedule-btn') as HTMLButtonElement;
+		const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement;
+		const confirmCancelBtn = document.getElementById('confirm-cancel') as HTMLButtonElement;
+		const confirmRescheduleBtn = document.getElementById('confirm-reschedule') as HTMLButtonElement;
+		const backToSelectionBtn = document.getElementById('back-to-selection') as HTMLButtonElement;
+		const backToSelection2Btn = document.getElementById('back-to-selection-2') as HTMLButtonElement;
 
 		// Form elements
-		const reasonTextarea = document.getElementById('cancellation-reason');
-		const rescheduleReasonTextarea = document.getElementById('reschedule-reason');
-		const availabilityCalendar = document.getElementById('availability-calendar');
+		const reasonTextarea = document.getElementById('cancellation-reason') as HTMLTextAreaElement;
+		const rescheduleReasonTextarea = document.getElementById('reschedule-reason') as HTMLTextAreaElement;
+		const availabilityCalendar = document.getElementById('availability-calendar') as HTMLElement;
 
 		// State variables
-		let currentBookingData = null;
-		let availabilityData = null;
-		let selectedDate = null;
-		let selectedTime = null;
+		interface BookingData {
+			customerName: string;
+			email: string;
+			currentDate: string;
+			currentTime: string;
+			visitors: number;
+			amount: number;
+			rescheduleCount: number;
+		}
+
+		let currentBookingData: BookingData | null = null;
+		let availabilityData: Record<string, string[]> | null = null;
+		let selectedDate: string | null = null;
+		let selectedTime: string | null = null;
 
 		// Initialize page
-		async function initializePage() {
+		async function initializePage(): Promise<void> {
 			if (!cancellationToken) {
 				showError('Invalid cancellation link. Please check your email for the correct link.');
 				return;
@@ -563,166 +573,203 @@
 			}
 		}
 
-		function showError(message) {
-			loadingState.style.display = 'none';
-			errorMessage.textContent = message;
-			errorState.style.display = 'block';
+		function showError(message: string): void {
+			if (loadingState) loadingState.style.display = 'none';
+			if (errorMessage) errorMessage.textContent = message;
+			if (errorState) errorState.style.display = 'block';
 		}
 
-		function showBookingDetails(booking) {
-			loadingState.style.display = 'none';
+		function showBookingDetails(booking: BookingData): void {
+			if (loadingState) loadingState.style.display = 'none';
 			currentBookingData = booking;
 
 			// Populate booking details
-			document.getElementById('customer-name').textContent = booking.customerName;
-			document.getElementById('customer-email').textContent = booking.email;
-			document.getElementById('visit-date').textContent = new Date(booking.currentDate).toLocaleDateString('en-US', {
-				weekday: 'long',
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric'
-			});
-			document.getElementById('visit-time').textContent = booking.currentTime;
-			document.getElementById('visitor-count').textContent = booking.visitors;
-			document.getElementById('total-amount').textContent = `$${booking.amount}`;
+			const customerNameEl = document.getElementById('customer-name');
+			const customerEmailEl = document.getElementById('customer-email');
+			const visitDateEl = document.getElementById('visit-date');
+			const visitTimeEl = document.getElementById('visit-time');
+			const visitorCountEl = document.getElementById('visitor-count');
+			const totalAmountEl = document.getElementById('total-amount');
 
-			// Show reschedule count if any
-			if (booking.rescheduleCount > 0) {
-				headerSubtitle.textContent = `Booking Management (Rescheduled ${booking.rescheduleCount} time${booking.rescheduleCount > 1 ? 's' : ''})`;
-			}
-
-			actionSelection.style.display = 'block';
-		}
-
-		// Event Listeners
-		rescheduleBtn.addEventListener('click', () => {
-			actionSelection.style.display = 'none';
-			headerSubtitle.textContent = 'Reschedule Booking';
-			rescheduleForm.style.display = 'block';
-			loadAvailability();
-		});
-
-		cancelBtn.addEventListener('click', () => {
-			actionSelection.style.display = 'none';
-			headerSubtitle.textContent = 'Cancel Booking';
-			cancellationForm.style.display = 'block';
-		});
-
-		backToSelectionBtn.addEventListener('click', () => {
-			cancellationForm.style.display = 'none';
-			headerSubtitle.textContent = 'Booking Management';
-			actionSelection.style.display = 'block';
-		});
-
-		backToSelection2Btn.addEventListener('click', () => {
-			rescheduleForm.style.display = 'none';
-			headerSubtitle.textContent = 'Booking Management';
-			actionSelection.style.display = 'block';
-			selectedDate = null;
-			selectedTime = null;
-			confirmRescheduleBtn.style.display = 'none';
-		});
-
-		// Handle cancellation confirmation
-		confirmCancelBtn.addEventListener('click', async () => {
-			if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
-				return;
-			}
-
-			confirmCancelBtn.disabled = true;
-			confirmCancelBtn.textContent = 'Cancelling...';
-
-			try {
-				const response = await fetch('/api/cancel-booking', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						cancellationToken,
-						reason: reasonTextarea.value.trim() || null
-					})
-				});
-
-				const data = await response.json();
-
-				if (!response.ok) {
-					throw new Error(data.error || 'Cancellation failed');
-				}
-
-				// Show success state
-				cancellationForm.style.display = 'none';
-				headerSubtitle.textContent = 'Booking Cancelled';
-				successState.style.display = 'block';
-				document.querySelector('#success-state h3').textContent = 'Booking Cancelled Successfully';
-				document.querySelector('#success-state p').textContent = 'Your booking has been cancelled and you will receive a confirmation email shortly.';
-
-			} catch (error) {
-				console.error('Cancellation error:', error);
-				showError(error.message || 'Failed to cancel booking. Please try again.');
-				confirmCancelBtn.disabled = false;
-				confirmCancelBtn.textContent = 'Cancel Booking';
-			}
-		});
-
-		// Handle reschedule confirmation
-		confirmRescheduleBtn.addEventListener('click', async () => {
-			if (!selectedDate || !selectedTime) {
-				showError('Please select a new date and time for your booking.');
-				return;
-			}
-
-			if (!confirm(`Are you sure you want to reschedule your booking to ${selectedDate} at ${selectedTime}?`)) {
-				return;
-			}
-
-			confirmRescheduleBtn.disabled = true;
-			confirmRescheduleBtn.textContent = 'Rescheduling...';
-
-			try {
-				const response = await fetch('/api/reschedule-booking', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						cancellationToken,
-						newDate: selectedDate,
-						newTime: selectedTime,
-						reason: rescheduleReasonTextarea.value.trim() || null
-					})
-				});
-
-				const data = await response.json();
-
-				if (!response.ok) {
-					throw new Error(data.error || 'Reschedule failed');
-				}
-
-				// Show success state
-				rescheduleForm.style.display = 'none';
-				headerSubtitle.textContent = 'Booking Rescheduled';
-				successState.style.display = 'block';
-				document.querySelector('#success-state h3').textContent = 'Booking Rescheduled Successfully';
-				document.querySelector('#success-state p').textContent = `Your booking has been rescheduled to ${new Date(selectedDate).toLocaleDateString('en-US', {
+			if (customerNameEl) customerNameEl.textContent = booking.customerName;
+			if (customerEmailEl) customerEmailEl.textContent = booking.email;
+			if (visitDateEl) {
+				visitDateEl.textContent = new Date(booking.currentDate).toLocaleDateString('en-US', {
 					weekday: 'long',
 					year: 'numeric',
 					month: 'long',
 					day: 'numeric'
-				})} at ${selectedTime}. You will receive a confirmation email shortly.`;
-
-			} catch (error) {
-				console.error('Reschedule error:', error);
-				showError(error.message || 'Failed to reschedule booking. Please try again.');
-				confirmRescheduleBtn.disabled = false;
-				confirmRescheduleBtn.textContent = 'Confirm Reschedule';
+				});
 			}
-		});
+			if (visitTimeEl) visitTimeEl.textContent = booking.currentTime;
+			if (visitorCountEl) visitorCountEl.textContent = booking.visitors.toString();
+			if (totalAmountEl) totalAmountEl.textContent = `$${booking.amount}`;
+
+			// Show reschedule count if any
+			if (booking.rescheduleCount > 0 && headerSubtitle) {
+				headerSubtitle.textContent = `Booking Management (Rescheduled ${booking.rescheduleCount} time${booking.rescheduleCount > 1 ? 's' : ''})`;
+			}
+
+			if (actionSelection) actionSelection.style.display = 'block';
+		}
+
+		// Event Listeners
+		if (rescheduleBtn) {
+			rescheduleBtn.addEventListener('click', () => {
+				if (actionSelection) actionSelection.style.display = 'none';
+				if (headerSubtitle) headerSubtitle.textContent = 'Reschedule Booking';
+				if (rescheduleForm) rescheduleForm.style.display = 'block';
+				loadAvailability();
+			});
+		}
+
+		if (cancelBtn) {
+			cancelBtn.addEventListener('click', () => {
+				if (actionSelection) actionSelection.style.display = 'none';
+				if (headerSubtitle) headerSubtitle.textContent = 'Cancel Booking';
+				if (cancellationForm) cancellationForm.style.display = 'block';
+			});
+		}
+
+		if (backToSelectionBtn) {
+			backToSelectionBtn.addEventListener('click', () => {
+				if (cancellationForm) cancellationForm.style.display = 'none';
+				if (headerSubtitle) headerSubtitle.textContent = 'Booking Management';
+				if (actionSelection) actionSelection.style.display = 'block';
+			});
+		}
+
+		if (backToSelection2Btn) {
+			backToSelection2Btn.addEventListener('click', () => {
+				if (rescheduleForm) rescheduleForm.style.display = 'none';
+				if (headerSubtitle) headerSubtitle.textContent = 'Booking Management';
+				if (actionSelection) actionSelection.style.display = 'block';
+				selectedDate = null;
+				selectedTime = null;
+				if (confirmRescheduleBtn) confirmRescheduleBtn.style.display = 'none';
+			});
+		}
+
+		// Handle cancellation confirmation
+		if (confirmCancelBtn) {
+			confirmCancelBtn.addEventListener('click', async () => {
+				if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+					return;
+				}
+
+				confirmCancelBtn.disabled = true;
+				confirmCancelBtn.textContent = 'Cancelling...';
+
+				try {
+					const reasonValue = reasonTextarea ? reasonTextarea.value.trim() || null : null;
+
+					const response = await fetch('/api/cancel-booking', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							cancellationToken,
+							reason: reasonValue
+						})
+					});
+
+					const data = await response.json();
+
+					if (!response.ok) {
+						throw new Error(data.error || 'Cancellation failed');
+					}
+
+					// Show success state
+					if (cancellationForm) cancellationForm.style.display = 'none';
+					if (headerSubtitle) headerSubtitle.textContent = 'Booking Cancelled';
+					if (successState) successState.style.display = 'block';
+
+					const successTitle = document.querySelector('#success-state h3');
+					const successText = document.querySelector('#success-state p');
+					if (successTitle) successTitle.textContent = 'Booking Cancelled Successfully';
+					if (successText) successText.textContent = 'Your booking has been cancelled and you will receive a confirmation email shortly.';
+
+				} catch (error: unknown) {
+					console.error('Cancellation error:', error);
+					const errorMessage = error instanceof Error ? error.message : 'Failed to cancel booking. Please try again.';
+					showError(errorMessage);
+					confirmCancelBtn.disabled = false;
+					confirmCancelBtn.textContent = 'Cancel Booking';
+				}
+			});
+		}
+
+		// Handle reschedule confirmation
+		if (confirmRescheduleBtn) {
+			confirmRescheduleBtn.addEventListener('click', async () => {
+				if (!selectedDate || !selectedTime) {
+					showError('Please select a new date and time for your booking.');
+					return;
+				}
+
+				if (!confirm(`Are you sure you want to reschedule your booking to ${selectedDate} at ${selectedTime}?`)) {
+					return;
+				}
+
+				confirmRescheduleBtn.disabled = true;
+				confirmRescheduleBtn.textContent = 'Rescheduling...';
+
+				try {
+					const reasonValue = rescheduleReasonTextarea ? rescheduleReasonTextarea.value.trim() || null : null;
+
+					const response = await fetch('/api/reschedule-booking', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							cancellationToken,
+							newDate: selectedDate,
+							newTime: selectedTime,
+							reason: reasonValue
+						})
+					});
+
+					const data = await response.json();
+
+					if (!response.ok) {
+						throw new Error(data.error || 'Reschedule failed');
+					}
+
+					// Show success state
+					if (rescheduleForm) rescheduleForm.style.display = 'none';
+					if (headerSubtitle) headerSubtitle.textContent = 'Booking Rescheduled';
+					if (successState) successState.style.display = 'block';
+
+					const successTitle = document.querySelector('#success-state h3');
+					const successText = document.querySelector('#success-state p');
+					if (successTitle) successTitle.textContent = 'Booking Rescheduled Successfully';
+					if (successText) {
+						successText.textContent = `Your booking has been rescheduled to ${new Date(selectedDate).toLocaleDateString('en-US', {
+							weekday: 'long',
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric'
+						})} at ${selectedTime}. You will receive a confirmation email shortly.`;
+					}
+
+				} catch (error: unknown) {
+					console.error('Reschedule error:', error);
+					const errorMessage = error instanceof Error ? error.message : 'Failed to reschedule booking. Please try again.';
+					showError(errorMessage);
+					confirmRescheduleBtn.disabled = false;
+					confirmRescheduleBtn.textContent = 'Confirm Reschedule';
+				}
+			});
+		}
 
 		// Load availability data
-		async function loadAvailability() {
+		async function loadAvailability(): Promise<void> {
 			try {
-				availabilityCalendar.innerHTML = '<p>Loading available dates...</p>';
+				if (availabilityCalendar) {
+					availabilityCalendar.innerHTML = '<p>Loading available dates...</p>';
+				}
 
 				const response = await fetch('/api/availability');
 				const data = await response.json();
@@ -736,20 +783,22 @@
 
 			} catch (error) {
 				console.error('Error loading availability:', error);
-				availabilityCalendar.innerHTML = '<p style="color: #dc3545;">Failed to load available dates. Please try again.</p>';
+				if (availabilityCalendar) {
+					availabilityCalendar.innerHTML = '<p style="color: #dc3545;">Failed to load available dates. Please try again.</p>';
+				}
 			}
 		}
 
 		// Render availability calendar
-		function renderAvailabilityCalendar() {
-			if (!availabilityData) return;
+		function renderAvailabilityCalendar(): void {
+			if (!availabilityData || !availabilityCalendar) return;
 
 			const container = document.createElement('div');
 			container.className = 'calendar-container';
 
 			// Group dates by month
-			const datesByMonth = {};
-			Object.keys(availabilityData).forEach(date => {
+			const datesByMonth: Record<string, string[]> = {};
+			Object.keys(availabilityData).forEach((date: string) => {
 				const dateObj = new Date(date);
 				const monthKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
 				if (!datesByMonth[monthKey]) {
@@ -759,12 +808,12 @@
 			});
 
 			// Render each month
-			Object.keys(datesByMonth).sort().forEach(monthKey => {
+			Object.keys(datesByMonth).sort().forEach((monthKey: string) => {
 				const monthContainer = document.createElement('div');
 				monthContainer.className = 'calendar-month';
 
 				const [year, month] = monthKey.split('-');
-				const monthName = new Date(year, month - 1, 1).toLocaleDateString('en-US', {
+				const monthName = new Date(parseInt(year), parseInt(month) - 1, 1).toLocaleDateString('en-US', {
 					month: 'long',
 					year: 'numeric'
 				});
@@ -778,7 +827,7 @@
 				datesContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
 				datesContainer.style.gap = '10px';
 
-				datesByMonth[monthKey].forEach(date => {
+				datesByMonth[monthKey].forEach((date: string) => {
 					const dateButton = document.createElement('button');
 					dateButton.className = 'calendar-day available';
 					dateButton.textContent = new Date(date).toLocaleDateString('en-US', {
@@ -791,7 +840,17 @@
 						dateButton.className = 'calendar-day current-booking';
 						dateButton.textContent += ' (Current)';
 					} else {
-						dateButton.addEventListener('click', () => selectDate(date));
+						dateButton.addEventListener('click', (event: Event) => {
+							selectDate(date);
+							const target = event.target as HTMLElement;
+							if (target) {
+								// Update date selection UI
+								document.querySelectorAll('.calendar-day.available').forEach((btn: Element) => {
+									btn.classList.remove('selected');
+								});
+								target.classList.add('selected');
+							}
+						});
 					}
 
 					datesContainer.appendChild(dateButton);
@@ -806,22 +865,18 @@
 		}
 
 		// Select date and show time slots
-		function selectDate(date) {
+		function selectDate(date: string): void {
 			selectedDate = date;
 			selectedTime = null;
-
-			// Update date selection UI
-			document.querySelectorAll('.calendar-day.available').forEach(btn => {
-				btn.classList.remove('selected');
-			});
-			event.target.classList.add('selected');
 
 			// Show time slots for selected date
 			showTimeSlots(date);
 		}
 
 		// Show available time slots for selected date
-		function showTimeSlots(date) {
+		function showTimeSlots(date: string): void {
+			if (!availabilityData || !availabilityCalendar) return;
+
 			const timeSlots = availabilityData[date] || [];
 
 			// Remove existing time slots
@@ -833,7 +888,7 @@
 			const timeSlotsContainer = document.createElement('div');
 			timeSlotsContainer.className = 'time-slots';
 
-			timeSlots.forEach(time => {
+			timeSlots.forEach((time: string) => {
 				const timeButton = document.createElement('button');
 				timeButton.className = 'time-slot';
 				timeButton.textContent = time;
@@ -843,7 +898,9 @@
 					timeButton.className = 'time-slot current-booking';
 					timeButton.textContent += ' (Current)';
 				} else {
-					timeButton.addEventListener('click', () => selectTime(time));
+					timeButton.addEventListener('click', (event: Event) => {
+						selectTime(time, event);
+					});
 				}
 
 				timeSlotsContainer.appendChild(timeButton);
@@ -853,17 +910,23 @@
 		}
 
 		// Select time slot
-		function selectTime(time) {
+		function selectTime(time: string, event: Event): void {
 			selectedTime = time;
 
 			// Update time selection UI
-			document.querySelectorAll('.time-slot').forEach(btn => {
+			document.querySelectorAll('.time-slot').forEach((btn: Element) => {
 				btn.classList.remove('selected');
 			});
-			event.target.classList.add('selected');
+
+			const target = event.target as HTMLElement;
+			if (target) {
+				target.classList.add('selected');
+			}
 
 			// Show confirm button
-			confirmRescheduleBtn.style.display = 'inline-flex';
+			if (confirmRescheduleBtn) {
+				confirmRescheduleBtn.style.display = 'inline-flex';
+			}
 		}
 
 		// Initialize page when DOM is loaded

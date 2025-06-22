@@ -417,6 +417,17 @@ body {
 	border-color: #dc2626;
 }
 
+.btn-info {
+	background: #3b82f6;
+	color: var(--admin-white);
+	border-color: #3b82f6;
+}
+
+.btn-info:hover {
+	background: #2563eb;
+	border-color: #2563eb;
+}
+
 /* Payment status styling with meaningful colors */
 .status-paid {
 	color: #059669;

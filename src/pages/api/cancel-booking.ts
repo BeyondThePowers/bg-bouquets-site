@@ -79,7 +79,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         numberOfVisitors: bookingData.number_of_visitors,
         totalAmount: bookingData.total_amount,
         paymentMethod: bookingData.payment_method,
-        cancellationReason: reason
+        cancellationReason: reason,
+        cancellationToken: bookingData.cancellation_token
       }).catch(error => {
         console.error('Failed to send cancellation confirmation:', error);
       });
@@ -95,7 +96,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         numberOfVisitors: bookingData.number_of_visitors,
         totalAmount: bookingData.total_amount,
         paymentMethod: bookingData.payment_method,
-        cancellationReason: reason
+        cancellationReason: reason,
+        cancellationToken: bookingData.cancellation_token
       }).catch(error => {
         console.error('Failed to send admin cancellation notification:', error);
       });

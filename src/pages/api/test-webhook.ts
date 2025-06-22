@@ -37,13 +37,15 @@ export const POST: APIRoute = async ({ request }) => {
       webhookType = 'Cancellation Confirmation';
       result = await sendCancellationConfirmation({
         ...sampleBookingData,
-        cancellationReason: 'Test cancellation reason'
+        cancellationReason: 'Test cancellation reason',
+        cancellationToken: 'test-cancellation-token-123'
       });
     } else if (type === 'cancellation-admin') {
       webhookType = 'Admin Cancellation Notification';
       result = await sendCancellationNotification({
         ...sampleBookingData,
-        cancellationReason: 'Test cancellation reason'
+        cancellationReason: 'Test cancellation reason',
+        cancellationToken: 'test-cancellation-token-123'
       });
     } else if (type === 'reschedule') {
       webhookType = 'Reschedule Confirmation';
@@ -51,7 +53,8 @@ export const POST: APIRoute = async ({ request }) => {
         ...sampleBookingData,
         originalDate: '2025-07-10',
         originalTime: '6:00 PM',
-        rescheduleReason: 'Test reschedule reason'
+        rescheduleReason: 'Test reschedule reason',
+        cancellationToken: 'test-cancellation-token-123'
       });
     } else {
       return new Response(JSON.stringify({
