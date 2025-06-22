@@ -95,9 +95,11 @@ import Layout from '../layouts/Layout.astro';
 						</div> -->
 
 						<!-- Booking Form -->
-						<form id="booking-form" class="space-y-3">
-							<!-- Desktop: 2-column layout, Mobile: single column -->
-							<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+						<!-- Booking Form Container -->
+						<div id="booking-form-container" class="transition-all duration-500 ease-in-out">
+							<form id="booking-form" class="space-y-3">
+								<!-- Desktop: 2-column layout, Mobile: single column -->
+								<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 								<div>
 									<label for="fullName" class="block text-sm font-playfair font-medium text-charcoal mb-1">Full Name *</label>
 									<input
@@ -310,6 +312,56 @@ import Layout from '../layouts/Layout.astro';
 								Secure payment powered by Stripe. Your information is protected.
 							</p>
 						</form>
+						</div>
+
+						<!-- Success Message (Hidden by default) -->
+						<div id="booking-success" class="hidden transition-all duration-500 ease-in-out opacity-0 transform translate-y-4">
+							<div class="text-center space-y-6 py-8">
+								<!-- Success Icon -->
+								<div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center" style="background-color: #F8E7E8;">
+									<svg class="w-8 h-8" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+									</svg>
+								</div>
+
+								<!-- Success Message -->
+								<div class="space-y-3">
+									<h3 class="text-2xl font-playfair font-bold text-charcoal">You're All Set!</h3>
+									<div id="booking-details" class="space-y-2">
+										<p class="font-roboto text-charcoal">
+											Your bouquet experience is confirmed for:
+										</p>
+										<div class="bg-white p-4 rounded-lg border-2" style="border-color: #E8B4B8;">
+											<p class="font-playfair font-semibold text-lg text-charcoal" id="success-date-time">
+												<!-- Date and time will be inserted here -->
+											</p>
+											<p class="font-roboto text-sm text-charcoal mt-1" id="success-visitors">
+												<!-- Visitor count will be inserted here -->
+											</p>
+										</div>
+									</div>
+									<p class="font-roboto text-charcoal" id="success-email-message">
+										<!-- Email confirmation message will be inserted here -->
+									</p>
+								</div>
+
+								<!-- Call-to-Action Buttons -->
+								<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-4">
+									<button
+										id="make-another-booking"
+										class="vintage-button px-6 py-3 text-sm lg:text-base font-playfair font-semibold rounded-sm transition-all duration-200 hover:transform hover:scale-105"
+									>
+										Make Another Booking
+									</button>
+									<a
+										href="#contact"
+										class="border-2 border-charcoal bg-cream px-6 py-3 rounded-sm font-playfair font-semibold hover:bg-shabby-pink transition-all duration-300 text-center text-sm lg:text-base"
+									>
+										Contact Us
+									</a>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -958,6 +1010,12 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 
 		// Initialize custom calendar
 		function initializeCustomCalendar() {
+			setupCalendarState();
+			setupCalendarEventListeners();
+		}
+
+		// Set up calendar state (can be called multiple times)
+		function setupCalendarState() {
 			// Start with a month that has available dates
 			const validDates = Object.keys(availabilityData);
 			if (validDates.length > 0) {
@@ -967,6 +1025,12 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 
 			// Show current month
 			renderCalendar();
+		}
+
+		// Set up calendar event listeners (should only be called once)
+		let calendarEventListenersSetup = false;
+		function setupCalendarEventListeners() {
+			if (calendarEventListenersSetup) return;
 
 			// Event listeners
 			visitDateInput.addEventListener('click', () => {
@@ -987,6 +1051,8 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 					customCalendar.classList.add('hidden');
 				}
 			});
+
+			calendarEventListenersSetup = true;
 		}
 
 		// Render calendar for current month
@@ -1415,9 +1481,7 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 				// Success - use message from server (which is already conditional based on payment method)
 
 				// Success
-				alert(result.message || 'Booking successful! You’ll receive a confirmation email.');
-				bookingForm.reset();
-				updateTotalPrice();
+				showBookingSuccess(booking, result.message);
 				await loadAvailability(); // Refresh times if needed
 
 			} catch (err) {
@@ -1432,6 +1496,93 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 
 		// Load available slots initially
 		loadAvailability();
+
+		// Success state management functions
+		function showBookingSuccess(booking: any, message: string) {
+			const bookingFormContainer = document.getElementById('booking-form-container');
+			const bookingSuccess = document.getElementById('booking-success');
+			const successDateTime = document.getElementById('success-date-time');
+			const successVisitors = document.getElementById('success-visitors');
+			const successEmailMessage = document.getElementById('success-email-message');
+
+			// Format date and time for display
+			const visitDate = new Date(booking.visitDate);
+			const formattedDate = visitDate.toLocaleDateString('en-US', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+
+			// Update success message content
+			if (successDateTime) {
+				successDateTime.textContent = `${formattedDate} at ${booking.preferredTime}`;
+			}
+			if (successVisitors) {
+				const visitorText = booking.numberOfVisitors === 1 ? 'bouquet' : 'bouquets';
+				successVisitors.textContent = `${booking.numberOfVisitors} ${visitorText} ($${booking.totalAmount})`;
+			}
+			if (successEmailMessage) {
+				successEmailMessage.textContent = message || 'You\'ll receive a confirmation email shortly.';
+			}
+
+			// Hide form with smooth transition
+			if (bookingFormContainer) {
+				bookingFormContainer.style.opacity = '0';
+				bookingFormContainer.style.transform = 'translateY(-20px)';
+
+				setTimeout(() => {
+					bookingFormContainer.classList.add('hidden');
+
+					// Show success message
+					if (bookingSuccess) {
+						bookingSuccess.classList.remove('hidden');
+						// Trigger reflow to ensure the element is rendered
+						bookingSuccess.offsetHeight;
+						bookingSuccess.classList.remove('opacity-0', 'translate-y-4');
+						bookingSuccess.classList.add('opacity-100', 'translate-y-0');
+					}
+				}, 300);
+			}
+		}
+
+		function resetBookingForm() {
+			const bookingFormContainer = document.getElementById('booking-form-container');
+			const bookingSuccess = document.getElementById('booking-success');
+
+			// Hide success message
+			if (bookingSuccess) {
+				bookingSuccess.classList.add('opacity-0', 'translate-y-4');
+				bookingSuccess.classList.remove('opacity-100', 'translate-y-0');
+
+				setTimeout(() => {
+					bookingSuccess.classList.add('hidden');
+
+					// Show form again
+					if (bookingFormContainer) {
+						bookingFormContainer.classList.remove('hidden');
+						bookingFormContainer.style.opacity = '1';
+						bookingFormContainer.style.transform = 'translateY(0)';
+
+						// Reset form fields
+						bookingForm.reset();
+						updateTotalPrice();
+
+						// Clear any validation errors
+						const errorFields = document.querySelectorAll('.border-red-500');
+						errorFields.forEach(field => field.classList.remove('border-red-500'));
+
+						// Reset calendar state and clear selection
+						selectedDate = '';
+						setupCalendarState();
+					}
+				}, 300);
+			}
+		}
+
+		// Set up "Make Another Booking" button
+		const makeAnotherBookingBtn = document.getElementById('make-another-booking');
+		makeAnotherBookingBtn?.addEventListener('click', resetBookingForm);
 	});
 
 	// Initialize flower section

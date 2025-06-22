@@ -1,0 +1,857 @@
+---
+// src/pages/garden-mgmt/bookings.astro
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Booking Management - BG Bouquet</title>
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+	<link rel="stylesheet" href="/fonts/fonts.css">
+	<link rel="stylesheet" href="/styles/admin-bookings.css">
+</head>
+<body>
+	<!-- Login Form (shown initially) -->
+	<div id="login-container" class="login-container">
+		<div class="login-form">
+			<h2>Admin Access</h2>
+			<div id="login-error" class="error" style="display: none;"></div>
+			<form id="login-form">
+				<div class="form-group">
+					<label for="admin-password">Password:</label>
+					<input type="password" id="admin-password" required>
+				</div>
+				<button type="submit" class="btn btn-primary">Login</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Main Admin Interface (hidden initially) -->
+	<div id="admin-interface" style="display: none;">
+		<div class="header">
+			<div class="header-content">
+				<h1>BG Bouquet Admin</h1>
+				<button id="logout-btn" class="logout-btn">Logout</button>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="controls">
+				<div class="controls-row">
+					<div class="form-group">
+						<label for="status-filter">Status:</label>
+						<select id="status-filter">
+							<option value="all">All Bookings</option>
+							<option value="confirmed">Active</option>
+							<option value="cancelled">Cancelled</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="search-input">Search:</label>
+						<input type="text" id="search-input" placeholder="Name, email, or phone...">
+					</div>
+					<div class="form-group">
+						<label>&nbsp;</label>
+						<button id="search-btn" class="btn btn-primary">Search</button>
+					</div>
+					<div class="form-group">
+						<label>&nbsp;</label>
+						<button id="refresh-btn" class="btn btn-secondary">Refresh</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="bookings-table">
+				<div class="table-header">
+					Booking Management
+				</div>
+
+				<div id="loading" class="loading">
+					<p>Loading bookings...</p>
+				</div>
+
+				<div id="error-container" style="display: none;"></div>
+
+				<div id="bookings-container" style="display: none;">
+					<div class="column-headers">
+						<div>Customer</div>
+						<div>Date & Time</div>
+						<div>Amount</div>
+						<div>Payment</div>
+						<div>Status</div>
+						<div>Actions</div>
+					</div>
+					<div id="bookings-grid" class="bookings-grid">
+						<!-- Cards will be inserted here -->
+					</div>
+				</div>
+
+				<div id="pagination" class="pagination" style="display: none;">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Global variables
+		let adminToken = null;
+		let currentPage = 0;
+		let currentFilters = { status: 'all', search: '' };
+		const pageSize = 20;
+
+		// DOM elements
+		const loginContainer = document.getElementById('login-container');
+		const adminInterface = document.getElementById('admin-interface');
+		const loginForm = document.getElementById('login-form');
+		const loginError = document.getElementById('login-error');
+		const adminPassword = document.getElementById('admin-password');
+		const logoutBtn = document.getElementById('logout-btn');
+		const statusFilter = document.getElementById('status-filter');
+		const searchInput = document.getElementById('search-input');
+		const searchBtn = document.getElementById('search-btn');
+		const refreshBtn = document.getElementById('refresh-btn');
+		const loading = document.getElementById('loading');
+		const errorContainer = document.getElementById('error-container');
+		const bookingsContainer = document.getElementById('bookings-container');
+		const bookingsGrid = document.getElementById('bookings-grid');
+		const pagination = document.getElementById('pagination');
+
+		// Event listeners
+		loginForm.addEventListener('submit', handleLogin);
+		logoutBtn.addEventListener('click', handleLogout);
+		searchBtn.addEventListener('click', handleSearch);
+		refreshBtn.addEventListener('click', () => loadBookings());
+		statusFilter.addEventListener('change', handleSearch);
+		searchInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') handleSearch();
+		});
+
+		// Login handler
+		async function handleLogin(e) {
+			e.preventDefault();
+			
+			const password = adminPassword.value;
+			if (!password) return;
+
+			try {
+				// Test authentication by making a request to admin API
+				const response = await fetch('/api/garden-mgmt/bookings?limit=1', {
+					headers: {
+						'Authorization': `Bearer ${password}`
+					}
+				});
+
+				if (response.ok) {
+					adminToken = password;
+					loginContainer.style.display = 'none';
+					adminInterface.style.display = 'block';
+					loadBookings();
+				} else {
+					showLoginError('Invalid password');
+				}
+			} catch (error) {
+				showLoginError('Login failed. Please try again.');
+			}
+		}
+
+		// Logout handler
+		function handleLogout() {
+			adminToken = null;
+			adminInterface.style.display = 'none';
+			loginContainer.style.display = 'flex';
+			adminPassword.value = '';
+			loginError.style.display = 'none';
+		}
+
+		// Show login error
+		function showLoginError(message) {
+			loginError.textContent = message;
+			loginError.style.display = 'block';
+		}
+
+		// Search handler
+		function handleSearch() {
+			currentFilters.status = statusFilter.value;
+			currentFilters.search = searchInput.value.trim();
+			currentPage = 0;
+			loadBookings();
+		}
+
+		// Load bookings
+		async function loadBookings() {
+			if (!adminToken) return;
+
+			try {
+				loading.style.display = 'block';
+				errorContainer.style.display = 'none';
+				bookingsContainer.style.display = 'none';
+
+				const params = new URLSearchParams({
+					limit: pageSize,
+					offset: currentPage * pageSize,
+					status: currentFilters.status
+				});
+
+				if (currentFilters.search) {
+					params.append('search', currentFilters.search);
+				}
+
+				const response = await fetch(`/api/garden-mgmt/bookings?${params}`, {
+					headers: {
+						'Authorization': `Bearer ${adminToken}`
+					}
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to load bookings');
+				}
+
+				const data = await response.json();
+				renderBookings(data.bookings);
+				renderPagination(data.total);
+
+			} catch (error) {
+				console.error('Error loading bookings:', error);
+				showError('Failed to load bookings. Please try again.');
+			} finally {
+				loading.style.display = 'none';
+			}
+		}
+
+		// Render bookings cards
+		function renderBookings(bookings) {
+			bookingsGrid.innerHTML = '';
+
+			if (bookings.length === 0) {
+				bookingsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #6c757d; font-style: italic;">No bookings found</div>';
+			} else {
+				bookings.forEach(booking => {
+					const card = createBookingCard(booking);
+					bookingsGrid.appendChild(card);
+				});
+			}
+
+			bookingsContainer.style.display = 'block';
+		}
+
+		// Create booking card with professional horizontal layout
+		function createBookingCard(booking) {
+			const card = document.createElement('div');
+			card.className = 'booking-card';
+
+			// Status should only be 'Active' or 'Cancelled' - refunds are separate
+			let statusClass, statusText;
+			if (booking.status === 'cancelled') {
+				statusClass = 'status-cancelled';
+				statusText = 'Cancelled';
+			} else {
+				statusClass = 'status-active';
+				statusText = 'Active';
+			}
+
+			// Format date
+			const bookingDate = new Date(booking.date).toLocaleDateString('en-US', {
+				weekday: 'short',
+				month: 'short',
+				day: 'numeric'
+			});
+
+			// Get customer initials for avatar
+			const initials = booking.full_name
+				.split(' ')
+				.map(name => name.charAt(0))
+				.join('')
+				.toUpperCase()
+				.substring(0, 2);
+
+			card.innerHTML = `
+				<div class="card-content">
+					<!-- Customer Info -->
+					<div class="customer-section">
+						<div class="customer-avatar">${initials}</div>
+						<div class="customer-info">
+							<div class="customer-name">${booking.full_name}</div>
+							<div class="customer-contact">${booking.email}</div>
+						</div>
+					</div>
+
+					<!-- Booking Date & Time -->
+					<div class="booking-datetime">
+						<div class="datetime-main">${bookingDate}</div>
+						<div class="datetime-time">${booking.time}</div>
+						${booking.reschedule_count > 0 ? `<div class="reschedule-note">Rescheduled ${booking.reschedule_count}x</div>` : ''}
+					</div>
+
+					<!-- Amount & Visitors -->
+					<div class="booking-amount">
+						<div class="amount-main">$${booking.total_amount}</div>
+						<div class="amount-details">${booking.number_of_visitors} ${booking.number_of_visitors === 1 ? 'person' : 'people'}</div>
+						${booking.admin_refund_amount ? `<div class="refund-note">Refunded: $${booking.admin_refund_amount}</div>` : ''}
+					</div>
+
+					<!-- Payment Status -->
+					<div class="payment-status">
+						<div class="payment-main ${booking.payment_status === 'paid' ? 'status-paid' : 'status-pending'}">
+							${booking.payment_status === 'paid' ? 'PAID' : 'UNPAID'}
+						</div>
+						<div class="payment-method">
+							${booking.payment_method === 'pay_on_arrival' ? 'Pay on arrival' : 'Online'}
+						</div>
+					</div>
+
+					<!-- Status Badge -->
+					<div class="booking-status">
+						<span class="status-badge ${statusClass}">${statusText}</span>
+					</div>
+
+					<!-- Actions -->
+					<div class="booking-actions">
+						${booking.status === 'confirmed' ? `<button class="btn btn-small btn-danger" onclick="cancelBooking('${booking.id}')">Cancel</button>` : ''}
+						${booking.status === 'confirmed' && booking.payment_method === 'pay_on_arrival' ?
+							`<button class="btn btn-small ${booking.payment_status === 'paid' ? 'btn-warning' : 'btn-success'}"
+								onclick="showPaymentToggleModal('${booking.id}', '${booking.payment_status}', '${booking.full_name}')">
+								${booking.payment_status === 'paid' ? 'Mark Unpaid' : 'Mark Paid'}
+							</button>`
+							: ''
+						}
+						${booking.status === 'confirmed' && booking.payment_status === 'paid' ?
+							`<button class="btn btn-small btn-primary" onclick="documentRefund('${booking.id}')">Document Refund</button>`
+							: ''
+						}
+						${booking.total_actions > 0 ?
+							`<button class="btn btn-small btn-secondary" onclick="viewBookingHistory('${booking.id}')">
+								History (${booking.total_actions})
+							</button>`
+							: ''
+						}
+					</div>
+				</div>
+			`;
+
+			return card;
+		}
+
+		// Render pagination
+		function renderPagination(total) {
+			const totalPages = Math.ceil(total / pageSize);
+			pagination.innerHTML = '';
+
+			if (totalPages <= 1) {
+				pagination.style.display = 'none';
+				return;
+			}
+
+			// Previous button
+			const prevBtn = document.createElement('button');
+			prevBtn.textContent = 'Previous';
+			prevBtn.disabled = currentPage === 0;
+			prevBtn.onclick = () => {
+				if (currentPage > 0) {
+					currentPage--;
+					loadBookings();
+				}
+			};
+			pagination.appendChild(prevBtn);
+
+			// Page numbers
+			for (let i = 0; i < totalPages; i++) {
+				const pageBtn = document.createElement('button');
+				pageBtn.textContent = i + 1;
+				pageBtn.className = i === currentPage ? 'active' : '';
+				pageBtn.onclick = () => {
+					currentPage = i;
+					loadBookings();
+				};
+				pagination.appendChild(pageBtn);
+			}
+
+			// Next button
+			const nextBtn = document.createElement('button');
+			nextBtn.textContent = 'Next';
+			nextBtn.disabled = currentPage >= totalPages - 1;
+			nextBtn.onclick = () => {
+				if (currentPage < totalPages - 1) {
+					currentPage++;
+					loadBookings();
+				}
+			};
+			pagination.appendChild(nextBtn);
+
+			pagination.style.display = 'flex';
+		}
+
+		// Show error
+		function showError(message) {
+			errorContainer.innerHTML = `<div class="error">${message}</div>`;
+			errorContainer.style.display = 'block';
+		}
+
+		// Admin action functions - make them global so onclick can access them
+		window.cancelBooking = async function(bookingId) {
+			const reason = prompt('Reason for cancellation (optional):');
+			if (reason === null) return; // User cancelled
+
+			const adminUser = prompt('Your admin name:');
+			if (!adminUser) {
+				alert('Admin name is required');
+				return;
+			}
+
+			if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+			try {
+				const response = await fetch('/api/garden-mgmt/cancel-booking', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${adminToken}`
+					},
+					body: JSON.stringify({
+						bookingId,
+						reason,
+						adminUser,
+						notifyCustomer: true
+					})
+				});
+
+				const data = await response.json();
+
+				if (response.ok) {
+					alert('Booking cancelled successfully');
+					loadBookings(); // Refresh the list
+				} else {
+					alert(`Failed to cancel booking: ${data.error}`);
+				}
+			} catch (error) {
+				alert('Error cancelling booking. Please try again.');
+			}
+		};
+
+		window.showPaymentToggleModal = function(bookingId, currentStatus, customerName) {
+			const newStatus = currentStatus === 'paid' ? 'pending' : 'paid';
+			const action = newStatus === 'paid' ? 'mark as paid' : 'mark as unpaid';
+
+			// Populate modal
+			document.getElementById('paymentCustomerName').textContent = customerName;
+			document.getElementById('paymentAction').textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} this booking`;
+			document.getElementById('paymentBookingId').value = bookingId;
+			document.getElementById('paymentNewStatus').value = newStatus;
+
+			// Show modal
+			document.getElementById('paymentToggleModal').style.display = 'block';
+		};
+
+		window.closePaymentToggleModal = function() {
+			document.getElementById('paymentToggleModal').style.display = 'none';
+			// Clear the admin name field
+			document.getElementById('paymentAdminName').value = '';
+		};
+
+		window.confirmPaymentToggle = async function() {
+			const bookingId = document.getElementById('paymentBookingId').value;
+			const newStatus = document.getElementById('paymentNewStatus').value;
+			const adminUser = document.getElementById('paymentAdminName').value.trim();
+
+			// Validation
+			if (!adminUser) {
+				alert('Please enter your name for record keeping');
+				return;
+			}
+
+			try {
+				const response = await fetch('/api/garden-mgmt/toggle-payment', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${adminToken}`
+					},
+					body: JSON.stringify({
+						bookingId,
+						newStatus,
+						adminUser
+					})
+				});
+
+				const data = await response.json();
+
+				if (response.ok) {
+					closePaymentToggleModal();
+					loadBookings(); // Refresh the list
+				} else {
+					alert(`Failed to update payment status: ${data.error}`);
+				}
+			} catch (error) {
+				console.error('Error updating payment status:', error);
+				alert('Error updating payment status. Please try again.');
+			}
+		};
+
+		window.documentRefund = async function(bookingId) {
+			try {
+				// Fetch current refund data from the API
+				const response = await fetch(`/api/garden-mgmt/document-refund?bookingId=${bookingId}`, {
+					headers: {
+						'Authorization': `Bearer ${adminToken}`
+					}
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch refund data');
+				}
+
+				const data = await response.json();
+				const booking = data.booking;
+				const existingRefund = booking.refund;
+
+				// Populate modal with booking information
+				document.getElementById('refundCustomerName').textContent = booking.customerName;
+				document.getElementById('refundBookingDetails').textContent = `${booking.date} at ${booking.time}`;
+				document.getElementById('refundOriginalAmount').textContent = booking.totalAmount.toFixed(2);
+				document.getElementById('refundMaxAmount').textContent = booking.totalAmount.toFixed(2);
+				document.getElementById('refundBookingId').value = bookingId;
+
+				// Set max amount validation
+				document.getElementById('refundAmount').max = booking.totalAmount;
+
+				// Update modal title based on whether refund exists
+				const modalTitle = document.querySelector('#refundModal .modal-header h3');
+				if (existingRefund) {
+					modalTitle.textContent = 'Update Refund Documentation';
+
+					// Pre-populate form with existing refund data
+					document.getElementById('refundAmount').value = existingRefund.amount;
+					document.getElementById('refundMethod').value = existingRefund.method;
+					document.getElementById('refundNotes').value = existingRefund.notes || '';
+					document.getElementById('refundAdminName').value = existingRefund.processedBy || '';
+				} else {
+					modalTitle.textContent = 'Document Refund';
+
+					// Clear form for new refund
+					document.getElementById('refundForm').reset();
+					document.getElementById('refundBookingId').value = bookingId;
+				}
+
+				// Show modal
+				document.getElementById('refundModal').style.display = 'block';
+
+			} catch (error) {
+				console.error('Error loading refund data:', error);
+				alert('Error loading refund information. Please try again.');
+			}
+		};
+
+		window.closeRefundModal = function() {
+			document.getElementById('refundModal').style.display = 'none';
+		};
+
+		window.submitRefund = async function() {
+			const form = document.getElementById('refundForm');
+
+			const bookingId = document.getElementById('refundBookingId').value;
+			const refundAmount = parseFloat(document.getElementById('refundAmount').value);
+			const refundMethod = document.getElementById('refundMethod').value;
+			const refundNotes = document.getElementById('refundNotes').value;
+			const adminUser = document.getElementById('refundAdminName').value;
+			const maxAmount = parseFloat(document.getElementById('refundAmount').max);
+
+			// Validation
+			if (!refundAmount || refundAmount <= 0) {
+				alert('Please enter a valid refund amount');
+				return;
+			}
+
+			if (refundAmount > maxAmount) {
+				alert(`Refund amount cannot exceed $${maxAmount.toFixed(2)}`);
+				return;
+			}
+
+			if (!refundMethod) {
+				alert('Please select a refund method');
+				return;
+			}
+
+			if (!adminUser.trim()) {
+				alert('Please enter your name for record keeping');
+				return;
+			}
+
+			try {
+				// First, get the current refund data to track changes
+				const currentResponse = await fetch(`/api/garden-mgmt/document-refund?bookingId=${bookingId}`, {
+					headers: {
+						'Authorization': `Bearer ${adminToken}`
+					}
+				});
+
+				let previousRefund = null;
+				if (currentResponse.ok) {
+					const currentData = await currentResponse.json();
+					previousRefund = currentData.booking.refund;
+				}
+
+				// Submit the refund update
+				const response = await fetch('/api/garden-mgmt/document-refund', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${adminToken}`
+					},
+					body: JSON.stringify({
+						bookingId,
+						refundAmount,
+						refundMethod,
+						refundNotes,
+						adminUser,
+						previousRefund // Include previous data for history tracking
+					})
+				});
+
+				const data = await response.json();
+
+				if (response.ok) {
+					closeRefundModal();
+					loadBookings(); // Refresh the list
+				} else {
+					alert(`Failed to document refund: ${data.error}`);
+				}
+			} catch (error) {
+				console.error('Error documenting refund:', error);
+				alert('Error documenting refund. Please try again.');
+			}
+		};
+
+		// Close modals when clicking outside
+		window.onclick = function(event) {
+			const refundModal = document.getElementById('refundModal');
+			const paymentModal = document.getElementById('paymentToggleModal');
+
+			if (event.target === refundModal) {
+				closeRefundModal();
+			}
+
+			if (event.target === paymentModal) {
+				closePaymentToggleModal();
+			}
+		};
+
+		window.viewBookingHistory = async function(bookingId) {
+			try {
+				// Fetch booking history from the database
+				const response = await fetch(`/api/garden-mgmt/booking-history?bookingId=${bookingId}`, {
+					headers: {
+						'Authorization': `Bearer ${adminToken}`
+					}
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch booking history');
+				}
+
+				const data = await response.json();
+
+				// Populate modal header info
+				document.getElementById('historyCustomerName').textContent = data.booking.customerName;
+				document.getElementById('historyBookingDetails').textContent = `${data.booking.date} at ${data.booking.time}`;
+
+				const historyContent = document.getElementById('historyContent');
+
+				if (data.actions && data.actions.length > 0) {
+					// Create history items
+					let historyHTML = '';
+
+					data.actions.forEach((action, index) => {
+						const date = new Date(action.action_timestamp).toLocaleDateString('en-US', {
+							weekday: 'short',
+							year: 'numeric',
+							month: 'short',
+							day: 'numeric'
+						});
+						const time = new Date(action.action_timestamp).toLocaleTimeString('en-US', {
+							hour: 'numeric',
+							minute: '2-digit',
+							hour12: true
+						});
+
+						// Format action type, with special handling for payment and refund actions
+						let actionType;
+						if (action.reason && action.reason.includes('Payment marked as')) {
+							// Extract the payment action from the reason
+							if (action.reason.includes('Payment marked as PAID')) {
+								actionType = 'Payment Marked Paid';
+							} else if (action.reason.includes('Payment marked as UNPAID')) {
+								actionType = 'Payment Marked Unpaid';
+							} else {
+								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+							}
+						} else if (action.reason && action.reason.includes('Refund document')) {
+							// Extract the refund action from the reason
+							if (action.reason.includes('Refund documented -')) {
+								actionType = 'Refund Documented';
+							} else if (action.reason.includes('Refund document updated')) {
+								actionType = 'Refund Updated';
+							} else {
+								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+							}
+						} else {
+							actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+						}
+
+						historyHTML += `
+							<div class="history-item">
+								<div class="history-header">
+									<span class="history-action">${actionType}</span>
+									<span class="history-date">${date} at ${time}</span>
+								</div>
+								<div class="history-details">
+									${action.reason ? `<div class="history-reason"><strong>Reason:</strong> ${action.reason}</div>` : ''}
+									<div class="history-performer">
+										<strong>Performed by:</strong> ${action.performed_by_admin ? `Admin: ${action.performed_by_admin}` : 'Customer'}
+									</div>
+									${action.action_type.includes('reschedule') ? `
+										<div class="history-reschedule">
+											<strong>Changed from:</strong> ${action.original_date} at ${action.original_time}<br>
+											<strong>Changed to:</strong> ${action.new_date} at ${action.new_time}
+										</div>
+									` : ''}
+								</div>
+							</div>
+						`;
+					});
+
+					historyContent.innerHTML = historyHTML;
+				} else {
+					historyContent.innerHTML = `
+						<div class="no-history">
+							<p>No history found for this booking.</p>
+							<p><small>Booking ID: ${bookingId}</small></p>
+						</div>
+					`;
+				}
+
+				// Show the modal
+				document.getElementById('historyModal').style.display = 'block';
+
+			} catch (error) {
+				console.error('Error fetching booking history:', error);
+				alert('Error loading booking history. Please try again.');
+			}
+		};
+
+		window.closeHistoryModal = function() {
+			document.getElementById('historyModal').style.display = 'none';
+		};
+
+		// Close history modal when clicking outside of it
+		window.addEventListener('click', function(event) {
+			const historyModal = document.getElementById('historyModal');
+			if (event.target === historyModal) {
+				window.closeHistoryModal();
+			}
+		});
+	</script>
+
+	<!-- Refund Modal -->
+	<div id="refundModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Document Refund</h3>
+				<span class="close" onclick="closeRefundModal()">&times;</span>
+			</div>
+			<div class="modal-body">
+				<div class="booking-info">
+					<p><strong>Customer:</strong> <span id="refundCustomerName"></span></p>
+					<p><strong>Booking:</strong> <span id="refundBookingDetails"></span></p>
+					<p><strong>Original Amount:</strong> $<span id="refundOriginalAmount"></span></p>
+				</div>
+
+				<form id="refundForm">
+					<input type="hidden" id="refundBookingId" />
+
+					<div class="form-group">
+						<label for="refundAmount">Amount refunded to customer:</label>
+						<input type="number" id="refundAmount" step="0.01" min="0" required />
+						<small class="form-help">Maximum: $<span id="refundMaxAmount"></span></small>
+					</div>
+
+					<div class="form-group">
+						<label for="refundMethod">How was the refund issued:</label>
+						<select id="refundMethod" required>
+							<option value="">Select method...</option>
+							<option value="Cash">Cash</option>
+							<option value="E-transfer">E-transfer</option>
+							<option value="Credit card reversal">Credit card reversal</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="refundNotes">Notes about this refund:</label>
+						<textarea id="refundNotes" rows="3" placeholder="e.g., Reason for refund, special circumstances"></textarea>
+					</div>
+
+					<div class="form-group">
+						<label for="refundAdminName">Your name (for record keeping):</label>
+						<input type="text" id="refundAdminName" required />
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" onclick="closeRefundModal()">Cancel</button>
+				<button type="button" class="btn btn-primary" onclick="submitRefund()">Document Refund</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Booking History Modal -->
+	<div id="historyModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Booking History</h3>
+				<span class="close" onclick="closeHistoryModal()">&times;</span>
+			</div>
+			<div class="modal-body">
+				<div class="booking-info">
+					<p><strong>Customer:</strong> <span id="historyCustomerName"></span></p>
+					<p><strong>Booking:</strong> <span id="historyBookingDetails"></span></p>
+				</div>
+
+				<div id="historyContent">
+					<!-- History items will be inserted here -->
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" onclick="closeHistoryModal()">Close</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Payment Toggle Confirmation Modal -->
+	<div id="paymentToggleModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Confirm Payment Status Change</h3>
+				<span class="close" onclick="closePaymentToggleModal()">&times;</span>
+			</div>
+			<div class="modal-body">
+				<div class="booking-info">
+					<p><strong>Customer:</strong> <span id="paymentCustomerName"></span></p>
+					<p><strong>Action:</strong> <span id="paymentAction"></span></p>
+				</div>
+
+				<div class="form-group">
+					<label for="paymentAdminName">Your name (for record keeping):</label>
+					<input type="text" id="paymentAdminName" required placeholder="Enter your admin name" />
+				</div>
+
+				<input type="hidden" id="paymentBookingId" />
+				<input type="hidden" id="paymentNewStatus" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" onclick="closePaymentToggleModal()">Cancel</button>
+				<button type="button" class="btn btn-primary" onclick="confirmPaymentToggle()">Confirm</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,873 @@
+---
+// src/pages/cancel.astro
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cancel Booking - BG Bouquet</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Allura:wght@400&family=Playfair+Display:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--shabby-pink: #F8E7E8;
+			--shabby-blue: #EFF9FA;
+			--cream: #FEFCF8;
+			--charcoal: #333333;
+			--rose: #E8B4B8;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Roboto', sans-serif;
+			background-color: var(--cream);
+			color: var(--charcoal);
+			line-height: 1.6;
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 600px;
+			width: 100%;
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			overflow: hidden;
+		}
+
+		.header {
+			background: linear-gradient(135deg, var(--shabby-pink), var(--shabby-blue));
+			padding: 40px 30px;
+			text-align: center;
+		}
+
+		.header h1 {
+			font-family: 'Allura', cursive;
+			font-size: 3rem;
+			color: var(--charcoal);
+			margin-bottom: 10px;
+		}
+
+		.header p {
+			font-size: 1.1rem;
+			opacity: 0.8;
+		}
+
+		.content {
+			padding: 40px 30px;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 40px 0;
+		}
+
+		.spinner {
+			width: 40px;
+			height: 40px;
+			border: 4px solid var(--shabby-pink);
+			border-top: 4px solid var(--rose);
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin: 0 auto 20px;
+		}
+
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+
+		.booking-details {
+			background: var(--shabby-blue);
+			padding: 25px;
+			border-radius: 8px;
+			margin-bottom: 30px;
+		}
+
+		.booking-details h3 {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.5rem;
+			margin-bottom: 15px;
+			color: var(--charcoal);
+		}
+
+		.detail-row {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 10px;
+			padding: 8px 0;
+			border-bottom: 1px solid rgba(51, 51, 51, 0.1);
+		}
+
+		.detail-row:last-child {
+			border-bottom: none;
+		}
+
+		.detail-label {
+			font-weight: 500;
+			color: var(--charcoal);
+		}
+
+		.detail-value {
+			font-weight: 400;
+			text-align: right;
+		}
+
+		.form-group {
+			margin-bottom: 25px;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 500;
+			color: var(--charcoal);
+		}
+
+		.form-group textarea {
+			width: 100%;
+			padding: 12px;
+			border: 2px solid #e1e5e9;
+			border-radius: 6px;
+			font-family: 'Roboto', sans-serif;
+			font-size: 1rem;
+			resize: vertical;
+			min-height: 100px;
+		}
+
+		.form-group textarea:focus {
+			outline: none;
+			border-color: var(--rose);
+		}
+
+		.button-group {
+			display: flex;
+			gap: 15px;
+			flex-wrap: wrap;
+		}
+
+		.btn {
+			padding: 12px 24px;
+			border: none;
+			border-radius: 6px;
+			font-family: 'Playfair Display', serif;
+			font-size: 1rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 140px;
+		}
+
+		.btn-cancel {
+			background-color: #dc3545;
+			color: white;
+		}
+
+		.btn-cancel:hover {
+			background-color: #c82333;
+			transform: translateY(-2px);
+		}
+
+		.btn-cancel:disabled {
+			background-color: #6c757d;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.btn-primary {
+			background-color: var(--rose);
+			color: white;
+		}
+
+		.btn-primary:hover {
+			background-color: #d49ca0;
+			transform: translateY(-2px);
+		}
+
+		.btn-primary:disabled {
+			background-color: #6c757d;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.btn-secondary {
+			background-color: var(--cream);
+			color: var(--charcoal);
+			border: 2px solid var(--charcoal);
+		}
+
+		.btn-secondary:hover {
+			background-color: var(--shabby-pink);
+		}
+
+		.error {
+			background-color: #f8d7da;
+			color: #721c24;
+			padding: 15px;
+			border-radius: 6px;
+			margin-bottom: 20px;
+			border: 1px solid #f5c6cb;
+		}
+
+		.success {
+			background-color: #d4edda;
+			color: #155724;
+			padding: 20px;
+			border-radius: 6px;
+			text-align: center;
+			border: 1px solid #c3e6cb;
+		}
+
+		.success h3 {
+			font-family: 'Playfair Display', serif;
+			margin-bottom: 10px;
+		}
+
+		/* Availability Calendar Styles */
+		.calendar-container {
+			background: white;
+			border-radius: 8px;
+			padding: 20px;
+			border: 2px solid var(--shabby-blue);
+		}
+
+		.calendar-month {
+			margin-bottom: 30px;
+		}
+
+		.calendar-month h4 {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.3rem;
+			margin-bottom: 15px;
+			text-align: center;
+			color: var(--charcoal);
+		}
+
+		.calendar-grid {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+			gap: 8px;
+			margin-bottom: 20px;
+		}
+
+		.calendar-day {
+			aspect-ratio: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 4px;
+			font-size: 0.9rem;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.calendar-day.available {
+			background-color: var(--shabby-blue);
+			color: var(--charcoal);
+		}
+
+		.calendar-day.available:hover {
+			background-color: var(--rose);
+			color: white;
+		}
+
+		.calendar-day.unavailable {
+			background-color: #f5f5f5;
+			color: #ccc;
+			cursor: not-allowed;
+		}
+
+		.calendar-day.current-booking {
+			background-color: #ffeb3b;
+			color: var(--charcoal);
+			font-weight: bold;
+			cursor: not-allowed;
+		}
+
+		.calendar-day.selected {
+			background-color: var(--rose);
+			color: white;
+			font-weight: bold;
+		}
+
+		.time-slots {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+			gap: 10px;
+			margin-top: 15px;
+		}
+
+		.time-slot {
+			padding: 10px;
+			border: 2px solid var(--shabby-blue);
+			border-radius: 6px;
+			text-align: center;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			background: white;
+		}
+
+		.time-slot:hover {
+			border-color: var(--rose);
+			background-color: var(--shabby-pink);
+		}
+
+		.time-slot.selected {
+			background-color: var(--rose);
+			color: white;
+			border-color: var(--rose);
+		}
+
+		.time-slot.unavailable {
+			background-color: #f5f5f5;
+			color: #ccc;
+			cursor: not-allowed;
+			border-color: #ddd;
+		}
+
+		.time-slot.current-booking {
+			background-color: #ffeb3b;
+			border-color: #ffc107;
+			cursor: not-allowed;
+		}
+
+		@media (max-width: 768px) {
+			.header h1 {
+				font-size: 2.5rem;
+			}
+
+			.content {
+				padding: 30px 20px;
+			}
+
+			.button-group {
+				flex-direction: column;
+			}
+
+			.btn {
+				width: 100%;
+			}
+
+			.calendar-grid {
+				gap: 4px;
+			}
+
+			.calendar-day {
+				font-size: 0.8rem;
+			}
+
+			.time-slots {
+				grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+				gap: 8px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>BG Bouquet</h1>
+			<p id="header-subtitle">Booking Management</p>
+		</div>
+		
+		<div class="content">
+			<!-- Loading State -->
+			<div id="loading-state" class="loading">
+				<div class="spinner"></div>
+				<p>Verifying your cancellation request...</p>
+			</div>
+
+			<!-- Error State -->
+			<div id="error-state" class="error" style="display: none;">
+				<p id="error-message"></p>
+			</div>
+
+			<!-- Action Selection -->
+			<div id="action-selection" style="display: none;">
+				<div class="booking-details">
+					<h3>Current Booking Details</h3>
+					<div class="detail-row">
+						<span class="detail-label">Customer:</span>
+						<span class="detail-value" id="customer-name"></span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Email:</span>
+						<span class="detail-value" id="customer-email"></span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Date:</span>
+						<span class="detail-value" id="visit-date"></span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Time:</span>
+						<span class="detail-value" id="visit-time"></span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Visitors:</span>
+						<span class="detail-value" id="visitor-count"></span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Total Amount:</span>
+						<span class="detail-value" id="total-amount"></span>
+					</div>
+				</div>
+
+				<div style="text-align: center; margin: 30px 0;">
+					<p style="font-size: 1.1rem; margin-bottom: 25px; color: var(--charcoal);">
+						What would you like to do with your booking?
+					</p>
+				</div>
+
+				<div class="button-group">
+					<button id="reschedule-btn" class="btn btn-primary">
+						Reschedule Booking
+					</button>
+					<button id="cancel-btn" class="btn btn-cancel">
+						Cancel Booking
+					</button>
+					<a href="/" class="btn btn-secondary">
+						Keep Booking
+					</a>
+				</div>
+			</div>
+
+			<!-- Cancellation Form -->
+			<div id="cancellation-form" style="display: none;">
+				<div class="form-group">
+					<label for="cancellation-reason">Reason for Cancellation (Optional):</label>
+					<textarea
+						id="cancellation-reason"
+						placeholder="Please let us know why you're cancelling (optional)..."
+					></textarea>
+				</div>
+
+				<div class="button-group">
+					<button id="confirm-cancel" class="btn btn-cancel">
+						Cancel Booking
+					</button>
+					<button id="back-to-selection" class="btn btn-secondary">
+						Back
+					</button>
+				</div>
+			</div>
+
+			<!-- Reschedule Form -->
+			<div id="reschedule-form" style="display: none;">
+				<h3 style="margin-bottom: 20px;">Select New Date & Time</h3>
+
+				<div class="form-group">
+					<label for="reschedule-reason">Reason for Reschedule (Optional):</label>
+					<textarea
+						id="reschedule-reason"
+						placeholder="Please let us know why you're rescheduling (optional)..."
+					></textarea>
+				</div>
+
+				<div id="availability-calendar" style="margin: 20px 0;">
+					<p>Loading available dates...</p>
+				</div>
+
+				<div class="button-group">
+					<button id="confirm-reschedule" class="btn btn-primary" style="display: none;">
+						Confirm Reschedule
+					</button>
+					<button id="back-to-selection-2" class="btn btn-secondary">
+						Back
+					</button>
+				</div>
+			</div>
+
+			<!-- Success State -->
+			<div id="success-state" class="success" style="display: none;">
+				<h3>Booking Cancelled Successfully</h3>
+				<p>Your booking has been cancelled and you will receive a confirmation email shortly.</p>
+				<p style="margin-top: 15px;">
+					<a href="/" class="btn btn-secondary">Return to Homepage</a>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Get cancellation token from URL
+		const urlParams = new URLSearchParams(window.location.search);
+		const cancellationToken = urlParams.get('token');
+
+		// DOM elements
+		const loadingState = document.getElementById('loading-state');
+		const errorState = document.getElementById('error-state');
+		const errorMessage = document.getElementById('error-message');
+		const actionSelection = document.getElementById('action-selection');
+		const cancellationForm = document.getElementById('cancellation-form');
+		const rescheduleForm = document.getElementById('reschedule-form');
+		const successState = document.getElementById('success-state');
+		const headerSubtitle = document.getElementById('header-subtitle');
+
+		// Action buttons
+		const rescheduleBtn = document.getElementById('reschedule-btn');
+		const cancelBtn = document.getElementById('cancel-btn');
+		const confirmCancelBtn = document.getElementById('confirm-cancel');
+		const confirmRescheduleBtn = document.getElementById('confirm-reschedule');
+		const backToSelectionBtn = document.getElementById('back-to-selection');
+		const backToSelection2Btn = document.getElementById('back-to-selection-2');
+
+		// Form elements
+		const reasonTextarea = document.getElementById('cancellation-reason');
+		const rescheduleReasonTextarea = document.getElementById('reschedule-reason');
+		const availabilityCalendar = document.getElementById('availability-calendar');
+
+		// State variables
+		let currentBookingData = null;
+		let availabilityData = null;
+		let selectedDate = null;
+		let selectedTime = null;
+
+		// Initialize page
+		async function initializePage() {
+			if (!cancellationToken) {
+				showError('Invalid cancellation link. Please check your email for the correct link.');
+				return;
+			}
+
+			try {
+				// Validate cancellation token
+				const response = await fetch(`/api/cancel-booking?token=${encodeURIComponent(cancellationToken)}`);
+				const data = await response.json();
+
+				if (!response.ok) {
+					showError(data.error || 'Invalid cancellation link.');
+					return;
+				}
+
+				// Show booking details
+				showBookingDetails(data.booking);
+			} catch (error) {
+				console.error('Error validating cancellation token:', error);
+				showError('Unable to load booking details. Please try again.');
+			}
+		}
+
+		function showError(message) {
+			loadingState.style.display = 'none';
+			errorMessage.textContent = message;
+			errorState.style.display = 'block';
+		}
+
+		function showBookingDetails(booking) {
+			loadingState.style.display = 'none';
+			currentBookingData = booking;
+
+			// Populate booking details
+			document.getElementById('customer-name').textContent = booking.customerName;
+			document.getElementById('customer-email').textContent = booking.email;
+			document.getElementById('visit-date').textContent = new Date(booking.currentDate).toLocaleDateString('en-US', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+			document.getElementById('visit-time').textContent = booking.currentTime;
+			document.getElementById('visitor-count').textContent = booking.visitors;
+			document.getElementById('total-amount').textContent = `$${booking.amount}`;
+
+			// Show reschedule count if any
+			if (booking.rescheduleCount > 0) {
+				headerSubtitle.textContent = `Booking Management (Rescheduled ${booking.rescheduleCount} time${booking.rescheduleCount > 1 ? 's' : ''})`;
+			}
+
+			actionSelection.style.display = 'block';
+		}
+
+		// Event Listeners
+		rescheduleBtn.addEventListener('click', () => {
+			actionSelection.style.display = 'none';
+			headerSubtitle.textContent = 'Reschedule Booking';
+			rescheduleForm.style.display = 'block';
+			loadAvailability();
+		});
+
+		cancelBtn.addEventListener('click', () => {
+			actionSelection.style.display = 'none';
+			headerSubtitle.textContent = 'Cancel Booking';
+			cancellationForm.style.display = 'block';
+		});
+
+		backToSelectionBtn.addEventListener('click', () => {
+			cancellationForm.style.display = 'none';
+			headerSubtitle.textContent = 'Booking Management';
+			actionSelection.style.display = 'block';
+		});
+
+		backToSelection2Btn.addEventListener('click', () => {
+			rescheduleForm.style.display = 'none';
+			headerSubtitle.textContent = 'Booking Management';
+			actionSelection.style.display = 'block';
+			selectedDate = null;
+			selectedTime = null;
+			confirmRescheduleBtn.style.display = 'none';
+		});
+
+		// Handle cancellation confirmation
+		confirmCancelBtn.addEventListener('click', async () => {
+			if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+				return;
+			}
+
+			confirmCancelBtn.disabled = true;
+			confirmCancelBtn.textContent = 'Cancelling...';
+
+			try {
+				const response = await fetch('/api/cancel-booking', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						cancellationToken,
+						reason: reasonTextarea.value.trim() || null
+					})
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || 'Cancellation failed');
+				}
+
+				// Show success state
+				cancellationForm.style.display = 'none';
+				headerSubtitle.textContent = 'Booking Cancelled';
+				successState.style.display = 'block';
+				document.querySelector('#success-state h3').textContent = 'Booking Cancelled Successfully';
+				document.querySelector('#success-state p').textContent = 'Your booking has been cancelled and you will receive a confirmation email shortly.';
+
+			} catch (error) {
+				console.error('Cancellation error:', error);
+				showError(error.message || 'Failed to cancel booking. Please try again.');
+				confirmCancelBtn.disabled = false;
+				confirmCancelBtn.textContent = 'Cancel Booking';
+			}
+		});
+
+		// Handle reschedule confirmation
+		confirmRescheduleBtn.addEventListener('click', async () => {
+			if (!selectedDate || !selectedTime) {
+				showError('Please select a new date and time for your booking.');
+				return;
+			}
+
+			if (!confirm(`Are you sure you want to reschedule your booking to ${selectedDate} at ${selectedTime}?`)) {
+				return;
+			}
+
+			confirmRescheduleBtn.disabled = true;
+			confirmRescheduleBtn.textContent = 'Rescheduling...';
+
+			try {
+				const response = await fetch('/api/reschedule-booking', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						cancellationToken,
+						newDate: selectedDate,
+						newTime: selectedTime,
+						reason: rescheduleReasonTextarea.value.trim() || null
+					})
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || 'Reschedule failed');
+				}
+
+				// Show success state
+				rescheduleForm.style.display = 'none';
+				headerSubtitle.textContent = 'Booking Rescheduled';
+				successState.style.display = 'block';
+				document.querySelector('#success-state h3').textContent = 'Booking Rescheduled Successfully';
+				document.querySelector('#success-state p').textContent = `Your booking has been rescheduled to ${new Date(selectedDate).toLocaleDateString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				})} at ${selectedTime}. You will receive a confirmation email shortly.`;
+
+			} catch (error) {
+				console.error('Reschedule error:', error);
+				showError(error.message || 'Failed to reschedule booking. Please try again.');
+				confirmRescheduleBtn.disabled = false;
+				confirmRescheduleBtn.textContent = 'Confirm Reschedule';
+			}
+		});
+
+		// Load availability data
+		async function loadAvailability() {
+			try {
+				availabilityCalendar.innerHTML = '<p>Loading available dates...</p>';
+
+				const response = await fetch('/api/availability');
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || 'Failed to load availability');
+				}
+
+				availabilityData = data;
+				renderAvailabilityCalendar();
+
+			} catch (error) {
+				console.error('Error loading availability:', error);
+				availabilityCalendar.innerHTML = '<p style="color: #dc3545;">Failed to load available dates. Please try again.</p>';
+			}
+		}
+
+		// Render availability calendar
+		function renderAvailabilityCalendar() {
+			if (!availabilityData) return;
+
+			const container = document.createElement('div');
+			container.className = 'calendar-container';
+
+			// Group dates by month
+			const datesByMonth = {};
+			Object.keys(availabilityData).forEach(date => {
+				const dateObj = new Date(date);
+				const monthKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+				if (!datesByMonth[monthKey]) {
+					datesByMonth[monthKey] = [];
+				}
+				datesByMonth[monthKey].push(date);
+			});
+
+			// Render each month
+			Object.keys(datesByMonth).sort().forEach(monthKey => {
+				const monthContainer = document.createElement('div');
+				monthContainer.className = 'calendar-month';
+
+				const [year, month] = monthKey.split('-');
+				const monthName = new Date(year, month - 1, 1).toLocaleDateString('en-US', {
+					month: 'long',
+					year: 'numeric'
+				});
+
+				const monthHeader = document.createElement('h4');
+				monthHeader.textContent = monthName;
+				monthContainer.appendChild(monthHeader);
+
+				const datesContainer = document.createElement('div');
+				datesContainer.style.display = 'grid';
+				datesContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+				datesContainer.style.gap = '10px';
+
+				datesByMonth[monthKey].forEach(date => {
+					const dateButton = document.createElement('button');
+					dateButton.className = 'calendar-day available';
+					dateButton.textContent = new Date(date).toLocaleDateString('en-US', {
+						month: 'short',
+						day: 'numeric'
+					});
+
+					// Check if this is the current booking date
+					if (currentBookingData && date === currentBookingData.currentDate) {
+						dateButton.className = 'calendar-day current-booking';
+						dateButton.textContent += ' (Current)';
+					} else {
+						dateButton.addEventListener('click', () => selectDate(date));
+					}
+
+					datesContainer.appendChild(dateButton);
+				});
+
+				monthContainer.appendChild(datesContainer);
+				container.appendChild(monthContainer);
+			});
+
+			availabilityCalendar.innerHTML = '';
+			availabilityCalendar.appendChild(container);
+		}
+
+		// Select date and show time slots
+		function selectDate(date) {
+			selectedDate = date;
+			selectedTime = null;
+
+			// Update date selection UI
+			document.querySelectorAll('.calendar-day.available').forEach(btn => {
+				btn.classList.remove('selected');
+			});
+			event.target.classList.add('selected');
+
+			// Show time slots for selected date
+			showTimeSlots(date);
+		}
+
+		// Show available time slots for selected date
+		function showTimeSlots(date) {
+			const timeSlots = availabilityData[date] || [];
+
+			// Remove existing time slots
+			const existingTimeSlots = document.querySelector('.time-slots');
+			if (existingTimeSlots) {
+				existingTimeSlots.remove();
+			}
+
+			const timeSlotsContainer = document.createElement('div');
+			timeSlotsContainer.className = 'time-slots';
+
+			timeSlots.forEach(time => {
+				const timeButton = document.createElement('button');
+				timeButton.className = 'time-slot';
+				timeButton.textContent = time;
+
+				// Check if this is the current booking time
+				if (currentBookingData && date === currentBookingData.currentDate && time === currentBookingData.currentTime) {
+					timeButton.className = 'time-slot current-booking';
+					timeButton.textContent += ' (Current)';
+				} else {
+					timeButton.addEventListener('click', () => selectTime(time));
+				}
+
+				timeSlotsContainer.appendChild(timeButton);
+			});
+
+			availabilityCalendar.appendChild(timeSlotsContainer);
+		}
+
+		// Select time slot
+		function selectTime(time) {
+			selectedTime = time;
+
+			// Update time selection UI
+			document.querySelectorAll('.time-slot').forEach(btn => {
+				btn.classList.remove('selected');
+			});
+			event.target.classList.add('selected');
+
+			// Show confirm button
+			confirmRescheduleBtn.style.display = 'inline-flex';
+		}
+
+		// Initialize page when DOM is loaded
+		document.addEventListener('DOMContentLoaded', initializePage);
+	</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 // src/pages/api/bookings.ts
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
+import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -175,7 +176,7 @@ export const POST: APIRoute = async ({ request }) => {
       payment_status: paymentStatus,
     });
 
-    const { error: insertError } = await supabase.from('bookings').insert({
+    const { data: insertedBooking, error: insertError } = await supabase.from('bookings').insert({
       full_name: fullName,
       email,
       phone,
@@ -185,15 +186,57 @@ export const POST: APIRoute = async ({ request }) => {
       total_amount: totalAmount,
       payment_method: paymentMethod,
       payment_status: paymentStatus,
-    });
+    }).select('id, created_at, cancellation_token').single();
 
-    console.log('Insert result:', { insertError });
+    console.log('Insert result:', { insertedBooking, insertError });
 
     if (insertError) {
       console.error('Insert error:', insertError);
       return new Response(JSON.stringify({ error: `Booking failed: ${insertError.message}` }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Prepare booking data for webhook
+    const bookingData = {
+      id: insertedBooking.id,
+      fullName,
+      email,
+      phone,
+      visitDate,
+      preferredTime,
+      numberOfVisitors,
+      totalAmount,
+      paymentMethod,
+      createdAt: insertedBooking.created_at,
+    };
+
+    // Send confirmation email webhook (async, don't block response)
+    // Only send for "pay_on_arrival" for now, "pay_now" will be handled post-payment
+    if (paymentMethod === 'pay_on_arrival') {
+      console.log('Sending booking confirmation webhook for pay_on_arrival booking');
+
+      // Send webhook with retry logic in background
+      sendWebhookWithRetry(
+        () => sendBookingConfirmation(bookingData, insertedBooking.cancellation_token),
+        3, // max retries
+        2000 // initial delay
+      ).then(success => {
+        logWebhookAttempt(
+          bookingData.id,
+          'confirmation',
+          success,
+          success ? undefined : 'Failed after retries'
+        );
+      }).catch(error => {
+        console.error('Webhook sending failed:', error);
+        logWebhookAttempt(
+          bookingData.id,
+          'confirmation',
+          false,
+          error.message
+        );
       });
     }
 
