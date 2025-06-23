@@ -829,3 +829,7 @@ select.shabby-input {
 #flowerSearch {
   padding-left:3rem;
 }
+
+.flower-card img {
+  height:100%;
+}
