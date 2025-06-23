@@ -374,6 +374,72 @@ import Layout from '../layouts/Layout.astro';
 		<img loading="lazy" src="/images/bg-bouguet-top-flowers.webp" aria-hidden="true" alt="" pointer-events-none class="hero-decorative-flower-right-top desktop-decoration" />
 	</section>
 
+	<!-- Pricing Banner Section -->
+	<section id="pricing" class="py-20" style="position: relative;">
+
+		<!--- WTF -->
+		<div class="py-20 white-background-container" style=" z-index: 1; background-color:#fff; background-size: cover; background-blend-mode: multiply; height:100%; position: absolute; top: 0; left: 0; width: 100%;">
+		</div>
+		<!--- WTF -->	
+
+		<div class="max-w-4xl mx-auto px-4 pricing-content" style="z-index: 2; position: relative;">
+			<div class="shabby-card p-8 lg:p-12 distressed-shadow text-center">
+				<h2 class="text-3xl md:text-4xl font-playfair font-bold mb-6" style="color: #333333;">
+					Simple, Transparent Pricing
+				</h2>
+
+				<div class="mb-8">
+					<div class="text-5xl md:text-6xl font-allura mb-4" style="color: #E8B4B8;">
+						$35
+					</div>
+					<div class="text-xl font-playfair font-semibold mb-2" style="color: #333333;">
+						per bouquet
+					</div>
+					<p class="text-lg font-roboto max-w-2xl mx-auto" style="color: #333333;">
+						Everything you need for the perfect bouquet experience is included
+					</p>
+				</div>
+
+				<div class="grid md:grid-cols-3 gap-6 mb-8">
+					<div class="flex flex-col items-center">
+						<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
+							<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+							</svg>
+						</div>
+						<h3 class="font-playfair font-semibold mb-2" style="color: #333333;">All Tools Included</h3>
+						<p class="text-sm font-roboto text-center" style="color: #333333;">Professional cutting shears and collection vessels provided</p>
+					</div>
+
+					<div class="flex flex-col items-center">
+						<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
+							<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+							</svg>
+						</div>
+						<h3 class="font-playfair font-semibold mb-2" style="color: #333333;">Expert Guidance</h3>
+						<p class="text-sm font-roboto text-center" style="color: #333333;">Care instructions and tips for keeping your flowers fresh</p>
+					</div>
+
+					<div class="flex flex-col items-center">
+						<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
+							<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+							</svg>
+						</div>
+						<h3 class="font-playfair font-semibold mb-2" style="color: #333333;">Beautiful Location</h3>
+						<p class="text-sm font-roboto text-center" style="color: #333333;">Stunning mountain views and free on-site parking</p>
+					</div>
+				</div>
+
+				<a href="#home" class="vintage-button px-8 py-4 text-lg font-playfair font-semibold inline-block rounded-sm">
+					Book Your Bouquet Experience
+				</a>
+			</div>
+		</div>
+
+	</section>
+
 	<!-- What to Expect Section -->
 	<section id="what-to-expect" class="py-20" style="position: relative;">
 
@@ -590,78 +656,117 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 
 			<!-- Search and Controls -->
-			<div class="mb-8">
-				<!-- Search Bar -->
-				<div class="max-w-2xl mx-auto mb-6">
-					<div class="relative">
-						<label for="flowerSearch" class="sr-only">Search for flowers</label>
-						<input
-							type="text"
-							id="flowerSearch"
-							name="flowerSearch"
-							placeholder="Search for flowers (e.g., roses, tulips, sunflowers...)"
-							class="w-full px-4 py-3 pl-12 pr-4 shabby-input font-roboto text-lg"
-							autocomplete="off"
-							aria-label="Search for flowers"
-							aria-describedby="search-help"
-						>
-						<svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
-							<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
-						</svg>
-						<div id="searchClear" class="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer hidden">
-							<svg class="w-5 h-5" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
-								<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-							</svg>
+			<div class="mb-12">
+				<div class="max-w-6xl mx-auto">
+					<!-- Desktop: Side by side layout -->
+					<div class="flex flex-col lg:flex-row lg:items-end gap-6">
+
+						<!-- Search Section -->
+						<div class="flex-1">
+							<div class="mb-3">
+								<h3 class="text-lg font-playfair font-semibold" style="color: #333333;">Search Flowers</h3>
+							</div>
+							<div class="relative">
+								<label for="flowerSearch" class="sr-only">Search for flowers</label>
+								<input
+									type="text"
+									id="flowerSearch"
+									name="flowerSearch"
+									placeholder="Search for flowers (e.g., roses, tulips, sunflowers...)"
+									class="inset-input w-full px-4 py-3 pl-14 pr-12 font-roboto text-base"
+									autocomplete="off"
+									aria-label="Search for flowers"
+									aria-describedby="search-help"
+								>
+								<div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+									<svg class="w-5 h-5" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+									</svg>
+								</div>
+								<div id="searchClear" class="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer hidden p-1 rounded-full hover:bg-gray-100 transition-colors duration-200">
+									<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+									</svg>
+								</div>
+
+								<!-- Autocomplete Suggestions -->
+								<div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white rounded border border-gray-300 shadow-lg hidden z-10 max-h-60 overflow-y-auto mt-1">
+									<!-- Suggestions will be populated by JavaScript -->
+								</div>
+							</div>
 						</div>
 
-						<!-- Autocomplete Suggestions -->
-						<div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white rounded-lg shadow-lg border-2 hidden z-10 max-h-60 overflow-y-auto" style="border-color: #E8B4B8;">
-							<!-- Suggestions will be populated by JavaScript -->
+						<!-- Filters Section -->
+						<div class="flex flex-col sm:flex-row gap-4 lg:gap-6">
+							<!-- View Toggle (Mobile Only) -->
+							<div class="mobile-view-toggle">
+								<div class="mb-2 lg:hidden">
+									<span class="text-sm font-playfair font-semibold" style="color: #333333;">View</span>
+								</div>
+								<div class="flex items-center space-x-2">
+									<button id="carouselView" class="px-4 py-2 rounded font-playfair font-medium transition-all duration-200 vintage-button text-sm flex items-center space-x-1">
+										<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+											<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+										</svg>
+										<span class="hidden sm:inline">Cards</span>
+									</button>
+									<button id="listView" class="px-4 py-2 rounded font-playfair font-medium transition-all duration-200 border text-sm flex items-center space-x-1" style="border-color: #E8B4B8; color: #E8B4B8; background-color: transparent;">
+										<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M3 4a1 1 0 000 2h14a1 1 0 100-2H3zm0 4a1 1 0 000 2h14a1 1 0 100-2H3zm0 4a1 1 0 000 2h14a1 1 0 100-2H3z" clip-rule="evenodd"></path>
+										</svg>
+										<span class="hidden sm:inline">List</span>
+									</button>
+								</div>
+							</div>
+
+							<!-- Filter Dropdowns -->
+							<div class="flex flex-col sm:flex-row gap-3">
+								<div>
+									<div class="mb-2">
+										<label for="colorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
+									</div>
+									<div class="relative">
+										<select id="colorFilter" name="colorFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-28 appearance-none" aria-label="Filter flowers by color">
+											<option value="">All</option>
+											<option value="red">Red</option>
+											<option value="pink">Pink</option>
+											<option value="white">White</option>
+											<option value="yellow">Yellow</option>
+											<option value="purple">Purple</option>
+											<option value="orange">Orange</option>
+											<option value="blue">Blue</option>
+										</select>
+										<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+											<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+											</svg>
+										</div>
+									</div>
+								</div>
+
+								<div>
+									<div class="mb-2">
+										<label for="occasionFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Occasion</label>
+									</div>
+									<div class="relative">
+										<select id="occasionFilter" name="occasionFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by occasion">
+											<option value="">All</option>
+											<option value="wedding">Wedding</option>
+											<option value="birthday">Birthday</option>
+											<option value="anniversary">Anniversary</option>
+											<option value="sympathy">Sympathy</option>
+											<option value="everyday">Everyday</option>
+										</select>
+										<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+											<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+											</svg>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
-				</div>
-
-				<!-- Filter Controls -->
-				<div class="flex flex-wrap justify-center gap-4 mb-6">
-					<!-- View Toggle (Mobile Only) -->
-					<div class="mobile-view-toggle flex items-center space-x-2">
-						<button id="carouselView" class="px-4 py-2 rounded-lg font-playfair font-medium transition-all duration-200 vintage-button text-sm">
-							Carousel
-						</button>
-						<button id="listView" class="px-4 py-2 rounded-lg font-playfair font-medium transition-all duration-200 border-2 text-sm" style="border-color: #E8B4B8; color: #E8B4B8; background-color: #FAF7F4;">
-							List
-						</button>
-					</div>
-
-					<!-- Filters -->
-					<div class="flex items-center space-x-4">
-						<div>
-							<label for="colorFilter" class="sr-only">Filter by color</label>
-							<select id="colorFilter" name="colorFilter" class="px-4 py-2 rounded-lg shabby-input font-roboto text-sm" aria-label="Filter flowers by color">
-								<option value="">All Colors</option>
-								<option value="red">Red</option>
-								<option value="pink">Pink</option>
-								<option value="white">White</option>
-								<option value="yellow">Yellow</option>
-								<option value="purple">Purple</option>
-								<option value="orange">Orange</option>
-								<option value="blue">Blue</option>
-							</select>
-						</div>
-
-						<div>
-							<label for="occasionFilter" class="sr-only">Filter by occasion</label>
-							<select id="occasionFilter" name="occasionFilter" class="px-4 py-2 rounded-lg shabby-input font-roboto text-sm" aria-label="Filter flowers by occasion">
-								<option value="">All Occasions</option>
-								<option value="wedding">Wedding</option>
-								<option value="birthday">Birthday</option>
-								<option value="anniversary">Anniversary</option>
-								<option value="sympathy">Sympathy</option>
-								<option value="everyday">Everyday</option>
-							</select>
-						</div>
-					</div>
-
 				</div>
 			</div>
 
@@ -807,78 +912,166 @@ import Layout from '../layouts/Layout.astro';
 	<section id="about" class="py-20 bg-white" style="position: relative;">
 		<div class="max-w-6xl mx-auto px-4" style="z-index: 2; position: relative;">
 			<div class="text-center mb-16">
-				<h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 mb-6">About Our Garden</h2>
-				<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+				<h2 class="text-4xl md:text-5xl font-playfair font-bold mb-6" style="color: #333333;">About Our Garden</h2>
+				<p class="text-xl font-roboto max-w-3xl mx-auto" style="color: #333333;">
 					Our bouquet garden is a carefully curated collection of the most beautiful flowers,
 					designed to inspire and delight visitors of all ages.
 				</p>
 			</div>
-			<div class="grid md:grid-cols-2 gap-12 items-center center-mobile-text">
-				<div>
-					<h3 class="text-2xl font-bold text-gray-900 mb-4 center-mobile-text">Our Story</h3>
-					<p class="text-gray-600 mb-6">
-BG Bouquets is a welcoming, cut-your-own bouquet farm tucked in the sunny foothills of Southern Alberta — minutes from Hill Spring, Cardston, and Waterton Lakes National Park. Whether you're local or just passing through, our flower field is a place to slow down, breathe deep, and build something beautiful with your own hands.
-					</p>
-					<p class="text-gray-600">
-We're proud to share the simple joys of our family farm in full bloom. Pick from a wide variety of seasonal flowers — including sunflowers, sweet peas, snapdragons, lavender, roses, and more — all grown with care in our prairie soil and perfect for creating your own custom bouquet.
-					</p>
+
+			<div class="grid lg:grid-cols-2 gap-12 items-center">
+				<!-- Story Content -->
+				<div class="shabby-card p-8 distressed-shadow">
+					<h3 class="text-2xl font-playfair font-bold mb-6 center-mobile-text" style="color: #333333;">Our Story</h3>
+					<div class="space-y-4">
+						<p class="font-roboto leading-relaxed" style="color: #333333;">
+							BG Bouquets is a welcoming, cut-your-own bouquet farm tucked in the sunny foothills of Southern Alberta — minutes from Hill Spring, Cardston, and Waterton Lakes National Park. Whether you're local or just passing through, our flower field is a place to slow down, breathe deep, and build something beautiful with your own hands.
+						</p>
+						<p class="font-roboto leading-relaxed" style="color: #333333;">
+							We're proud to share the simple joys of our family farm in full bloom. Pick from a wide variety of seasonal flowers — including sunflowers, sweet peas, snapdragons, lavender, roses, and more — all grown with care in our prairie soil and perfect for creating your own custom bouquet.
+						</p>
+					</div>
+
+					<!-- Features Grid -->
+					<div class="grid md:grid-cols-2 gap-4 mt-8">
+						<div class="flex items-center space-x-3">
+							<div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+								</svg>
+							</div>
+							<span class="font-roboto text-sm" style="color: #333333;">Family-owned farm</span>
+						</div>
+						<div class="flex items-center space-x-3">
+							<div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+								</svg>
+							</div>
+							<span class="font-roboto text-sm" style="color: #333333;">Seasonal varieties</span>
+						</div>
+						<div class="flex items-center space-x-3">
+							<div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+								</svg>
+							</div>
+							<span class="font-roboto text-sm" style="color: #333333;">Mountain views</span>
+						</div>
+						<div class="flex items-center space-x-3">
+							<div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+								</svg>
+							</div>
+							<span class="font-roboto text-sm" style="color: #333333;">All ages welcome</span>
+						</div>
+					</div>
 				</div>
-				<div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
-					<span class="text-gray-500">Garden Image Placeholder</span>
+
+				<!-- Image Placeholder -->
+				<div class="shabby-card p-8 distressed-shadow">
+					<div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
+						<span class="text-gray-500 font-roboto">Garden Image Placeholder</span>
+					</div>
 				</div>
 			</div>
 		</div>
 		<!--- WTF -->
 		<div id="white-background-container" class="py-20" style=" z-index: 1; background-color:#fff; background-size: cover; background-blend-mode: multiply; height:100%; position: absolute; top: 0; left: 0; width: 100%;">
 		</div>
-		<!--- WTF -->		
+		<!--- WTF -->
 	</section>
 
 	<!-- Location Section -->
 	<section id="location" class="py-20 bg-white">
 		<div class="max-w-6xl mx-auto px-4">
 			<div class="text-center mb-16">
-				<h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 mb-6">Visit Us</h2>
-				<p class="text-xl text-gray-600 max-w-3xl mx-auto">
-					Find us in the heart of the southern alberta countryside, on the way to waterton national park.
+				<h2 class="text-4xl md:text-5xl font-playfair font-bold mb-6" style="color: #333333;">Visit Us</h2>
+				<p class="text-xl font-roboto max-w-3xl mx-auto" style="color: #333333;">
+					Find us in the heart of the southern Alberta countryside, on the way to Waterton National Park.
 				</p>
 			</div>
-			<div class="grid md:grid-cols-2 gap-12">
-				<div>
-					<h3 class="text-2xl font-bold text-gray-900 mb-6">Location Details</h3>
-					<div class="space-y-4">
-						<div class="flex items-start space-x-3">
-							<div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-								<span class="text-white text-xs">📍</span>
+
+			<div class="grid lg:grid-cols-2 gap-12">
+				<!-- Location Details -->
+				<div class="shabby-card p-8 distressed-shadow">
+					<h3 class="text-2xl font-playfair font-bold mb-6" style="color: #333333;">Location Details</h3>
+					<div class="space-y-6">
+						<div class="flex items-start space-x-4">
+							<div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+								</svg>
 							</div>
 							<div>
-								<p class="font-semibold text-gray-900">Address</p>
-								<p class="text-gray-600">123 Garden Lane, Flower Valley, State 12345</p>
+								<p class="font-playfair font-semibold mb-1" style="color: #333333;">Address</p>
+								<p class="font-roboto" style="color: #333333;">123 Garden Lane, Flower Valley, State 12345</p>
 							</div>
 						</div>
-						<div class="flex items-start space-x-3">
-							<div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-								<span class="text-white text-xs">🕒</span>
+
+						<div class="flex items-start space-x-4">
+							<div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+								</svg>
 							</div>
 							<div>
-								<p class="font-semibold text-gray-900">Hours</p>
-								<p class="text-gray-600">Thursday, Friday, Saturday: 10:00 AM - 1:00 PM & 6:00 PM - 9:00 PM</p>
-								<p class="text-gray-600">Closed Monday, Tuesday, Wednesday, Sunday</p>
+								<p class="font-playfair font-semibold mb-1" style="color: #333333;">Hours</p>
+								<p class="font-roboto mb-1" style="color: #333333;">Thursday, Friday, Saturday</p>
+								<p class="font-roboto text-sm" style="color: #333333;">10:00 AM - 1:00 PM & 6:00 PM - 9:00 PM</p>
+								<p class="font-roboto text-sm italic" style="color: #666;">Closed Monday, Tuesday, Wednesday, Sunday</p>
 							</div>
 						</div>
-						<div class="flex items-start space-x-3">
-							<div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-								<span class="text-white text-xs">🚗</span>
+
+						<div class="flex items-start space-x-4">
+							<div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+									<path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
+								</svg>
 							</div>
 							<div>
-								<p class="font-semibold text-gray-900">Parking</p>
-								<p class="text-gray-600">Free parking available on-site</p>
+								<p class="font-playfair font-semibold mb-1" style="color: #333333;">Parking</p>
+								<p class="font-roboto" style="color: #333333;">Free parking available on-site</p>
+								<p class="font-roboto text-sm" style="color: #666;">Easy access with mountain views</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Additional Info -->
+					<div class="mt-8 pt-6 border-t" style="border-color: #F8E7E8;">
+						<div class="grid md:grid-cols-2 gap-4">
+							<div class="flex items-center space-x-2">
+								<div class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: #F8E7E8;">
+									<svg class="w-3 h-3" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+									</svg>
+								</div>
+								<span class="font-roboto text-sm" style="color: #333333;">Wheelchair accessible</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<div class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: #F8E7E8;">
+									<svg class="w-3 h-3" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+									</svg>
+								</div>
+								<span class="font-roboto text-sm" style="color: #333333;">Restroom facilities</span>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
-					<span class="text-gray-500">Map Placeholder</span>
+
+				<!-- Map Placeholder -->
+				<div class="shabby-card p-8 distressed-shadow">
+					<div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
+						<span class="text-gray-500 font-roboto">Map Placeholder</span>
+					</div>
+					<div class="mt-6 text-center">
+						<a href="#" class="vintage-button px-6 py-3 text-sm font-playfair font-semibold rounded-sm inline-block">
+							Get Directions
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -886,76 +1079,245 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 
 	<!-- Contact Section -->
 	<section id="contact" class="py-20 bg-white">
-		<div class="max-w-4xl mx-auto px-4">
+
+		<div class="max-w-7xl mx-auto px-4">
+
+			<!-- Header -->
 			<div class="text-center mb-16">
-				<h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 mb-6">Get in Touch</h2>
+				<h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 mb-6">FAQ & Contact</h2>
 				<p class="text-xl text-gray-600 max-w-3xl mx-auto">
 					Have questions or want to plan a special event? We'd love to hear from you.
 				</p>
 			</div>
-			<div class="grid md:grid-cols-2 gap-12">
+
+			<!-- Two Column Layout: FAQ + Contact Form -->
+			<div class="grid lg:grid-cols-2 gap-12 mb-16">
+				
+				<!-- FAQ Section -->
 				<div>
-					<h3 class="text-2xl font-bold text-gray-900 mb-6">Contact Information</h3>
-					<div class="space-y-4">
-						<div class="flex items-center space-x-3">
-							<div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-								<span class="text-white text-xs">📞</span>
+
+					<!-- Header -->
+					<div class="mb-8">
+						<h3 class="text-3xl font-playfair font-bold mb-4" style="color: #333333;">Frequently Asked Questions</h3>
+						<p class="text-lg font-roboto" style="color: #333333;">Everything you need to know about your bouquet experience</p>
+					</div>
+
+					<div class="shabby-card p-6 distressed-shadow">
+						<!-- FAQ Items -->
+						<div class="space-y-4">
+							
+							<!-- FAQ Item 1 -->
+							<div class="faq-item border-b border-shabby-pink pb-4">
+								<button class="faq-question w-full text-left flex justify-between items-center py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-dusty-rose focus-visible:ring-offset-2" aria-expanded="false">
+									<span class="text-lg font-playfair font-semibold" style="color: #333333;">What's included in the price?</span>
+									<svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+									</svg>
+								</button>
+								<div class="faq-answer hidden overflow-hidden">
+									<div class="pt-2 pb-4">
+										<p class="font-roboto" style="color: #333333;">Your $35 bouquet experience includes all cutting tools (professional shears), a collection vessel for gathering your flowers, expert guidance on flower selection and care, and detailed care instructions to keep your bouquet fresh longer. Free on-site parking is also included.</p>
+									</div>
+								</div>
 							</div>
-							<div>
-								<p class="font-semibold text-gray-900">Phone</p>
-								<p class="text-gray-600">(555) 123-4567</p>
+
+							<!-- FAQ Item 2 -->
+							<div class="faq-item border-b border-shabby-pink pb-4">
+								<button class="faq-question w-full text-left flex justify-between items-center py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-dusty-rose focus-visible:ring-offset-2" aria-expanded="false">
+									<span class="text-lg font-playfair font-semibold" style="color: #333333;">Do you provide scissors/tools/vessels?</span>
+									<svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+									</svg>
+								</button>
+								<div class="faq-answer hidden overflow-hidden">
+									<div class="pt-2 pb-4">
+										<p class="font-roboto" style="color: #333333;">Yes! We provide everything you need. Professional-grade cutting shears are available for all visitors, along with collection vessels (buckets or baskets) to gather your flowers. You don't need to bring any tools - just come ready to enjoy the experience!</p>
+									</div>
+								</div>
 							</div>
-						</div>
-						<div class="flex items-center space-x-3">
-							<div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-								<span class="text-white text-xs">✉️</span>
+
+							<!-- FAQ Item 3 -->
+							<div class="faq-item border-b border-shabby-pink pb-4">
+								<button class="faq-question w-full text-left flex justify-between items-center py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-dusty-rose focus-visible:ring-offset-2" aria-expanded="false">
+									<span class="text-lg font-playfair font-semibold" style="color: #333333;">What happens if it rains or there is bad weather?</span>
+									<svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+									</svg>
+								</button>
+								<div class="faq-answer hidden overflow-hidden">
+									<div class="pt-2 pb-4">
+										<p class="font-roboto" style="color: #333333;">Light rain doesn't stop the flower picking fun! However, in case of severe weather (thunderstorms, heavy rain, or dangerous conditions), we may need to reschedule your visit for safety reasons. We'll contact you as soon as possible if weather conditions require rescheduling, and we'll work with you to find a new date that works for everyone.</p>
+									</div>
+								</div>
 							</div>
-							<div>
-								<p class="font-semibold text-gray-900">Email</p>
-								<p class="text-gray-600">info@bouquetgarden.com</p>
+
+							<!-- FAQ Item 4 -->
+							<div class="faq-item border-b border-shabby-pink pb-4">
+								<button class="faq-question w-full text-left flex justify-between items-center py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-dusty-rose focus-visible:ring-offset-2" aria-expanded="false">
+									<span class="text-lg font-playfair font-semibold" style="color: #333333;">Can I bring children?</span>
+									<svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+									</svg>
+								</button>
+								<div class="faq-answer hidden overflow-hidden">
+									<div class="pt-2 pb-4">
+										<p class="font-roboto" style="color: #333333;">Absolutely! Children are welcome and we love seeing families enjoy the garden together. Please supervise little ones at all times, especially around the cutting tools and in the flower beds. We recommend staying on marked paths to protect both the flowers and ensure everyone's safety. It's a wonderful educational experience for kids to learn about flowers and nature!</p>
+									</div>
+								</div>
 							</div>
-						</div>
-						<div class="flex items-center space-x-3">
-							<div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-								<span class="text-white text-xs">💬</span>
+
+							<!-- FAQ Item 5 -->
+							<div class="faq-item">
+								<button class="faq-question w-full text-left flex justify-between items-center py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-dusty-rose focus-visible:ring-offset-2" aria-expanded="false">
+									<span class="text-lg font-playfair font-semibold" style="color: #333333;">Can I bring pets?</span>
+									<svg class="faq-arrow w-5 h-5 transform transition-transform duration-200" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+									</svg>
+								</button>
+								<div class="faq-answer hidden overflow-hidden">
+									<div class="pt-2 pb-4">
+										<p class="font-roboto" style="color: #333333;">We love pets, but to protect our flowers and ensure the safety of all visitors, we ask that pets remain in the parking area. This helps preserve the flower beds and prevents any accidents. You're welcome to bring your furry friends along for the car ride - they can enjoy the fresh country air while you create your beautiful bouquet!</p>
+									</div>
+								</div>
 							</div>
-							<div>
-								<p class="font-semibold text-gray-900">Social Media</p>
-								<p class="text-gray-600">Follow us @bouquetgarden</p>
-							</div>
+
 						</div>
 					</div>
+
 				</div>
+
+				<!-- Contact Form Section -->
 				<div>
-					<h3 class="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h3>
-					<form class="space-y-4">
-						<div>
-							<label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-							<input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+
+					<!-- Header -->
+					<div class="mb-8">
+						<h3 class="text-3xl font-playfair font-bold mb-4" style="color: #333333;">Send us a Message</h3>
+						<p class="text-lg font-roboto" style="color: #333333;">Have a question not covered in our FAQ? We'd love to help!</p>
+					</div>
+
+					<!-- Contact Form -->
+					<div class="shabby-card p-6 distressed-shadow">
+						<form class="space-y-4">
+							<div>
+								<label for="contact-name" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Name *</label>
+								<input type="text" id="contact-name" name="name" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="Your full name">
+							</div>
+							<div>
+								<label for="contact-email" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Email *</label>
+								<input type="email" id="contact-email" name="email" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="your@email.com">
+							</div>
+							<div>
+								<label for="contact-subject" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Subject</label>
+								<input type="text" id="contact-subject" name="subject" class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="What's this about?">
+							</div>
+							<div>
+								<label for="contact-message" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Message *</label>
+								<textarea id="contact-message" name="message" rows="5" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm resize-none" placeholder="Tell us how we can help..."></textarea>
+							</div>
+							<button type="submit" class="w-full vintage-button px-6 py-3 text-sm font-playfair font-semibold rounded-sm">
+								Send Message
+							</button>
+						</form>
+					</div>
+
+				</div>
+
+			</div>
+
+
+		</div>
+
+			<!-- Contact Information Section -->
+			<div class="text-center">
+				<h3 class="text-2xl font-playfair font-bold mb-8" style="color: #333333;">Contact Information</h3>
+				<div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+					<div class="flex flex-col items-center">
+						<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
+							<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+							</svg>
 						</div>
-						<div>
-							<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-							<input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+						<h4 class="font-playfair font-semibold mb-2" style="color: #333333;">Phone</h4>
+						<p class="font-roboto" style="color: #333333;">(555) 123-4567</p>
+					</div>
+
+					<div class="flex flex-col items-center">
+						<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
+							<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+								<path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+							</svg>
 						</div>
-						<div>
-							<label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-							<textarea id="message" name="message" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+						<h4 class="font-playfair font-semibold mb-2" style="color: #333333;">Email</h4>
+						<p class="font-roboto" style="color: #333333;">info@bouquetgarden.com</p>
+					</div>
+
+					<div class="flex flex-col items-center">
+						<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
+							<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path>
+							</svg>
 						</div>
-						<button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-green-700 transition-colors duration-200">
-							Send Message
-						</button>
-					</form>
+						<h4 class="font-playfair font-semibold mb-2" style="color: #333333;">Social Media</h4>
+						<p class="font-roboto" style="color: #333333;">Follow us @bouquetgarden</p>
+					</div>
 				</div>
 			</div>
-		</div>
+		
 	</section>
 </Layout>
 
 <!-- Calendar styles moved to global.css for better organization -->
 
 <script>
+	// FAQ Accordion functionality
+	function initializeFAQ() {
+		const faqItems = document.querySelectorAll('.faq-item');
+
+		faqItems.forEach(item => {
+			const question = item.querySelector('.faq-question') as HTMLButtonElement;
+			const answer = item.querySelector('.faq-answer') as HTMLElement;
+			const arrow = item.querySelector('.faq-arrow') as HTMLElement;
+
+			if (question && answer && arrow) {
+				question.addEventListener('click', () => {
+					const isOpen = question.getAttribute('aria-expanded') === 'true';
+
+					// Close all other FAQ items
+					faqItems.forEach(otherItem => {
+						if (otherItem !== item) {
+							const otherQuestion = otherItem.querySelector('.faq-question') as HTMLButtonElement;
+							const otherAnswer = otherItem.querySelector('.faq-answer') as HTMLElement;
+							const otherArrow = otherItem.querySelector('.faq-arrow') as HTMLElement;
+
+							if (otherQuestion && otherAnswer && otherArrow) {
+								otherQuestion.setAttribute('aria-expanded', 'false');
+								otherAnswer.classList.add('hidden');
+								otherArrow.style.transform = 'rotate(0deg)';
+							}
+						}
+					});
+
+					// Toggle current item
+					if (isOpen) {
+						question.setAttribute('aria-expanded', 'false');
+						answer.classList.add('hidden');
+						arrow.style.transform = 'rotate(0deg)';
+					} else {
+						question.setAttribute('aria-expanded', 'true');
+						answer.classList.remove('hidden');
+						arrow.style.transform = 'rotate(180deg)';
+					}
+				});
+			}
+		});
+	}
+
 	// Booking form functionality
 	document.addEventListener('DOMContentLoaded', () => {
+		// Initialize FAQ accordion
+		initializeFAQ();
+
 		const bookingForm = document.getElementById('booking-form') as HTMLFormElement;
 		const bookNowBtn = document.getElementById('bookNowBtn') as HTMLButtonElement;
 		const bookingBtnText = document.getElementById('bookingBtnText') as HTMLElement;
@@ -2206,23 +2568,35 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 
 		function createFlowerCard(flower: any, isDesktop = false) {
 			const cardClass = isDesktop ?
-				'shabby-card p-4 hover:scale-105 transition-transform duration-300 cursor-pointer' :
-				'shabby-card p-4 flex-shrink-0 w-80 sm:w-72 snap-center min-h-80';
+				'shabby-card distressed-shadow p-6 hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer group' :
+				'shabby-card distressed-shadow p-5 flex-shrink-0 w-80 sm:w-72 snap-center min-h-96 group';
 
 			return `
 				<div class="${cardClass}">
-					<div class="relative mb-4">
-						<div class="w-full h-48 flex items-center justify-center overflow-hidden">
-							<img class="w-full h-full object-cover" src="./images/flowers/${flower.image}" alt="${flower.name}" />
+					<div class="relative mb-4 overflow-hidden rounded-lg">
+						<div class="w-full h-48 bg-gradient-to-br from-shabby-pink to-dusty-blue">
+							<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" src="./images/flowers/${flower.image}" alt="${flower.name}" />
 						</div>
 					</div>
-					<div>
-						<h3 class="text-lg font-playfair font-bold mb-2" style="color: #333333;">${flower.name}</h3>
-						<p class="text-xs font-roboto mb-3" style="color: #333333;">${flower.description}</p>
-						<div class="flex flex-wrap gap-1">
+
+					<div class="space-y-3">
+						<div>
+							<h3 class="text-xl font-playfair font-bold mb-2 group-hover:text-dusty-rose transition-colors duration-200" style="color: #333333;">${flower.name}</h3>
+							<p class="text-sm font-roboto leading-relaxed" style="color: #666; line-height: 1.4;">${flower.description}</p>
+						</div>
+
+						<!-- Color palette -->
+						<div class="flex flex-wrap gap-1.5">
 							${flower.colors.map((color: string) => `
-								<span class="px-2 py-1 text-xs px-2 py-1 font-roboto" style="color: #333333; border: 1px solid #333;">
-									${color}
+								<div class="w-4 h-4 rounded-full" style="background-color: ${getColorHex(color)}; ${color.toLowerCase() === 'white' ? 'border: 1px solid #E8B4B8;' : ''}" title="${color}"></div>
+							`).join('')}
+						</div>
+
+						<!-- Occasions tags -->
+						<div class="flex flex-wrap gap-1.5 pt-2">
+							${flower.occasions.slice(0, 3).map((occasion: string) => `
+								<span class="px-2.5 py-1 rounded-full text-xs font-roboto font-medium capitalize transition-colors duration-200 hover:bg-dusty-rose" style="background-color: #FAF7F4; color: #333333; border: 1px solid #E8B4B8;">
+									${occasion}
 								</span>
 							`).join('')}
 						</div>
@@ -2231,27 +2605,52 @@ We're proud to share the simple joys of our family farm in full bloom. Pick from
 			`;
 		}
 
+		// Helper function to get color hex values
+		function getColorHex(colorName: string): string {
+			const colorMap: Record<string, string> = {
+				'red': '#EF4444',
+				'pink': '#EC4899',
+				'white': '#FFFFFF',
+				'yellow': '#EAB308',
+				'purple': '#A855F7',
+				'orange': '#F97316',
+				'blue': '#3B82F6',
+				'green': '#22C55E',
+				'lavender': '#C084FC',
+				'coral': '#FF7F7F'
+			};
+			return colorMap[colorName.toLowerCase()] || '#E8B4B8';
+		}
+
 		function createListItem(flower: any) {
 			return `
-				<div class="shabby-card p-4 distressed-shadow flex items-center space-x-4">
-					<div class="w-20 h-20 rounded-lg flex items-center justify-center vintage-border flex-shrink-0" style="background: linear-gradient(135deg, #F8E7E8 0%, #E8E0F0 100%);">
-						<svg class="w-8 h-8" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
-							<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-						</svg>
+				<div class="shabby-card p-6 distressed-shadow flex items-start space-x-6 hover:shadow-lg transition-shadow duration-300 group">
+					<div class="w-24 h-24 rounded-lg flex-shrink-0 overflow-hidden" style="background: linear-gradient(135deg, #F8E7E8 0%, #E8E0F0 100%);">
+						<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" src="./images/flowers/${flower.image}" alt="${flower.name}" />
 					</div>
-					<div class="flex-1">
-						<h3 class="text-lg font-playfair font-bold mb-1" style="color: #333333;">${flower.name}</h3>
-						<p class="text-sm font-roboto mb-2" style="color: #333333;">${flower.description}</p>
-						<div class="flex flex-wrap gap-1">
-							${flower.colors.slice(0, 3).map((color: string) => `
-								<span class="px-2 py-1 rounded-full text-xs font-roboto" style="background-color: #FAF7F4; color: #333333; border: 1px solid #E8B4B8;">
-									${color}
+					<div class="flex-1 space-y-3">
+						<div>
+							<h3 class="text-xl font-playfair font-bold mb-2 group-hover:text-dusty-rose transition-colors duration-200" style="color: #333333;">${flower.name}</h3>
+							<p class="text-sm font-roboto leading-relaxed" style="color: #666;">${flower.description}</p>
+						</div>
+
+						<!-- Color dots -->
+						<div class="flex flex-wrap gap-1.5">
+							${flower.colors.map((color: string) => `
+								<div class="w-4 h-4 rounded-full" style="background-color: ${getColorHex(color)}; ${color.toLowerCase() === 'white' ? 'border: 1px solid #E8B4B8;' : ''}" title="${color}"></div>
+							`).join('')}
+						</div>
+
+						<!-- Occasions and features -->
+						<div class="flex flex-wrap items-center gap-2">
+							<span class="text-xs font-playfair font-medium" style="color: #666;">Perfect for:</span>
+							${flower.occasions.slice(0, 4).map((occasion: string) => `
+								<span class="px-2.5 py-1 rounded-full text-xs font-roboto font-medium capitalize transition-colors duration-200 hover:bg-dusty-rose" style="background-color: #FAF7F4; color: #333333; border: 1px solid #E8B4B8;">
+									${occasion}
 								</span>
 							`).join('')}
-							${flower.colors.length > 3 ? `<span class="text-xs font-roboto" style="color: #E8B4B8;">+${flower.colors.length - 3} more</span>` : ''}
 						</div>
 					</div>
-
 				</div>
 			`;
 		}
