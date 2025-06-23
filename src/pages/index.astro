@@ -698,29 +698,10 @@ import Layout from '../layouts/Layout.astro';
 
 						<!-- Filters Section -->
 						<div class="flex flex-col sm:flex-row gap-4 lg:gap-6">
-							<!-- View Toggle (Mobile Only) -->
-							<div class="mobile-view-toggle">
-								<div class="mb-2 lg:hidden">
-									<span class="text-sm font-playfair font-semibold" style="color: #333333;">View</span>
-								</div>
-								<div class="flex items-center space-x-2">
-									<button id="carouselView" class="px-4 py-2 rounded font-playfair font-medium transition-all duration-200 vintage-button text-sm flex items-center space-x-1">
-										<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-											<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
-										</svg>
-										<span class="hidden sm:inline">Cards</span>
-									</button>
-									<button id="listView" class="px-4 py-2 rounded font-playfair font-medium transition-all duration-200 border text-sm flex items-center space-x-1" style="border-color: #E8B4B8; color: #E8B4B8; background-color: transparent;">
-										<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-											<path fill-rule="evenodd" d="M3 4a1 1 0 000 2h14a1 1 0 100-2H3zm0 4a1 1 0 000 2h14a1 1 0 100-2H3zm0 4a1 1 0 000 2h14a1 1 0 100-2H3z" clip-rule="evenodd"></path>
-										</svg>
-										<span class="hidden sm:inline">List</span>
-									</button>
-								</div>
-							</div>
+
 
 							<!-- Filter Dropdowns -->
-							<div class="flex flex-col sm:flex-row gap-3">
+							<div class="flex flex-row gap-3">
 								<div>
 									<div class="mb-2">
 										<label for="colorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
@@ -816,12 +797,7 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 			</div>
 
-			<!-- Mobile List View -->
-			<div id="mobileList" class="lg:hidden hidden">
-				<div id="listContainer" class="space-y-4">
-					<!-- List items will be inserted here by JavaScript -->
-				</div>
-			</div>
+
 
 			<!-- Desktop Grid View -->
 			<div id="desktopGrid" class="hidden lg:grid lg:grid-cols-4 xl:grid-cols-4 gap-6">
@@ -2078,12 +2054,10 @@ import Layout from '../layouts/Layout.astro';
 
 		let filteredFlowers = [...flowers];
 		let currentCardIndex = 0;
-		let currentView = 'carousel';
 
 		// Store original classes for restoration
 		let originalClasses = {
 			mobileCarousel: '',
-			mobileList: '',
 			desktopGrid: ''
 		};
 
@@ -2107,13 +2081,9 @@ import Layout from '../layouts/Layout.astro';
 		const searchSuggestions = document.getElementById('searchSuggestions') as HTMLElement;
 		const colorFilter = document.getElementById('colorFilter') as HTMLSelectElement;
 		const occasionFilter = document.getElementById('occasionFilter') as HTMLSelectElement;
-		const carouselView = document.getElementById('carouselView') as HTMLButtonElement;
-		const listView = document.getElementById('listView') as HTMLButtonElement;
 		const mobileCarousel = document.getElementById('mobileCarousel') as HTMLElement;
-		const mobileList = document.getElementById('mobileList') as HTMLElement;
 		const desktopGrid = document.getElementById('desktopGrid') as HTMLElement;
 		const carouselTrack = document.getElementById('carouselTrack') as HTMLElement;
-		const listContainer = document.getElementById('listContainer') as HTMLElement;
 		const prevBtn = document.getElementById('prevBtn') as HTMLButtonElement;
 		const nextBtn = document.getElementById('nextBtn') as HTMLButtonElement;
 		const flowerNavBtn = document.getElementById('flowerNavBtn') as HTMLButtonElement;
@@ -2134,9 +2104,6 @@ import Layout from '../layouts/Layout.astro';
 			if (mobileCarousel) {
 				originalClasses.mobileCarousel = mobileCarousel.className;
 			}
-			if (mobileList) {
-				originalClasses.mobileList = mobileList.className;
-			}
 			if (desktopGrid) {
 				originalClasses.desktopGrid = desktopGrid.className;
 			}
@@ -2153,9 +2120,7 @@ import Layout from '../layouts/Layout.astro';
 			colorFilter?.addEventListener('change', applyFilters);
 			occasionFilter?.addEventListener('change', applyFilters);
 
-			// View toggle (mobile only)
-			carouselView?.addEventListener('click', () => switchView('carousel'));
-			listView?.addEventListener('click', () => switchView('list'));
+
 
 			// Carousel controls
 			prevBtn?.addEventListener('click', () => navigateCarousel(-1));
@@ -2382,43 +2347,7 @@ import Layout from '../layouts/Layout.astro';
 			applyFilters();
 		};
 
-		function switchView(view: string) {
-			currentView = view;
 
-			if (view === 'carousel') {
-				carouselView?.classList.add('vintage-button');
-				carouselView?.classList.remove('border-2');
-				carouselView?.style.removeProperty('border-color');
-				carouselView?.style.removeProperty('color');
-				carouselView?.style.removeProperty('background-color');
-
-				listView?.classList.remove('vintage-button');
-				listView?.classList.add('border-2');
-				listView?.style.setProperty('border-color', '#E8B4B8');
-				listView?.style.setProperty('color', '#E8B4B8');
-				listView?.style.setProperty('background-color', '#FAF7F4');
-
-				mobileCarousel?.classList.remove('hidden');
-				mobileList?.classList.add('hidden');
-			} else {
-				listView?.classList.add('vintage-button');
-				listView?.classList.remove('border-2');
-				listView?.style.removeProperty('border-color');
-				listView?.style.removeProperty('color');
-				listView?.style.removeProperty('background-color');
-
-				carouselView?.classList.remove('vintage-button');
-				carouselView?.classList.add('border-2');
-				carouselView?.style.setProperty('border-color', '#E8B4B8');
-				carouselView?.style.setProperty('color', '#E8B4B8');
-				carouselView?.style.setProperty('background-color', '#FAF7F4');
-
-				mobileList?.classList.remove('hidden');
-				mobileCarousel?.classList.add('hidden');
-			}
-
-			updateDisplay();
-		}
 
 		function navigateCarousel(direction: number) {
 			if (filteredFlowers.length === 0) return;
@@ -2453,21 +2382,14 @@ import Layout from '../layouts/Layout.astro';
 			if (window.innerWidth >= 1024) {
 				updateDesktopGrid();
 			} else {
-				if (currentView === 'carousel') {
-					updateMobileCarousel();
-				} else {
-					updateMobileList();
-				}
+				updateMobileCarousel();
 			}
 		}
 
 		function showNoResults() {
-			// Remove all classes except 'hidden' to eliminate conflicts
+			// Hide all view containers
 			if (mobileCarousel) {
 				mobileCarousel.className = 'hidden';
-			}
-			if (mobileList) {
-				mobileList.className = 'hidden';
 			}
 			if (desktopGrid) {
 				desktopGrid.className = 'hidden';
@@ -2486,12 +2408,9 @@ import Layout from '../layouts/Layout.astro';
 		function hideNoResults() {
 			noResults?.classList.add('hidden');
 
-			// Restore original classes to all containers
+			// Restore original classes to containers
 			if (mobileCarousel && originalClasses.mobileCarousel) {
 				mobileCarousel.className = originalClasses.mobileCarousel;
-			}
-			if (mobileList && originalClasses.mobileList) {
-				mobileList.className = originalClasses.mobileList;
 			}
 			if (desktopGrid && originalClasses.desktopGrid) {
 				desktopGrid.className = originalClasses.desktopGrid;
@@ -2501,16 +2420,9 @@ import Layout from '../layouts/Layout.astro';
 			if (window.innerWidth >= 1024) {
 				desktopGrid?.classList.remove('hidden');
 				mobileCarousel?.classList.add('hidden');
-				mobileList?.classList.add('hidden');
 			} else {
 				desktopGrid?.classList.add('hidden');
-				if (currentView === 'carousel') {
-					mobileCarousel?.classList.remove('hidden');
-					mobileList?.classList.add('hidden');
-				} else {
-					mobileList?.classList.remove('hidden');
-					mobileCarousel?.classList.add('hidden');
-				}
+				mobileCarousel?.classList.remove('hidden');
 			}
 		}
 
@@ -2526,18 +2438,6 @@ import Layout from '../layouts/Layout.astro';
 				occasionFilter.style.opacity = '0.5';
 				occasionFilter.style.cursor = 'not-allowed';
 			}
-
-			// Disable view toggle buttons (but keep them visible)
-			if (carouselView) {
-				carouselView.disabled = true;
-				carouselView.style.opacity = '0.5';
-				carouselView.style.cursor = 'not-allowed';
-			}
-			if (listView) {
-				listView.disabled = true;
-				listView.style.opacity = '0.5';
-				listView.style.cursor = 'not-allowed';
-			}
 		}
 
 		function enableFiltersAndControls() {
@@ -2551,18 +2451,6 @@ import Layout from '../layouts/Layout.astro';
 				occasionFilter.disabled = false;
 				occasionFilter.style.opacity = '1';
 				occasionFilter.style.cursor = 'pointer';
-			}
-
-			// Enable view toggle buttons
-			if (carouselView) {
-				carouselView.disabled = false;
-				carouselView.style.opacity = '1';
-				carouselView.style.cursor = 'pointer';
-			}
-			if (listView) {
-				listView.disabled = false;
-				listView.style.opacity = '1';
-				listView.style.cursor = 'pointer';
 			}
 		}
 
@@ -2622,38 +2510,7 @@ import Layout from '../layouts/Layout.astro';
 			return colorMap[colorName.toLowerCase()] || '#E8B4B8';
 		}
 
-		function createListItem(flower: any) {
-			return `
-				<div class="flower-card shabby-card p-6 distressed-shadow flex items-start space-x-6 hover:shadow-lg transition-shadow duration-300 group">
-					<div class="w-24 h-24 rounded-lg flex-shrink-0 overflow-hidden" style="background: linear-gradient(135deg, #F8E7E8 0%, #E8E0F0 100%);">
-						<img class="flower-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" src="./images/flowers/${flower.image}" alt="${flower.name}" />
-					</div>
-					<div class="flex-1 space-y-3">
-						<div>
-							<h3 class="text-xl font-playfair font-bold mb-2 group-hover:text-dusty-rose transition-colors duration-200" style="color: #333333;">${flower.name}</h3>
-							<p class="text-sm font-roboto leading-relaxed" style="color: #666;">${flower.description}</p>
-						</div>
 
-						<!-- Color dots -->
-						<div class="flex flex-wrap gap-1.5">
-							${flower.colors.map((color: string) => `
-								<div class="w-4 h-4 rounded-full" style="background-color: ${getColorHex(color)}; ${color.toLowerCase() === 'white' ? 'border: 1px solid #E8B4B8;' : ''}" title="${color}"></div>
-							`).join('')}
-						</div>
-
-						<!-- Occasions and features -->
-						<div class="flex flex-wrap items-center gap-2">
-							<span class="text-xs font-playfair font-medium" style="color: #666;">Perfect for:</span>
-							${flower.occasions.slice(0, 4).map((occasion: string) => `
-								<span class="px-2.5 py-1 rounded-full text-xs font-roboto font-medium capitalize transition-colors duration-200 hover:bg-dusty-rose" style="background-color: #FAF7F4; color: #333333; border: 1px solid #E8B4B8;">
-									${occasion}
-								</span>
-							`).join('')}
-						</div>
-					</div>
-				</div>
-			`;
-		}
 
 		function updateMobileCarousel() {
 			if (!carouselTrack) return;
@@ -2676,10 +2533,7 @@ import Layout from '../layouts/Layout.astro';
 			updateFlowerNavigation();
 		}
 
-		function updateMobileList() {
-			if (!listContainer) return;
-			listContainer.innerHTML = filteredFlowers.map(flower => createListItem(flower)).join('');
-		}
+
 
 		function updateDesktopGrid() {
 			if (!desktopGrid) return;

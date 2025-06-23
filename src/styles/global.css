@@ -727,16 +727,7 @@ select.shabby-input {
    CUSTOM CALENDAR STYLING
    ============================================================================ */
 
-/* Mobile View Toggle - Hide on desktop, show on mobile */
-.mobile-view-toggle {
-  display: flex;
-}
 
-@media (min-width: 768px) {
-  .mobile-view-toggle {
-    display: none !important;
-  }
-}
 
 /* Custom Calendar Container */
 #customCalendar {
