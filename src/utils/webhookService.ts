@@ -16,7 +16,8 @@ const WEBHOOK_CONFIG = {
 // Helper function to get webhook URL for event type
 function getWebhookUrl(eventType: keyof typeof WEBHOOK_CONFIG): string | undefined {
   const envVarName = WEBHOOK_CONFIG[eventType];
-  return import.meta.env[envVarName];
+  // In server-side contexts (like Netlify Functions), non-PUBLIC_ env vars are only available via process.env
+  return process.env[envVarName] || import.meta.env[envVarName];
 }
 
 interface BookingData {
@@ -350,7 +351,7 @@ export async function sendCancellationNotification(cancellationData: Cancellatio
       metadata: {
         source: 'website',
         emailType: 'admin_cancellation_notification',
-        adminEmail: import.meta.env.ADMIN_EMAIL,
+        adminEmail: process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL,
         cancellationToken: cancellationData.cancellationToken,
       },
     },

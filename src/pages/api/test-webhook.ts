@@ -97,9 +97,9 @@ export const GET: APIRoute = async () => {
       reschedule: 'POST /api/test-webhook with {"type": "reschedule"}'
     },
     environment: {
-      bookingWebhookConfigured: !!import.meta.env.MAKE_BOOKING_WEBHOOK_URL,
-      errorWebhookConfigured: !!import.meta.env.MAKE_ERROR_WEBHOOK_URL,
-      adminEmailConfigured: !!import.meta.env.ADMIN_EMAIL,
+      bookingWebhookConfigured: !!(process.env.MAKE_BOOKING_WEBHOOK_URL || import.meta.env.MAKE_BOOKING_WEBHOOK_URL),
+      cancellationWebhookConfigured: !!(process.env.MAKE_CANCELLATION_WEBHOOK_URL || import.meta.env.MAKE_CANCELLATION_WEBHOOK_URL),
+      adminEmailConfigured: !!(process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL),
     }
   }), {
     status: 200,
