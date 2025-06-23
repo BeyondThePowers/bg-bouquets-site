@@ -8,9 +8,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Cancel Booking - BG Bouquet</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Allura:wght@400&family=Playfair+Display:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
 	<style>
 		:root {
 			--shabby-pink: #F8E7E8;
@@ -27,7 +25,7 @@
 		}
 
 		body {
-			font-family: 'Roboto', sans-serif;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 			background-color: var(--cream);
 			color: var(--charcoal);
 			line-height: 1.6;
@@ -54,8 +52,9 @@
 		}
 
 		.header h1 {
-			font-family: 'Allura', cursive;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 			font-size: 3rem;
+			font-weight: 700;
 			color: var(--charcoal);
 			margin-bottom: 10px;
 		}
@@ -97,8 +96,9 @@
 		}
 
 		.booking-details h3 {
-			font-family: 'Playfair Display', serif;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 			font-size: 1.5rem;
+			font-weight: 600;
 			margin-bottom: 15px;
 			color: var(--charcoal);
 		}
@@ -141,7 +141,7 @@
 			padding: 12px;
 			border: 2px solid #e1e5e9;
 			border-radius: 6px;
-			font-family: 'Roboto', sans-serif;
+			font-family: inherit;
 			font-size: 1rem;
 			resize: vertical;
 			min-height: 100px;
@@ -162,7 +162,7 @@
 			padding: 12px 24px;
 			border: none;
 			border-radius: 6px;
-			font-family: 'Playfair Display', serif;
+			font-family: inherit;
 			font-size: 1rem;
 			font-weight: 600;
 			cursor: pointer;
@@ -235,35 +235,127 @@
 		}
 
 		.success h3 {
-			font-family: 'Playfair Display', serif;
+			font-family: inherit;
+			font-weight: 600;
 			margin-bottom: 10px;
 		}
 
-		/* Availability Calendar Styles */
-		.calendar-container {
-			background: white;
-			border-radius: 8px;
-			padding: 20px;
-			border: 2px solid var(--shabby-blue);
-		}
-
-		.calendar-month {
-			margin-bottom: 30px;
-		}
-
-		.calendar-month h4 {
-			font-family: 'Playfair Display', serif;
-			font-size: 1.3rem;
-			margin-bottom: 15px;
+		/* Modern Reschedule Form Styles */
+		.reschedule-header {
 			text-align: center;
-			color: var(--charcoal);
+			margin-bottom: 24px;
+		}
+
+		.reschedule-header h3 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: #1e293b;
+			margin-bottom: 4px;
+		}
+
+		.reschedule-header p {
+			color: #64748b;
+			font-size: 0.9rem;
+		}
+
+		.current-booking-card {
+			background: #f1f5f9;
+			border: 1px solid #e2e8f0;
+			border-radius: 8px;
+			padding: 16px;
+			margin-bottom: 24px;
+			text-align: center;
+		}
+
+		.current-booking-label {
+			font-size: 0.8rem;
+			color: #64748b;
+			margin-bottom: 4px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.current-booking-details {
+			font-weight: 600;
+			color: #1e293b;
+			display: flex;
+			justify-content: center;
+			gap: 12px;
+			flex-wrap: wrap;
+		}
+
+		/* Calendar Styles */
+		.calendar-section {
+			background: white;
+			border: 1px solid #e2e8f0;
+			border-radius: 12px;
+			padding: 20px;
+			margin-bottom: 24px;
+		}
+
+		.calendar-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+
+		.calendar-title {
+			font-size: 1.1rem;
+			font-weight: 600;
+			color: #1e293b;
+			margin: 0;
+		}
+
+		.calendar-nav {
+			background: none;
+			border: none;
+			padding: 8px;
+			border-radius: 6px;
+			cursor: pointer;
+			color: #475569;
+			transition: all 0.15s ease;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.calendar-nav:hover {
+			background: #f1f5f9;
+			color: #1e293b;
+		}
+
+		.calendar-nav:disabled {
+			opacity: 0.4;
+			cursor: not-allowed;
+		}
+
+		.calendar-nav:disabled:hover {
+			background: none;
+			color: #475569;
+		}
+
+		.calendar-weekdays {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+			gap: 4px;
+			margin-bottom: 8px;
+		}
+
+		.weekday {
+			text-align: center;
+			font-size: 0.75rem;
+			font-weight: 500;
+			color: #64748b;
+			padding: 8px 4px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
 		}
 
 		.calendar-grid {
 			display: grid;
 			grid-template-columns: repeat(7, 1fr);
-			gap: 8px;
-			margin-bottom: 20px;
+			gap: 4px;
 		}
 
 		.calendar-day {
@@ -271,89 +363,153 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			border-radius: 4px;
+			border-radius: 8px;
 			font-size: 0.9rem;
+			font-weight: 500;
 			cursor: pointer;
-			transition: all 0.2s ease;
+			transition: all 0.15s ease;
+			min-height: 44px;
+			border: 1px solid transparent;
 		}
 
 		.calendar-day.available {
-			background-color: var(--shabby-blue);
-			color: var(--charcoal);
+			background: white;
+			color: #1e293b;
+			border-color: #e2e8f0;
 		}
 
 		.calendar-day.available:hover {
-			background-color: var(--rose);
+			background: #3b82f6;
 			color: white;
-		}
-
-		.calendar-day.unavailable {
-			background-color: #f5f5f5;
-			color: #ccc;
-			cursor: not-allowed;
-		}
-
-		.calendar-day.current-booking {
-			background-color: #ffeb3b;
-			color: var(--charcoal);
-			font-weight: bold;
-			cursor: not-allowed;
+			border-color: #3b82f6;
 		}
 
 		.calendar-day.selected {
-			background-color: var(--rose);
+			background: #3b82f6;
 			color: white;
-			font-weight: bold;
+			border-color: #3b82f6;
 		}
 
-		.time-slots {
+		.calendar-day.unavailable {
+			background: #f8fafc;
+			color: #cbd5e1;
+			cursor: not-allowed;
+			border-color: transparent;
+		}
+
+		.calendar-day.current-booking {
+			background: #fef3c7;
+			color: #92400e;
+			border-color: #fbbf24;
+			cursor: not-allowed;
+			font-weight: 600;
+		}
+
+		.calendar-day-empty {
+			aspect-ratio: 1;
+			min-height: 44px;
+		}
+
+		/* Time Selection */
+		.time-section {
+			margin-bottom: 24px;
+		}
+
+		.time-section-title {
+			font-size: 1rem;
+			font-weight: 600;
+			color: #1e293b;
+			margin-bottom: 12px;
+		}
+
+		.time-grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-			gap: 10px;
-			margin-top: 15px;
+			gap: 8px;
 		}
 
 		.time-slot {
-			padding: 10px;
-			border: 2px solid var(--shabby-blue);
-			border-radius: 6px;
+			padding: 12px 16px;
+			border: 1px solid #e2e8f0;
+			border-radius: 8px;
 			text-align: center;
 			cursor: pointer;
-			transition: all 0.2s ease;
+			transition: all 0.15s ease;
 			background: white;
+			font-weight: 500;
+			min-height: 44px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 
 		.time-slot:hover {
-			border-color: var(--rose);
-			background-color: var(--shabby-pink);
+			border-color: #3b82f6;
+			background: #eff6ff;
 		}
 
 		.time-slot.selected {
-			background-color: var(--rose);
+			background: #3b82f6;
 			color: white;
-			border-color: var(--rose);
+			border-color: #3b82f6;
 		}
 
 		.time-slot.unavailable {
-			background-color: #f5f5f5;
-			color: #ccc;
+			background: #f8fafc;
+			color: #cbd5e1;
 			cursor: not-allowed;
-			border-color: #ddd;
+			border-color: #f1f5f9;
 		}
 
 		.time-slot.current-booking {
-			background-color: #ffeb3b;
-			border-color: #ffc107;
+			background: #fef3c7;
+			color: #92400e;
+			border-color: #fbbf24;
 			cursor: not-allowed;
 		}
 
+		/* Selection Summary */
+		.selection-summary {
+			background: #ecfdf5;
+			border: 1px solid #bbf7d0;
+			border-radius: 8px;
+			padding: 16px;
+			margin-bottom: 24px;
+		}
+
+		.summary-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			flex-wrap: wrap;
+		}
+
+		.summary-label {
+			font-size: 0.9rem;
+			color: #166534;
+			font-weight: 500;
+		}
+
+		.summary-text {
+			font-size: 0.9rem;
+			color: #166534;
+			font-weight: 600;
+		}
+
+		/* Mobile Responsive */
 		@media (max-width: 768px) {
+			.container {
+				margin: 10px;
+				max-width: none;
+			}
+
 			.header h1 {
-				font-size: 2.5rem;
+				font-size: 2rem;
 			}
 
 			.content {
-				padding: 30px 20px;
+				padding: 24px 20px;
 			}
 
 			.button-group {
@@ -362,19 +518,80 @@
 
 			.btn {
 				width: 100%;
+				min-height: 48px; /* Better touch target */
+			}
+
+			.calendar-section {
+				padding: 16px;
+			}
+
+			.calendar-nav {
+				padding: 12px; /* Larger touch target */
 			}
 
 			.calendar-grid {
-				gap: 4px;
+				gap: 2px;
 			}
 
 			.calendar-day {
-				font-size: 0.8rem;
+				font-size: 0.85rem;
+				min-height: 48px; /* Better touch target */
 			}
 
-			.time-slots {
-				grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+			.weekday {
+				font-size: 0.7rem;
+				padding: 6px 2px;
+			}
+
+			.time-grid {
+				grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 				gap: 8px;
+			}
+
+			.time-slot {
+				padding: 12px;
+				font-size: 0.9rem;
+				min-height: 48px; /* Better touch target */
+			}
+
+			.current-booking-details {
+				flex-direction: column;
+				gap: 4px;
+			}
+
+			.reschedule-header h3 {
+				font-size: 1.25rem;
+			}
+
+			.form-group textarea {
+				min-height: 120px; /* Easier to use on mobile */
+			}
+		}
+
+		/* Extra small screens */
+		@media (max-width: 480px) {
+			.container {
+				margin: 5px;
+			}
+
+			.content {
+				padding: 20px 16px;
+			}
+
+			.calendar-section {
+				padding: 12px;
+			}
+
+			.time-grid {
+				grid-template-columns: 1fr 1fr; /* Two columns on very small screens */
+			}
+
+			.calendar-title {
+				font-size: 1rem;
+			}
+
+			.reschedule-header h3 {
+				font-size: 1.1rem;
 			}
 		}
 	</style>
@@ -469,20 +686,74 @@
 
 			<!-- Reschedule Form -->
 			<div id="reschedule-form" style="display: none;">
-				<h3 style="margin-bottom: 20px;">Select New Date & Time</h3>
+				<div class="reschedule-header">
+					<h3>Reschedule Your Visit</h3>
+					<p>Select a new date and time for your booking</p>
+				</div>
 
+				<!-- Current Booking Display -->
+				<div id="current-booking-display" class="current-booking-card">
+					<div class="current-booking-label">Currently scheduled for:</div>
+					<div class="current-booking-details">
+						<span id="current-date-display"></span>
+						<span id="current-time-display"></span>
+					</div>
+				</div>
+
+				<!-- Calendar Section -->
+				<div class="calendar-section">
+					<div class="calendar-header">
+						<button type="button" id="prev-month" class="calendar-nav" aria-label="Previous month">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="15,18 9,12 15,6"></polyline>
+							</svg>
+						</button>
+						<h4 id="current-month" class="calendar-title"></h4>
+						<button type="button" id="next-month" class="calendar-nav" aria-label="Next month">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="9,6 15,12 9,18"></polyline>
+							</svg>
+						</button>
+					</div>
+
+					<!-- Calendar Grid -->
+					<div class="calendar-weekdays">
+						<div class="weekday" aria-label="Sunday">Sun</div>
+						<div class="weekday" aria-label="Monday">Mon</div>
+						<div class="weekday" aria-label="Tuesday">Tue</div>
+						<div class="weekday" aria-label="Wednesday">Wed</div>
+						<div class="weekday" aria-label="Thursday">Thu</div>
+						<div class="weekday" aria-label="Friday">Fri</div>
+						<div class="weekday" aria-label="Saturday">Sat</div>
+					</div>
+					<div id="calendar-days" class="calendar-grid" role="grid" aria-label="Calendar"></div>
+				</div>
+
+				<!-- Time Selection -->
+				<div id="time-selection" class="time-section" style="display: none;">
+					<h4 class="time-section-title">Available Times</h4>
+					<div id="time-slots" class="time-grid"></div>
+				</div>
+
+				<!-- Selected Summary -->
+				<div id="selection-summary" class="selection-summary" style="display: none;">
+					<div class="summary-content">
+						<span class="summary-label">New booking:</span>
+						<span id="selected-summary-text" class="summary-text"></span>
+					</div>
+				</div>
+
+				<!-- Reason (at bottom as requested) -->
 				<div class="form-group">
-					<label for="reschedule-reason">Reason for Reschedule (Optional):</label>
+					<label for="reschedule-reason">Reason for rescheduling (optional)</label>
 					<textarea
 						id="reschedule-reason"
-						placeholder="Please let us know why you're rescheduling (optional)..."
+						placeholder="Let us know why you're rescheduling..."
+						rows="3"
 					></textarea>
 				</div>
 
-				<div id="availability-calendar" style="margin: 20px 0;">
-					<p>Loading available dates...</p>
-				</div>
-
+				<!-- Action Buttons -->
 				<div class="button-group">
 					<button id="confirm-reschedule" class="btn btn-primary" style="display: none;">
 						Confirm Reschedule
@@ -530,17 +801,28 @@
 		// Form elements
 		const reasonTextarea = document.getElementById('cancellation-reason') as HTMLTextAreaElement;
 		const rescheduleReasonTextarea = document.getElementById('reschedule-reason') as HTMLTextAreaElement;
-		const availabilityCalendar = document.getElementById('availability-calendar') as HTMLElement;
+
+		// Modern calendar elements
+		const currentDateDisplay = document.getElementById('current-date-display') as HTMLElement;
+		const currentTimeDisplay = document.getElementById('current-time-display') as HTMLElement;
+		const prevMonthBtn = document.getElementById('prev-month') as HTMLButtonElement;
+		const nextMonthBtn = document.getElementById('next-month') as HTMLButtonElement;
+		const currentMonthEl = document.getElementById('current-month') as HTMLElement;
+		const calendarDays = document.getElementById('calendar-days') as HTMLElement;
+		const timeSelection = document.getElementById('time-selection') as HTMLElement;
+		const timeSlots = document.getElementById('time-slots') as HTMLElement;
+		const selectionSummary = document.getElementById('selection-summary') as HTMLElement;
+		const selectedSummaryText = document.getElementById('selected-summary-text') as HTMLElement;
 
 		// State variables
 		interface BookingData {
 			customerName: string;
 			email: string;
-			currentDate: string;
-			currentTime: string;
+			date: string;
+			time: string;
 			visitors: number;
 			amount: number;
-			rescheduleCount: number;
+			rescheduleCount?: number;
 		}
 
 		let currentBookingData: BookingData | null = null;
@@ -548,10 +830,26 @@
 		let selectedDate: string | null = null;
 		let selectedTime: string | null = null;
 
+		// Calendar state
+		let currentDate = new Date();
+
 		// Initialize page
 		async function initializePage(): Promise<void> {
 			if (!cancellationToken) {
 				showError('Invalid cancellation link. Please check your email for the correct link.');
+				return;
+			}
+
+			// Test mode for development
+			if (cancellationToken === 'test') {
+				showBookingDetails({
+					customerName: 'Test Customer',
+					email: 'test@example.com',
+					date: '2024-07-15',
+					time: '10:00 AM',
+					visitors: 2,
+					amount: 50
+				});
 				return;
 			}
 
@@ -594,19 +892,19 @@
 			if (customerNameEl) customerNameEl.textContent = booking.customerName;
 			if (customerEmailEl) customerEmailEl.textContent = booking.email;
 			if (visitDateEl) {
-				visitDateEl.textContent = new Date(booking.currentDate).toLocaleDateString('en-US', {
+				visitDateEl.textContent = new Date(booking.date).toLocaleDateString('en-US', {
 					weekday: 'long',
 					year: 'numeric',
 					month: 'long',
 					day: 'numeric'
 				});
 			}
-			if (visitTimeEl) visitTimeEl.textContent = booking.currentTime;
+			if (visitTimeEl) visitTimeEl.textContent = booking.time;
 			if (visitorCountEl) visitorCountEl.textContent = booking.visitors.toString();
 			if (totalAmountEl) totalAmountEl.textContent = `$${booking.amount}`;
 
 			// Show reschedule count if any
-			if (booking.rescheduleCount > 0 && headerSubtitle) {
+			if (booking.rescheduleCount && booking.rescheduleCount > 0 && headerSubtitle) {
 				headerSubtitle.textContent = `Booking Management (Rescheduled ${booking.rescheduleCount} time${booking.rescheduleCount > 1 ? 's' : ''})`;
 			}
 
@@ -619,6 +917,18 @@
 				if (actionSelection) actionSelection.style.display = 'none';
 				if (headerSubtitle) headerSubtitle.textContent = 'Reschedule Booking';
 				if (rescheduleForm) rescheduleForm.style.display = 'block';
+
+				// Show current booking info
+				if (currentBookingData && currentDateDisplay && currentTimeDisplay) {
+					const formattedDate = new Date(currentBookingData.date).toLocaleDateString('en-US', {
+						weekday: 'long',
+						month: 'long',
+						day: 'numeric'
+					});
+					currentDateDisplay.textContent = formattedDate;
+					currentTimeDisplay.textContent = currentBookingData.time;
+				}
+
 				loadAvailability();
 			});
 		}
@@ -644,8 +954,14 @@
 				if (rescheduleForm) rescheduleForm.style.display = 'none';
 				if (headerSubtitle) headerSubtitle.textContent = 'Booking Management';
 				if (actionSelection) actionSelection.style.display = 'block';
+
+				// Reset calendar state
 				selectedDate = null;
 				selectedTime = null;
+
+				// Hide time selection and summary
+				if (timeSelection) timeSelection.style.display = 'none';
+				if (selectionSummary) selectionSummary.style.display = 'none';
 				if (confirmRescheduleBtn) confirmRescheduleBtn.style.display = 'none';
 			});
 		}
@@ -716,6 +1032,31 @@
 				confirmRescheduleBtn.textContent = 'Rescheduling...';
 
 				try {
+					// Test mode - simulate success
+					if (cancellationToken === 'test') {
+						// Simulate API delay
+						await new Promise(resolve => setTimeout(resolve, 1000));
+
+						// Show success state
+						if (rescheduleForm) rescheduleForm.style.display = 'none';
+						if (headerSubtitle) headerSubtitle.textContent = 'Booking Rescheduled';
+						if (successState) successState.style.display = 'block';
+
+						const successTitle = document.querySelector('#success-state h3');
+						const successText = document.querySelector('#success-state p');
+						if (successTitle) successTitle.textContent = 'Booking Rescheduled Successfully (Test Mode)';
+						if (successText) {
+							const formattedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+								weekday: 'long',
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric'
+							});
+							successText.textContent = `Your booking has been rescheduled to ${formattedDate} at ${selectedTime}. You will receive a confirmation email shortly.`;
+						}
+						return;
+					}
+
 					const reasonValue = rescheduleReasonTextarea ? rescheduleReasonTextarea.value.trim() || null : null;
 
 					const response = await fetch('/api/reschedule-booking', {
@@ -764,13 +1105,9 @@
 			});
 		}
 
-		// Load availability data
+		// Load availability data and initialize calendar
 		async function loadAvailability(): Promise<void> {
 			try {
-				if (availabilityCalendar) {
-					availabilityCalendar.innerHTML = '<p>Loading available dates...</p>';
-				}
-
 				const response = await fetch('/api/availability');
 				const data = await response.json();
 
@@ -779,89 +1116,188 @@
 				}
 
 				availabilityData = data;
-				renderAvailabilityCalendar();
+				initializeCalendar();
 
 			} catch (error) {
 				console.error('Error loading availability:', error);
-				if (availabilityCalendar) {
-					availabilityCalendar.innerHTML = '<p style="color: #dc3545;">Failed to load available dates. Please try again.</p>';
-				}
+				showError('Failed to load available dates. Please try again.');
 			}
 		}
 
-		// Render availability calendar
-		function renderAvailabilityCalendar(): void {
-			if (!availabilityData || !availabilityCalendar) return;
+		// Initialize modern calendar
+		function initializeCalendar(): void {
+			if (!availabilityData) return;
 
-			const container = document.createElement('div');
-			container.className = 'calendar-container';
+			// Set up calendar state
+			const validDates = Object.keys(availabilityData);
+			if (validDates.length > 0) {
+				const firstValidDate = new Date(validDates[0]);
+				currentDate = new Date(firstValidDate.getFullYear(), firstValidDate.getMonth(), 1);
+			}
 
-			// Group dates by month
-			const datesByMonth: Record<string, string[]> = {};
-			Object.keys(availabilityData).forEach((date: string) => {
-				const dateObj = new Date(date);
-				const monthKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
-				if (!datesByMonth[monthKey]) {
-					datesByMonth[monthKey] = [];
-				}
-				datesByMonth[monthKey].push(date);
+			// Set up event listeners
+			setupCalendarEventListeners();
+
+			// Render calendar
+			renderCalendar();
+		}
+
+		// Set up calendar event listeners
+		function setupCalendarEventListeners(): void {
+			if (prevMonthBtn) {
+				prevMonthBtn.addEventListener('click', () => navigateToMonth(-1));
+			}
+
+			if (nextMonthBtn) {
+				nextMonthBtn.addEventListener('click', () => navigateToMonth(1));
+			}
+		}
+
+		// Render calendar for current month
+		function renderCalendar(): void {
+			if (!availabilityData || !calendarDays || !currentMonthEl) return;
+
+			const year = currentDate.getFullYear();
+			const month = currentDate.getMonth();
+
+			// Update month header
+			currentMonthEl.textContent = new Date(year, month).toLocaleDateString('en-US', {
+				month: 'long',
+				year: 'numeric'
 			});
 
-			// Render each month
-			Object.keys(datesByMonth).sort().forEach((monthKey: string) => {
-				const monthContainer = document.createElement('div');
-				monthContainer.className = 'calendar-month';
+			// Update navigation button states
+			updateNavigationButtons();
 
-				const [year, month] = monthKey.split('-');
-				const monthName = new Date(parseInt(year), parseInt(month) - 1, 1).toLocaleDateString('en-US', {
+			// Clear previous days
+			calendarDays.innerHTML = '';
+
+			// Get first day of month and number of days
+			const firstDay = new Date(year, month, 1).getDay();
+			const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+			// Add empty cells for days before month starts
+			for (let i = 0; i < firstDay; i++) {
+				const emptyDay = document.createElement('div');
+				emptyDay.className = 'calendar-day-empty';
+				calendarDays.appendChild(emptyDay);
+			}
+
+			// Add days of the month
+			for (let day = 1; day <= daysInMonth; day++) {
+				const dayEl = document.createElement('button');
+				dayEl.type = 'button';
+				dayEl.textContent = day.toString();
+
+				const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+				const dateObj = new Date(year, month, day);
+				const formattedDate = dateObj.toLocaleDateString('en-US', {
+					weekday: 'long',
 					month: 'long',
-					year: 'numeric'
+					day: 'numeric'
 				});
 
-				const monthHeader = document.createElement('h4');
-				monthHeader.textContent = monthName;
-				monthContainer.appendChild(monthHeader);
+				// Base styling for all day buttons
+				dayEl.className = 'calendar-day';
+				dayEl.setAttribute('role', 'gridcell');
 
-				const datesContainer = document.createElement('div');
-				datesContainer.style.display = 'grid';
-				datesContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
-				datesContainer.style.gap = '10px';
-
-				datesByMonth[monthKey].forEach((date: string) => {
-					const dateButton = document.createElement('button');
-					dateButton.className = 'calendar-day available';
-					dateButton.textContent = new Date(date).toLocaleDateString('en-US', {
-						month: 'short',
-						day: 'numeric'
-					});
-
+				// Check if date is available
+				if (availabilityData[dateStr]) {
 					// Check if this is the current booking date
-					if (currentBookingData && date === currentBookingData.currentDate) {
-						dateButton.className = 'calendar-day current-booking';
-						dateButton.textContent += ' (Current)';
+					if (currentBookingData && dateStr === currentBookingData.date) {
+						dayEl.className += ' current-booking';
+						dayEl.title = `Current booking date: ${formattedDate}`;
+						dayEl.setAttribute('aria-label', `Current booking date: ${formattedDate}`);
+						dayEl.disabled = true;
 					} else {
-						dateButton.addEventListener('click', (event: Event) => {
-							selectDate(date);
-							const target = event.target as HTMLElement;
-							if (target) {
-								// Update date selection UI
-								document.querySelectorAll('.calendar-day.available').forEach((btn: Element) => {
-									btn.classList.remove('selected');
-								});
-								target.classList.add('selected');
-							}
-						});
+						dayEl.className += ' available';
+						dayEl.setAttribute('aria-label', `Select ${formattedDate}`);
+						dayEl.addEventListener('click', () => selectDate(dateStr));
+
+						// Highlight selected date
+						if (dateStr === selectedDate) {
+							dayEl.className += ' selected';
+							dayEl.setAttribute('aria-pressed', 'true');
+						} else {
+							dayEl.setAttribute('aria-pressed', 'false');
+						}
 					}
+				} else {
+					// Unavailable date styling
+					dayEl.className += ' unavailable';
+					dayEl.disabled = true;
+					dayEl.setAttribute('aria-label', `${formattedDate} - unavailable`);
+				}
 
-					datesContainer.appendChild(dateButton);
-				});
+				calendarDays.appendChild(dayEl);
+			}
+		}
 
-				monthContainer.appendChild(datesContainer);
-				container.appendChild(monthContainer);
-			});
+		// Navigate to next/previous month with available dates
+		function navigateToMonth(direction: number): void {
+			const maxAttempts = 24; // Prevent infinite loops (2 years)
+			let attempts = 0;
 
-			availabilityCalendar.innerHTML = '';
-			availabilityCalendar.appendChild(container);
+			do {
+				currentDate.setMonth(currentDate.getMonth() + direction);
+				attempts++;
+
+				// Check if this month has any available dates
+				if (monthHasAvailableDates(currentDate) || attempts >= maxAttempts) {
+					break;
+				}
+			} while (attempts < maxAttempts);
+
+			renderCalendar();
+		}
+
+		// Check if a month has any available dates
+		function monthHasAvailableDates(date: Date): boolean {
+			if (!availabilityData) return false;
+
+			const year = date.getFullYear();
+			const month = date.getMonth();
+			const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+			// Check each day of the month
+			for (let day = 1; day <= daysInMonth; day++) {
+				const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+				if (availabilityData[dateStr]) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		// Update navigation button states
+		function updateNavigationButtons(): void {
+			if (!availabilityData || !prevMonthBtn || !nextMonthBtn) return;
+
+			const validDates = Object.keys(availabilityData);
+			if (validDates.length === 0) {
+				prevMonthBtn.disabled = true;
+				nextMonthBtn.disabled = true;
+				return;
+			}
+
+			// Get the range of available months
+			const firstDate = new Date(validDates[0]);
+			const lastDate = new Date(validDates[validDates.length - 1]);
+
+			const currentYear = currentDate.getFullYear();
+			const currentMonth = currentDate.getMonth();
+
+			// Check if we can go to previous month
+			const canGoPrev = currentYear > firstDate.getFullYear() ||
+							 (currentYear === firstDate.getFullYear() && currentMonth > firstDate.getMonth());
+
+			// Check if we can go to next month
+			const canGoNext = currentYear < lastDate.getFullYear() ||
+							 (currentYear === lastDate.getFullYear() && currentMonth < lastDate.getMonth());
+
+			prevMonthBtn.disabled = !canGoPrev;
+			nextMonthBtn.disabled = !canGoNext;
 		}
 
 		// Select date and show time slots
@@ -869,48 +1305,46 @@
 			selectedDate = date;
 			selectedTime = null;
 
+			// Update calendar UI
+			renderCalendar();
+
 			// Show time slots for selected date
 			showTimeSlots(date);
 		}
 
 		// Show available time slots for selected date
 		function showTimeSlots(date: string): void {
-			if (!availabilityData || !availabilityCalendar) return;
+			if (!availabilityData || !timeSlots || !timeSelection) return;
 
-			const timeSlots = availabilityData[date] || [];
+			const availableTimes = availabilityData[date] || [];
 
-			// Remove existing time slots
-			const existingTimeSlots = document.querySelector('.time-slots');
-			if (existingTimeSlots) {
-				existingTimeSlots.remove();
-			}
+			// Clear existing time slots
+			timeSlots.innerHTML = '';
 
-			const timeSlotsContainer = document.createElement('div');
-			timeSlotsContainer.className = 'time-slots';
+			// Show time selection section
+			timeSelection.style.display = 'block';
 
-			timeSlots.forEach((time: string) => {
+			availableTimes.forEach((time: string) => {
 				const timeButton = document.createElement('button');
+				timeButton.type = 'button';
 				timeButton.className = 'time-slot';
 				timeButton.textContent = time;
 
 				// Check if this is the current booking time
-				if (currentBookingData && date === currentBookingData.currentDate && time === currentBookingData.currentTime) {
-					timeButton.className = 'time-slot current-booking';
-					timeButton.textContent += ' (Current)';
+				if (currentBookingData && date === currentBookingData.date && time === currentBookingData.time) {
+					timeButton.className += ' current-booking';
+					timeButton.title = 'Current booking time';
+					timeButton.disabled = true;
 				} else {
-					timeButton.addEventListener('click', (event: Event) => {
-						selectTime(time, event);
-					});
+					timeButton.addEventListener('click', () => selectTime(time));
 				}
 
-				timeSlotsContainer.appendChild(timeButton);
+				timeSlots.appendChild(timeButton);
 			});
-
-			availabilityCalendar.appendChild(timeSlotsContainer);
 		}
 
 		// Select time slot
-		function selectTime(time: string, event: Event): void {
+		function selectTime(time: string): void {
 			selectedTime = time;
 
 			// Update time selection UI
@@ -918,15 +1352,35 @@
 				btn.classList.remove('selected');
 			});
 
-			const target = event.target as HTMLElement;
-			if (target) {
-				target.classList.add('selected');
-			}
+			// Find and highlight selected time
+			const timeButtons = timeSlots.querySelectorAll('.time-slot');
+			timeButtons.forEach((btn: Element) => {
+				if (btn.textContent === time) {
+					btn.classList.add('selected');
+				}
+			});
+
+			// Show selection summary
+			updateSelectionSummary();
 
 			// Show confirm button
 			if (confirmRescheduleBtn) {
 				confirmRescheduleBtn.style.display = 'inline-flex';
 			}
+		}
+
+		// Update selection summary
+		function updateSelectionSummary(): void {
+			if (!selectedDate || !selectedTime || !selectionSummary || !selectedSummaryText) return;
+
+			const formattedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+				weekday: 'long',
+				month: 'long',
+				day: 'numeric'
+			});
+
+			selectedSummaryText.textContent = `${formattedDate} at ${selectedTime}`;
+			selectionSummary.style.display = 'block';
 		}
 
 		// Initialize page when DOM is loaded

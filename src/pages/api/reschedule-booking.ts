@@ -70,8 +70,20 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     if (error) {
       console.error('Database error during reschedule:', error);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to process reschedule. Please try again.' 
+      console.error('Error details:', JSON.stringify(error, null, 2));
+
+      // Check if it's a function not found error
+      if (error.message && error.message.includes('function reschedule_booking')) {
+        return new Response(JSON.stringify({
+          error: 'Database function not found. Please ensure the database migration has been applied.'
+        }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      return new Response(JSON.stringify({
+        error: `Database error: ${error.message || 'Failed to process reschedule. Please try again.'}`
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
@@ -108,7 +120,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         originalDate: bookingData.original_date,
         originalTime: bookingData.original_time,
         rescheduleReason: reason,
-        cancellationToken: bookingData.cancellation_token
+        cancellationToken: cancellationToken
       };
 
       // Send reschedule confirmation webhook
