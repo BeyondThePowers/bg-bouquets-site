@@ -527,7 +527,7 @@ input[name="paymentMethod"] {
   padding-bottom: 12rem
 }
 
-#wood-background-container,
+/*#wood-background-container,
 #pink-background-container,
 #white-background-container,
 .white-background-container {
@@ -546,7 +546,36 @@ input[name="paymentMethod"] {
   mask-repeat: no-repeat;
   mask-position: top;
   background: inherit; /* So it blends in */
+ /* pointer-events: none; /* Don’t block clicks */ /*
+}*/
+
+#wood-background-container,
+.white-background-container,
+#pink-background-container {
+  position: absolute;
+  z-index: 2;
+  overflow: hidden;
+  padding-top: 20rem;
+  width: 100%;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: top;
   pointer-events: none; /* Don’t block clicks */
+  position: absolute;
+  top:0; 
+    margin-top: -6rem;
+}
+
+.white-background-container {
+  background-image: url('/images/section-edge-white-gradient.svg');
+}
+
+#wood-background-container {
+  background-image: url('/images/section-edge-blue-gradient.svg');
+}
+
+#pink-background-container {
+  background-image: url('/images/section-edge-pink-gradient.svg');
 }
 
 #wood-background-container, 
@@ -554,29 +583,32 @@ input[name="paymentMethod"] {
   transform: scaleX(-1);
 }
 
+#flowers {
+  z-index: 1; 
+  background-color:#F8E7E8;
+}
+
 /* Used in conjunction with an empty div to create distressed divider section mask*/
 #what-to-expect,
 #flowers,
 #about,
 #pricing {
- margin-top:-5.25rem;
- padding-top: 8rem;
- padding-bottom: 8rem;
-}
-
-#pricing,
-#flowers {
-  padding-bottom:10rem;
+ padding-top: 4rem;
+ padding-bottom: 12rem;
 }
 
 .pricing-content {
   z-index: 3;
 }
 
-.texture-background-wood::before {
+#what-to-expect {
+    background-color:#eff9fa;
+}
+
+#what-to-expect::before {
   content:'';
   opacity: 0.1;
-  z-index: -1;
+  z-index: 0;
   position: absolute;
   inset: 0;
   top: 0;
@@ -588,6 +620,7 @@ input[name="paymentMethod"] {
   background-size: cover; 
   background-position: center;
   background-blend-mode: multiply;
+  background-color:#eff9fa;
 }
 
 @media (max-width: 767px) {
