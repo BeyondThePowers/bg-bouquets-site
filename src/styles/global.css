@@ -598,8 +598,9 @@ input[name="paymentMethod"] {
   }
 
   #what-to-expect::before {
+    display: none;
     background-image: none;
-    background-blend-mode: normal;
+    background-blend-mode: unset;
   }
 
 }
