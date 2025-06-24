@@ -563,7 +563,7 @@ input[name="paymentMethod"] {
   pointer-events: none; /* Don’t block clicks */
   position: absolute;
   top:0; 
-    margin-top: -6rem;
+  margin-top: -6rem;
 }
 
 .white-background-container {
@@ -586,6 +586,17 @@ input[name="paymentMethod"] {
 #flowers {
   z-index: 1; 
   background-color:#F8E7E8;
+}
+
+@media screen and (max-width: 767px) {
+  
+  #wood-background-container,
+  #pink-background-container,
+  #white-background-container,
+  .white-background-container {
+      margin-top: 0;
+  }
+
 }
 
 /* Used in conjunction with an empty div to create distressed divider section mask*/
