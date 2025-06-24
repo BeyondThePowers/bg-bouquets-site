@@ -597,6 +597,11 @@ input[name="paymentMethod"] {
       margin-top: 0;
   }
 
+  #what-to-expect::before {
+    background-image: none;
+    background-blend-mode: normal;
+  }
+
 }
 
 /* Used in conjunction with an empty div to create distressed divider section mask*/
