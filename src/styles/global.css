@@ -597,7 +597,8 @@ input[name="paymentMethod"] {
       margin-top: 0;
   }
 
-  #what-to-expect::before {
+  #what-to-expect::before,
+  #home::before {
     display: none;
     background-image: none;
     background-blend-mode: unset;
