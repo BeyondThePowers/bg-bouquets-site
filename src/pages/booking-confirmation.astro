@@ -1,0 +1,250 @@
+---
+// src/pages/booking-confirmation.astro
+import Layout from '../layouts/Layout.astro';
+import { supabase } from '../../lib/supabase';
+
+// Get booking ID and order ID from URL parameters
+const bookingId = Astro.url.searchParams.get('booking_id');
+const orderId = Astro.url.searchParams.get('order_id');
+
+let booking = null;
+let error = null;
+
+if (bookingId) {
+  try {
+    const { data, error: fetchError } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('id', bookingId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching booking:', fetchError);
+      error = 'Booking not found';
+    } else {
+      booking = data;
+    }
+  } catch (err) {
+    console.error('Error:', err);
+    error = 'Failed to load booking details';
+  }
+} else {
+  error = 'No booking ID provided';
+}
+
+// Format date and time for display
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function formatTime(timeString: string): string {
+  return timeString; // Already formatted as "10:00 AM"
+}
+---
+
+<Layout title="Booking Confirmation - BG Bouquet Garden">
+  <main class="min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+      
+      {error ? (
+        <!-- Error State -->
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <h1 class="text-2xl font-allura text-charcoal mb-4">Oops! Something went wrong</h1>
+          <p class="text-gray-600 mb-6">{error}</p>
+          <a 
+            href="/" 
+            class="inline-block bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors font-roboto"
+          >
+            Return to Home
+          </a>
+        </div>
+      ) : booking ? (
+        <!-- Success State -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          
+          <!-- Header -->
+          <div class="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-8 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <h1 class="text-3xl font-allura mb-2">
+              {booking.payment_status === 'paid' ? 'Payment Confirmed!' : 'Booking Confirmed!'}
+            </h1>
+            <p class="text-pink-100 font-roboto">
+              {booking.payment_status === 'paid' 
+                ? 'Thank you for your payment. Your garden visit is all set!'
+                : 'Your booking has been created. Payment confirmation may take a few moments.'
+              }
+            </p>
+          </div>
+
+          <!-- Booking Details -->
+          <div class="p-8">
+            <h2 class="text-xl font-playfair text-charcoal mb-6">Booking Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Visit Information -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-500 mb-1">Visitor Name</label>
+                  <p class="text-charcoal font-roboto">{booking.full_name}</p>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-500 mb-1">Email</label>
+                  <p class="text-charcoal font-roboto">{booking.email}</p>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-500 mb-1">Phone</label>
+                  <p class="text-charcoal font-roboto">{booking.phone}</p>
+                </div>
+              </div>
+
+              <!-- Visit Schedule -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-500 mb-1">Visit Date</label>
+                  <p class="text-charcoal font-roboto">{formatDate(booking.date)}</p>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-500 mb-1">Time</label>
+                  <p class="text-charcoal font-roboto">{formatTime(booking.time)}</p>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-500 mb-1">Number of Visitors</label>
+                  <p class="text-charcoal font-roboto">{booking.number_of_visitors}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-lg font-playfair text-charcoal">Total Amount</span>
+                <span class="text-xl font-bold text-charcoal">${booking.total_amount}</span>
+              </div>
+              
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-sm text-gray-500">Payment Method</span>
+                <span class="text-sm text-charcoal capitalize">
+                  {booking.payment_method === 'pay_now' ? 'Online Payment' : 'Pay on Arrival'}
+                </span>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500">Payment Status</span>
+                <span class={`text-sm px-2 py-1 rounded-full ${
+                  booking.payment_status === 'paid' 
+                    ? 'bg-green-100 text-green-800' 
+                    : booking.payment_status === 'pending'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {booking.payment_status === 'paid' ? 'Paid' : 
+                   booking.payment_status === 'pending' ? 'Pending' : 'Failed'}
+                </span>
+              </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="mt-8 p-6 bg-blue-50 rounded-lg">
+              <h3 class="text-lg font-playfair text-charcoal mb-3">What's Next?</h3>
+              <ul class="space-y-2 text-sm text-gray-700 font-roboto">
+                <li class="flex items-start">
+                  <span class="text-blue-500 mr-2">•</span>
+                  You'll receive a confirmation email shortly with all the details
+                </li>
+                <li class="flex items-start">
+                  <span class="text-blue-500 mr-2">•</span>
+                  Please arrive at your scheduled time for the best experience
+                </li>
+                <li class="flex items-start">
+                  <span class="text-blue-500 mr-2">•</span>
+                  Bring comfortable walking shoes and a camera for memories
+                </li>
+                {booking.payment_method === 'pay_on_arrival' && (
+                  <li class="flex items-start">
+                    <span class="text-blue-500 mr-2">•</span>
+                    Payment can be made by cash or card upon arrival
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex flex-col sm:flex-row gap-4">
+              <a 
+                href="/" 
+                class="flex-1 bg-pink-500 text-white text-center px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors font-roboto"
+              >
+                Return to Home
+              </a>
+              <a 
+                href={`/cancel?token=${booking.cancellation_token}`}
+                class="flex-1 bg-gray-200 text-charcoal text-center px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-roboto"
+              >
+                Cancel or Reschedule
+              </a>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <!-- Loading State -->
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+          <div class="animate-spin w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p class="text-gray-600">Loading booking details...</p>
+        </div>
+      )}
+    </div>
+  </main>
+</Layout>
+
+<script>
+  // Auto-refresh page if payment is still pending (to check for webhook updates)
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('booking_id');
+    
+    // Check if payment is pending and refresh after a delay
+    const paymentStatus = document.querySelector('[data-payment-status]')?.getAttribute('data-payment-status');
+    
+    if (paymentStatus === 'pending' && bookingId) {
+      // Refresh page after 5 seconds to check for payment confirmation
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+    }
+  });
+</script>
+
+<style>
+  /* Add any additional styles here */
+  .shabby-input {
+    border: 1px solid #d1d5db;
+    background-color: #f9fafb;
+  }
+  
+  .shabby-input:focus {
+    outline: none;
+    border-color: #f472b6;
+    box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.1);
+  }
+</style>
+</Layout>

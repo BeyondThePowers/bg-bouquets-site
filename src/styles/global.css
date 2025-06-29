@@ -588,24 +588,6 @@ input[name="paymentMethod"] {
   background-color:#F8E7E8;
 }
 
-@media screen and (max-width: 767px) {
-  
-  #wood-background-container,
-  #pink-background-container,
-  #white-background-container,
-  .white-background-container {
-      margin-top: 0;
-  }
-
-  #what-to-expect::before,
-  #home::before {
-    display: none;
-    background-image: none;
-    background-blend-mode: unset;
-  }
-
-}
-
 /* Used in conjunction with an empty div to create distressed divider section mask*/
 #what-to-expect,
 #flowers,
@@ -651,12 +633,41 @@ input[name="paymentMethod"] {
   .hero-header-text {
     font-size: 64px;
   }
-  .center-mobile-text,
+
+  /* Industry standard: Left-align most content on mobile */
+  .center-mobile-text {
+    text-align: center;
+  }
+
+  /* Keep headings centered for visual hierarchy */
+  .center-mobile-text.keep-centered,
+  h1.center-mobile-text,
+  h2.center-mobile-text,
+  h3.center-mobile-text {
+    text-align: center;
+  }
+
+  /* Left-align card content for better readability */
   .center-text-card {
     text-align: center;
   }
+
+  /* Center only short headings in cards */
+  .center-text-card.card-heading {
+    text-align: center;
+  }
+
   .wheel-barrow {
     height:100px;
+  }
+
+  /* Improve mobile card content layout */
+  .center-text-card .flex.items-start.flex-col {
+    gap: 0.25rem;
+  }
+
+  .center-text-card .flex.items-start.flex-col span:first-child {
+    font-weight: 500;
   }
 }
 
@@ -874,4 +885,30 @@ select.shabby-input {
 
 .flower-card img {
   height:100%;
+}
+
+@media screen and (max-width: 767px) {
+  
+  #wood-background-container,
+  #pink-background-container,
+  #white-background-container,
+  .white-background-container {
+      margin-top: -1rem;
+  }
+
+  #what-to-expect::before,
+  #home::before {
+    display: none;
+    background-image: none;
+    background-blend-mode: unset;
+  }
+
+  #home,
+  #what-to-expect,
+  #flowers,
+  #about,
+  #pricing {
+    padding-bottom: 6rem!important;
+  }
+
 }

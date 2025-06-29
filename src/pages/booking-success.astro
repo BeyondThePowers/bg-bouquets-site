@@ -1,0 +1,130 @@
+---
+// src/pages/booking-success.astro
+import Layout from '../layouts/Layout.astro';
+
+// Get URL parameters for booking confirmation
+const url = Astro.url;
+const bookingId = url.searchParams.get('booking_id');
+const orderId = url.searchParams.get('order_id');
+const paymentStatus = url.searchParams.get('payment_status') || 'completed';
+
+// You might want to fetch booking details from Supabase here
+// For now, we'll show a generic success message
+---
+
+<Layout title="Booking Confirmed - Bluebell Gardens">
+  <main class="min-h-screen bg-gradient-to-b from-blue-50 to-pink-50 py-12">
+    <div class="container mx-auto px-4 max-w-2xl">
+      
+      <!-- Success Header -->
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Booking Confirmed!</h1>
+        <p class="text-gray-600">Thank you for choosing Bluebell Gardens</p>
+      </div>
+
+      <!-- Booking Details Card -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Visit Details</h2>
+        
+        {bookingId && (
+          <div class="mb-4 p-3 bg-gray-50 rounded">
+            <p class="text-sm text-gray-600">Booking Reference</p>
+            <p class="font-mono text-lg">{bookingId}</p>
+          </div>
+        )}
+
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Payment Status:</span>
+            <span class="font-semibold text-green-600 capitalize">{paymentStatus}</span>
+          </div>
+          
+          {orderId && (
+            <div class="flex justify-between">
+              <span class="text-gray-600">Order ID:</span>
+              <span class="font-mono text-sm">{orderId}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- What's Next -->
+      <div class="bg-blue-50 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-3">What's Next?</h3>
+        <ul class="space-y-2 text-blue-700">
+          <li class="flex items-start">
+            <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+            You'll receive a confirmation email shortly with your booking details
+          </li>
+          <li class="flex items-start">
+            <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+            Please arrive 10 minutes before your scheduled time
+          </li>
+          <li class="flex items-start">
+            <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+            Bring comfortable walking shoes and weather-appropriate clothing
+          </li>
+        </ul>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="bg-pink-50 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-pink-800 mb-3">Need Help?</h3>
+        <p class="text-pink-700 mb-2">
+          If you have any questions about your visit, please don't hesitate to contact us:
+        </p>
+        <div class="space-y-1 text-pink-700">
+          <p>📧 Email: info@bluebellgardens.ca</p>
+          <p>📞 Phone: (555) 123-4567</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a 
+          href="/" 
+          class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors text-center"
+        >
+          Return to Home
+        </a>
+        <button 
+          onclick="window.print()" 
+          class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          Print Confirmation
+        </button>
+      </div>
+
+      <!-- Cancellation Policy -->
+      <div class="mt-8 text-center text-sm text-gray-500">
+        <p>
+          Need to cancel or reschedule? 
+          <a href="/cancel" class="text-blue-600 hover:underline">Click here</a> 
+          or contact us directly.
+        </p>
+      </div>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    body {
+      background: white !important;
+    }
+    
+    .bg-gradient-to-b {
+      background: white !important;
+    }
+  }
+</style>

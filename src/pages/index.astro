@@ -15,17 +15,17 @@ import Layout from '../layouts/Layout.astro';
 				<!-- Left Column - Content -->
 				<div class="lg:col-span-3 space-y-8 flex flex-col justify-between h-full">
 
-						<h1 class="text-4xl md:text-6xl lg:text-7xl xl:text-[8.5rem] font-allura text-charcoal leading-none hero-header-text center-mobile-text">
+						<h1 class="text-4xl md:text-6xl lg:text-7xl xl:text-[8.5rem] font-allura text-charcoal leading-none hero-header-text center-mobile-text keep-centered">
 							Wander, Snip <br>& Gather
 						</h1>
-						
+
 						<p class="text-xl md:text-2xl font-roboto text-charcoal leading-relaxed center-mobile-text">
 							A U-pick fresh-cut flower bouquet experience for everyone! Perfect for relaxing, having fun, and making joyful memories near the sunny foothills of Southern Alberta.
 						</p>
 
 					<!-- Key Information -->
 					<div class="shabby-card p-6 distressed-shadow">
-						<h3 class="text-xl font-playfair font-bold text-charcoal mb-4 relative center-mobile-text">
+						<h3 class="text-xl font-playfair font-bold text-charcoal mb-4 relative center-mobile-text keep-centered">
 							Visit Information
 						</h3>
 						<div class="grid sm:grid-cols-2 gap-4 text-sm">
@@ -80,7 +80,7 @@ import Layout from '../layouts/Layout.astro';
 
 				<div class="shabby-card p-8 lg:p-12 distressed-shadow text-center lg:col-span-2" style="height: 100%;">
 					<h2 class="text-3xl md:text-4xl font-playfair font-bold mb-6" style="color: #333333;">
-						Simple, Transparent Pricing
+						Simple Pricing
 					</h2>
 
 					<div class="mb-8">
@@ -88,32 +88,22 @@ import Layout from '../layouts/Layout.astro';
 							$35
 						</div>
 						<div class="text-xl font-playfair font-semibold mb-2" style="color: #333333;">
-							per bouquet
+							Per Bouquet
 						</div>
 						<p class="text-lg font-roboto max-w-2xl mx-auto" style="color: #333333;">
-							Everything you need for the perfect bouquet experience is included
+							Each bouquet can have up to 25 stems from our beautiful selection of flowers.
 						</p>
 					</div>
 
-					<div class="grid md:grid-cols-3 gap-6 mb-8">
+					<div class="grid md:grid-cols-2 gap-6 mb-8">
 						<div class="flex flex-col items-center">
 							<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
 								<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
 									<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
 								</svg>
 							</div>
-							<h3 class="font-playfair font-semibold mb-2" style="color: #333333;">All Tools Included</h3>
-							<p class="text-sm font-roboto text-center" style="color: #333333;">Professional cutting shears and collection vessels provided</p>
-						</div>
-
-						<div class="flex flex-col items-center">
-							<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
-								<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-								</svg>
-							</div>
-							<h3 class="font-playfair font-semibold mb-2" style="color: #333333;">Expert Guidance</h3>
-							<p class="text-sm font-roboto text-center" style="color: #333333;">Care instructions and tips for keeping your flowers fresh</p>
+							<h3 class="font-playfair font-semibold mb-2" style="color: #333333;">Bouquet Vessels</h3>
+							<p class="text-sm font-roboto text-center" style="color: #333333;">Bring your own vessel or purchase one for a small fee.</p>
 						</div>
 
 						<div class="flex flex-col items-center">
@@ -465,28 +455,32 @@ import Layout from '../layouts/Layout.astro';
 				<!-- What to Bring -->
 				<div class="shabby-card-blue p-8">
 					<div class="text-center">
-						<h3 class="text-xl font-playfair font-bold mb-4" style="color: #333333;">What to Bring</h3>
+						<h3 class="text-xl font-playfair font-bold mb-4 text-center card-heading" style="color: #333333;">What to Bring</h3>
 						<img src="/images/bg-bouquet-cherry-blossoms.webp" aria-hidden="true" alt="" class="what-to-expect-card-decorative-flower" loading="lazy" />
 					</div>
 					<ul class="space-y-3 font-roboto" style="color: #333333;">
-						<li class="center-text-card">
-							<div class="flex items-center flex-col">
-								<span><strong>Comfortable walking shoes</strong></span><br><span> Ground can be uneven</span>
+						<li class="text-center">
+							<div class="flex flex-col">
+								<span><strong>Comfortable walking shoes</strong></span>
+								<span>Ground can be uneven</span>
 							</div>
 						</li>
-						<li class="center-text-card">
-							<div class="flex items-center flex-col">
-								<span><strong>Weather protection</strong></span><br><span>Hat, sunglasses, light jacket, sunscreen</span>
+						<li class="text-center">
+							<div class="flex flex-col">
+								<span><strong>Weather protection</strong></span>
+								<span>Hat, sunglasses, light jacket, sunscreen</span>
 							</div>
 						</li>
-						<li class="center-text-card">
-							<div class="flex items-center flex-col">
-								<span><strong>Water bottle</strong></span><br><span>Stay hydrated during your visit</span>
+						<li class="text-center">
+							<div class="flex flex-col">
+								<span><strong>Water bottle</strong></span>
+								<span>Stay hydrated during your visit</span>
 							</div>
 						</li>
-						<li class="center-text-card">
-							<div class="flex items-center flex-col">
-								<span><strong>Camera or phone</strong></span><br><span>Capture beautiful memories</span>
+						<li class="text-center">
+							<div class="flex flex-col">
+								<span><strong>Camera or phone</strong></span>
+								<span>Capture beautiful memories</span>
 							</div>
 						</li>
 					</ul>
@@ -495,28 +489,32 @@ import Layout from '../layouts/Layout.astro';
 				<!-- What's Included -->
 				<div class="shabby-card-blue p-8">
 					<div class="text-center">
-						<h3 class="text-xl font-playfair font-bold mb-4" style="color: #333333;">What's Included</h3>
+						<h3 class="text-xl font-playfair font-bold mb-4 text-center card-heading" style="color: #333333;">What's Included</h3>
 						<img src="/images/bg-bouquet-yellow-flowers.webp" aria-hidden="true" alt="" class="what-to-expect-card-decorative-flower" loading="lazy" />
 					</div>
-					<ul class="space-y-3 font-roboto" style="color: #333333;">
+					<ul class="space-y-3 font-roboto text-center" style="color: #333333;">
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Cutting tools</strong></span><br><span>Shears/Scissors provided</span>
+							<div class="flex flex-col">
+								<span><strong>Cutting tools</strong></span>
+								<span>Shears/Scissors provided</span>
 							</div>
 						</li>
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Collection vessel</strong></span><br><span>Perfect for gathering your blooms</span>
+							<div class="flex flex-col">
+								<span><strong>Collection vessel</strong></span>
+								<span>Perfect for gathering your blooms</span>
 							</div>
 						</li>
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Care instructions</strong></span><br><span>Keep your flowers fresh longer</span>
+							<div class="flex flex-col">
+								<span><strong>Care instructions</strong></span>
+								<span>Keep your flowers fresh longer</span>
 							</div>
 						</li>
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Free parking</strong></span><br><span>Convenient on-site parking</span>
+							<div class="flex flex-col">
+								<span><strong>Free parking</strong></span>
+								<span>Convenient on-site parking</span>
 							</div>
 						</li>
 					</ul>
@@ -525,32 +523,36 @@ import Layout from '../layouts/Layout.astro';
 				<!-- Farm Guidelines -->
 				<div class="shabby-card-blue p-8">
 					<div class="text-center">
-						<h3 class="text-xl font-playfair font-bold mb-4" style="color: #333333;">Gentle Guidelines</h3>
+						<h3 class="text-xl font-playfair font-bold mb-4 text-center card-heading" style="color: #333333;">Gentle Guidelines</h3>
 						<img src="/images/bg-bouquet-bluebells.webp" aria-hidden="true" alt="" class="what-to-expect-card-decorative-flower" loading="lazy" />
 					</div>
-					<ul class="space-y-3 font-roboto" style="color: #333333;">
+					<ul class="space-y-3 font-roboto text-center" style="color: #333333;">
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Stay on marked paths</strong></span><br><span>Protects both you and the flowers</span>
+							<div class="flex flex-col">
+								<span><strong>Stay on marked paths</strong></span>
+								<span>Protects both you and the flowers</span>
 							</div>
 						</li>
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Cut stems cleanly</strong></span><br><span>Use provided tools for best results</span>
+							<div class="flex flex-col">
+								<span><strong>Cut stems cleanly</strong></span>
+								<span>Use provided tools for best results</span>
 							</div>
 						</li>
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Children welcome</strong></span><br><span>Please supervise little ones</span>
+							<div class="flex flex-col">
+								<span><strong>Children welcome</strong></span>
+								<span>Please supervise little ones</span>
 							</div>
 						</li>
 						<li>
-							<div class="flex items-center flex-col">
-								<span><strong>Pet supervision</strong></span><br><span>Keep in parking area to protect flowers</span>
+							<div class="flex flex-col">
+								<span><strong>Pet supervision</strong></span>
+								<span>Keep in parking area to protect flowers</span>
 							</div>
 						</li>
 					</ul>
-				</div>				 
+				</div>
 			</div>
 
 			<!-- Experience Highlights -->
@@ -906,12 +908,12 @@ import Layout from '../layouts/Layout.astro';
 			<div class="grid lg:grid-cols-2 gap-12 items-center">
 				<!-- Story Content -->
 				<div class="shabby-card p-8 distressed-shadow">
-					<h3 class="text-2xl font-playfair font-bold mb-6 center-mobile-text" style="color: #333333;">Our Story</h3>
+					<h3 class="text-2xl font-playfair font-bold mb-6 center-mobile-text keep-centered" style="color: #333333;">Our Story</h3>
 					<div class="space-y-4">
-						<p class="font-roboto leading-relaxed" style="color: #333333;">
+						<p class="font-roboto leading-relaxed center-mobile-text" style="color: #333333;">
 							BG Bouquets is a welcoming, cut-your-own bouquet farm tucked in the sunny foothills of Southern Alberta — minutes from Hill Spring, Cardston, and Waterton Lakes National Park. Whether you're local or just passing through, our flower field is a place to slow down, breathe deep, and build something beautiful with your own hands.
 						</p>
-						<p class="font-roboto leading-relaxed" style="color: #333333;">
+						<p class="font-roboto leading-relaxed center-mobile-text" style="color: #333333;">
 							We're proud to share the simple joys of our family farm in full bloom. Pick from a wide variety of seasonal flowers — including sunflowers, sweet peas, snapdragons, lavender, roses, and more — all grown with care in our prairie soil and perfect for creating your own custom bouquet.
 						</p>
 					</div>
@@ -1820,9 +1822,15 @@ import Layout from '../layouts/Layout.astro';
 					return;
 				}
 
-				// Success - use message from server (which is already conditional based on payment method)
+				// Check if this is a Square payment that requires redirect
+				if (result.requiresPayment && result.paymentUrl) {
+					// Show loading message and redirect to Square payment
+					alert(result.message || 'Redirecting to payment...');
+					window.location.href = result.paymentUrl;
+					return; // Don't continue with normal success flow
+				}
 
-				// Success
+				// Success for pay_on_arrival bookings
 				showBookingSuccess(booking, result.message);
 				await loadAvailability(); // Refresh times if needed
 

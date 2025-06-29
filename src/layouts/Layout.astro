@@ -139,13 +139,25 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 		overscroll-behavior-x: contain;
 	}
 
-	/* Center mobile text utility */
+	/* Mobile text alignment - Industry standard left-aligned approach */
 	.center-mobile-text {
+		text-align: left; /* Default to left-aligned for better readability */
+	}
+
+	/* Keep headings centered on mobile for visual hierarchy */
+	.center-mobile-text.keep-centered,
+	h1.center-mobile-text,
+	h2.center-mobile-text,
+	h3.center-mobile-text {
 		text-align: center;
 	}
 
 	@media (min-width: 768px) {
 		.center-mobile-text {
+			text-align: left;
+		}
+
+		.center-mobile-text.keep-centered {
 			text-align: left;
 		}
 	}

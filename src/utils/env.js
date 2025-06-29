@@ -8,7 +8,12 @@ export function validateEnvironment() {
   const optionalEnvVars = {
     MAKE_BOOKING_WEBHOOK_URL: process.env.MAKE_BOOKING_WEBHOOK_URL,
     MAKE_CANCELLATION_WEBHOOK_URL: process.env.MAKE_CANCELLATION_WEBHOOK_URL,
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+    // Square payment integration (optional for pay-on-arrival only bookings)
+    SQUARE_APPLICATION_ID: process.env.SQUARE_APPLICATION_ID,
+    SQUARE_ACCESS_TOKEN: process.env.SQUARE_ACCESS_TOKEN,
+    SQUARE_LOCATION_ID: process.env.SQUARE_LOCATION_ID,
+    SQUARE_WEBHOOK_SIGNATURE_KEY: process.env.SQUARE_WEBHOOK_SIGNATURE_KEY
   };
 
   const missing = [];
@@ -49,7 +54,17 @@ export function validateEnvironment() {
 
   if (optionalMissing.length > 0) {
     console.warn('⚠️ Optional environment variables not configured:', optionalMissing);
-    console.warn('Email automation will not work without Make.com webhook URLs');
+
+    // Provide specific guidance for missing features
+    const missingSquare = optionalMissing.filter(key => key.startsWith('SQUARE_'));
+    const missingWebhooks = optionalMissing.filter(key => key.includes('WEBHOOK_URL'));
+
+    if (missingSquare.length > 0) {
+      console.warn('💳 Square payment integration disabled - only "pay on arrival" bookings will work');
+    }
+    if (missingWebhooks.length > 0) {
+      console.warn('📧 Email automation will not work without Make.com webhook URLs');
+    }
   }
 
   if (warnings.length > 0) {

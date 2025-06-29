@@ -1,0 +1,228 @@
+// src/pages/api/square-webhook.ts
+import type { APIRoute } from 'astro';
+import { supabase } from '../../../lib/supabase';
+import { verifyWebhookSignature } from '../../utils/squareService';
+import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
+
+export const POST: APIRoute = async ({ request, url }) => {
+  try {
+    console.log('Square webhook received');
+    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
+
+    // Get the raw body for signature verification
+    const rawBody = await request.text();
+    console.log('Raw webhook body length:', rawBody.length);
+
+    // Get the Square signature from headers
+    const signature = request.headers.get('x-square-signature');
+    if (!signature) {
+      console.error('Missing Square signature header');
+      return new Response('Missing signature', { status: 400 });
+    }
+
+    // Verify the webhook signature
+    const isValidSignature = verifyWebhookSignature(rawBody, signature, url.toString());
+    if (!isValidSignature) {
+      console.error('Invalid Square webhook signature');
+      return new Response('Invalid signature', { status: 401 });
+    }
+
+    // Parse the webhook payload
+    let webhookData;
+    try {
+      webhookData = JSON.parse(rawBody);
+    } catch (error) {
+      console.error('Failed to parse webhook JSON:', error);
+      return new Response('Invalid JSON', { status: 400 });
+    }
+
+    console.log('Square webhook data:', JSON.stringify(webhookData, null, 2));
+
+    // Handle different webhook event types
+    const eventType = webhookData.type;
+    console.log('Processing Square webhook event:', eventType);
+
+    switch (eventType) {
+      case 'payment.created':
+      case 'payment.updated':
+        await handlePaymentEvent(webhookData);
+        break;
+      
+      case 'order.updated':
+        await handleOrderEvent(webhookData);
+        break;
+      
+      default:
+        console.log('Unhandled Square webhook event type:', eventType);
+        break;
+    }
+
+    return new Response('OK', { status: 200 });
+
+  } catch (error) {
+    console.error('Square webhook error:', error);
+    return new Response('Internal server error', { status: 500 });
+  }
+};
+
+/**
+ * Handle Square payment events (payment.created, payment.updated)
+ */
+async function handlePaymentEvent(webhookData: any) {
+  try {
+    const payment = webhookData.data?.object?.payment;
+    if (!payment) {
+      console.error('No payment data in webhook');
+      return;
+    }
+
+    const orderId = payment.order_id;
+    const paymentId = payment.id;
+    const status = payment.status;
+    const amountMoney = payment.amount_money;
+
+    console.log('Processing payment event:', {
+      orderId,
+      paymentId,
+      status,
+      amount: amountMoney
+    });
+
+    // Find the booking by Square order ID
+    const { data: booking, error: bookingError } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('square_order_id', orderId)
+      .single();
+
+    if (bookingError || !booking) {
+      console.error('Booking not found for Square order:', orderId, bookingError);
+      return;
+    }
+
+    console.log('Found booking for payment:', booking.id);
+
+    // Handle different payment statuses
+    if (status === 'COMPLETED') {
+      console.log('Payment completed, updating booking status');
+      
+      // Update booking to paid status
+      const { error: updateError } = await supabase
+        .from('bookings')
+        .update({
+          payment_status: 'paid',
+          square_payment_id: paymentId,
+          payment_completed_at: new Date().toISOString()
+        })
+        .eq('id', booking.id);
+
+      if (updateError) {
+        console.error('Failed to update booking payment status:', updateError);
+        return;
+      }
+
+      // Send confirmation email
+      console.log('Sending booking confirmation email for paid booking');
+      
+      const bookingData = {
+        id: booking.id,
+        fullName: booking.full_name,
+        email: booking.email,
+        phone: booking.phone,
+        visitDate: booking.date,
+        preferredTime: booking.time,
+        numberOfVisitors: booking.number_of_visitors,
+        totalAmount: booking.total_amount,
+        paymentMethod: booking.payment_method,
+        createdAt: booking.created_at,
+      };
+
+      // Send webhook with retry logic in background
+      sendWebhookWithRetry(
+        () => sendBookingConfirmation(bookingData, booking.cancellation_token),
+        3, // max retries
+        2000 // initial delay
+      ).then(success => {
+        logWebhookAttempt(
+          booking.id,
+          'confirmation',
+          success,
+          success ? undefined : 'Failed after retries'
+        );
+      }).catch(error => {
+        console.error('Webhook sending failed:', error);
+        logWebhookAttempt(
+          booking.id,
+          'confirmation',
+          false,
+          error.message
+        );
+      });
+
+    } else if (status === 'FAILED' || status === 'CANCELED') {
+      console.log('Payment failed or canceled, updating booking status');
+      
+      // Update booking to failed status
+      const { error: updateError } = await supabase
+        .from('bookings')
+        .update({
+          payment_status: 'failed',
+          square_payment_id: paymentId
+        })
+        .eq('id', booking.id);
+
+      if (updateError) {
+        console.error('Failed to update booking payment status:', updateError);
+        return;
+      }
+
+      // Optionally, you could delete the booking or send a failure notification
+      console.log('Payment failed for booking:', booking.id);
+    }
+
+  } catch (error) {
+    console.error('Error handling payment event:', error);
+  }
+}
+
+/**
+ * Handle Square order events (order.updated)
+ */
+async function handleOrderEvent(webhookData: any) {
+  try {
+    const order = webhookData.data?.object?.order;
+    if (!order) {
+      console.error('No order data in webhook');
+      return;
+    }
+
+    const orderId = order.id;
+    const state = order.state;
+
+    console.log('Processing order event:', {
+      orderId,
+      state
+    });
+
+    // Find the booking by Square order ID
+    const { data: booking, error: bookingError } = await supabase
+      .from('bookings')
+      .select('id, payment_status')
+      .eq('square_order_id', orderId)
+      .single();
+
+    if (bookingError || !booking) {
+      console.error('Booking not found for Square order:', orderId, bookingError);
+      return;
+    }
+
+    console.log('Found booking for order event:', booking.id, 'Current status:', booking.payment_status);
+
+    // Handle order state changes if needed
+    // Most payment processing will be handled by payment events
+    // This is mainly for logging and additional order tracking
+
+  } catch (error) {
+    console.error('Error handling order event:', error);
+  }
+}

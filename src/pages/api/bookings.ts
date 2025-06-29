@@ -2,6 +2,7 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
+import { createPaymentLink, validateSquareConfig } from '../../utils/squareService';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -161,8 +162,9 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // 5. Insert new booking (both limits passed)
-    // Determine payment status based on payment method
-    const paymentStatus = paymentMethod === 'pay_now' ? 'paid' : 'pending';
+    // For Square payments, we'll set status to 'pending' until payment is confirmed
+    // For pay_on_arrival, we keep it as 'pending' until manually marked as paid
+    const paymentStatus = 'pending';
 
     console.log('Inserting booking with data:', {
       full_name: fullName,
@@ -212,6 +214,77 @@ export const POST: APIRoute = async ({ request }) => {
       createdAt: insertedBooking.created_at,
     };
 
+    // Handle Square payment for 'pay_now' bookings
+    if (paymentMethod === 'pay_now') {
+      console.log('Creating Square payment link for pay_now booking');
+
+      // Validate Square configuration
+      const squareConfig = validateSquareConfig();
+      if (!squareConfig.isValid) {
+        console.error('Square configuration invalid:', squareConfig.missing);
+        return new Response(JSON.stringify({
+          error: 'Online payment is currently unavailable. Please select "Pay on Arrival" or try again later.'
+        }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Create Square payment link
+      const paymentResult = await createPaymentLink({
+        bookingId: insertedBooking.id,
+        fullName,
+        email,
+        visitDate,
+        preferredTime,
+        numberOfVisitors,
+        totalAmount
+      });
+
+      if (!paymentResult.success) {
+        console.error('Failed to create Square payment link:', paymentResult.error);
+
+        // Delete the booking since payment link creation failed
+        await supabase.from('bookings').delete().eq('id', insertedBooking.id);
+
+        return new Response(JSON.stringify({
+          error: paymentResult.error || 'Failed to create payment link. Please try again or select "Pay on Arrival".'
+        }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Store the Square order ID in the booking for reference
+      if (paymentResult.orderId) {
+        try {
+          await supabase
+            .from('bookings')
+            .update({
+              square_order_id: paymentResult.orderId
+            })
+            .eq('id', insertedBooking.id);
+        } catch (updateError) {
+          console.warn('Could not update square_order_id (column may not exist yet):', updateError);
+          // Continue without storing the order ID - the booking is still valid
+        }
+      }
+
+      console.log('Square payment link created successfully:', paymentResult.paymentUrl);
+
+      // Return payment URL for redirect
+      return new Response(JSON.stringify({
+        success: true,
+        requiresPayment: true,
+        paymentUrl: paymentResult.paymentUrl,
+        bookingId: insertedBooking.id,
+        message: 'Booking created! Redirecting to payment...'
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Send confirmation email webhook (async, don't block response)
     // Only send for "pay_on_arrival" for now, "pay_now" will be handled post-payment
     if (paymentMethod === 'pay_on_arrival') {
@@ -240,10 +313,9 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Create appropriate success message based on payment method
-    const successMessage = paymentMethod === 'pay_now'
-      ? 'You\'re all set! We\'ve received your payment. You\'ll receive a confirmation email shortly.'
-      : 'Thanks for booking! You can pay when you arrive. You\'ll receive a confirmation email shortly.';
+    // Create appropriate success message for pay_on_arrival bookings
+    // (pay_now bookings are handled above with payment redirect)
+    const successMessage = 'Thanks for booking! You can pay when you arrive. You\'ll receive a confirmation email shortly.';
 
     return new Response(JSON.stringify({
       success: true,
@@ -255,7 +327,12 @@ export const POST: APIRoute = async ({ request }) => {
 
   } catch (error) {
     console.error('Booking API error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error. Please try again.' }), {
+    console.error('Error stack:', error.stack);
+    return new Response(JSON.stringify({
+      error: 'Internal server error. Please try again.',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
