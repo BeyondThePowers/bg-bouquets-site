@@ -8,6 +8,8 @@ export const POST: APIRoute = async ({ request }) => {
     const { type = 'confirmation' } = body;
 
     // Sample booking data for testing
+    const { paymentStatus = 'pending' } = body;
+
     const sampleBookingData = {
       id: `test_${Date.now()}`,
       fullName: 'Test Customer',
@@ -17,8 +19,19 @@ export const POST: APIRoute = async ({ request }) => {
       preferredTime: '10:00 AM',
       numberOfVisitors: 2,
       totalAmount: 70,
-      paymentMethod: 'pay_on_arrival',
+      paymentMethod: paymentStatus === 'completed' ? 'pay_now' : 'pay_on_arrival',
       createdAt: new Date().toISOString(),
+      // Add payment completion details for online payment tests
+      ...(paymentStatus === 'completed' && {
+        paymentCompletedAt: new Date().toISOString(),
+        squareOrderId: `test-order-${Date.now()}`,
+        squarePaymentId: `test-payment-${Date.now()}`,
+        paymentDetails: {
+          payment_id: `test-payment-${Date.now()}`,
+          amount_money: { amount: 7000, currency: 'CAD' },
+          status: 'COMPLETED'
+        }
+      })
     };
 
     let result;

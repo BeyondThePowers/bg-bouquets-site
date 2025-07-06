@@ -53,6 +53,3 @@
 # HTTPS redirect (only applies when deployed with HTTPS)
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-
-/* 
-  Basic-Auth: dev Q!w2e3r4t5y6

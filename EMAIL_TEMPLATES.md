@@ -15,10 +15,17 @@
 - Call-to-action buttons
 - Footer with contact information
 
-## 📧 Template 1: Booking Confirmation
+## 📧 Template 1: Unified Booking Confirmation (Pay-on-Arrival & Online Payment)
 
 ### Subject Line
 `🌸 Your BG Bouquet Garden Visit is Confirmed - {{booking.visit.date}}`
+
+### Key Features
+- **Conditional Payment Status**: Shows different content based on payment method and status
+- **Bouquet Count Display**: Shows number of bouquets (= number of visitors)
+- **Payment Details**: For online payments, shows amount paid and payment confirmation
+- **Refund Policy**: Included for paid bookings with link to full policy
+- **Cancellation/Reschedule**: Same functionality for both payment types
 
 ### Email Content
 ```html
@@ -52,8 +59,23 @@
             <h2 style="font-family: 'Playfair Display', serif; color: #333333;">Your Visit is Confirmed! 🌸</h2>
             
             <p>Dear {{booking.customer.name}},</p>
-            
+
             <p>Thank you for booking your visit to BG Bouquet Garden! We're excited to welcome you to our beautiful garden sanctuary.</p>
+
+            <!-- Payment Status Message (Conditional) -->
+            {{#if (eq booking.payment.status "completed")}}
+            <div style="background: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #2e7d32; font-weight: 500;">
+                    ✅ <strong>Payment Confirmed!</strong> Your payment of ${{booking.visit.amount}} has been successfully processed.
+                </p>
+            </div>
+            {{else}}
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #856404; font-weight: 500;">
+                    💳 <strong>Payment:</strong> You've selected to pay on arrival (${{booking.visit.amount}}).
+                </p>
+            </div>
+            {{/if}}
             
             <div class="booking-details">
                 <h3 style="font-family: 'Playfair Display', serif; margin-top: 0;">Booking Details</h3>
@@ -70,13 +92,38 @@
                     <span class="value">{{booking.visit.visitors}}</span>
                 </div>
                 <div class="detail-row">
+                    <span class="label">Bouquets Included:</span>
+                    <span class="value">{{booking.visit.bouquets}} (one per visitor)</span>
+                </div>
+                <div class="detail-row">
                     <span class="label">Total Amount:</span>
                     <span class="value">${{booking.visit.amount}}</span>
                 </div>
+
+                <!-- Payment Information (Conditional) -->
+                {{#if (eq booking.payment.status "completed")}}
                 <div class="detail-row">
-                    <span class="label">Payment:</span>
-                    <span class="value">{{booking.payment.method}}</span>
+                    <span class="label">Payment Status:</span>
+                    <span class="value" style="color: #4caf50; font-weight: 500;">✅ Paid Online</span>
                 </div>
+                {{#if booking.payment.squarePaymentId}}
+                <div class="detail-row">
+                    <span class="label">Payment Reference:</span>
+                    <span class="value">{{booking.payment.squarePaymentId}}</span>
+                </div>
+                {{/if}}
+                {{#if booking.payment.completedAt}}
+                <div class="detail-row">
+                    <span class="label">Payment Date:</span>
+                    <span class="value">{{booking.payment.completedAt}}</span>
+                </div>
+                {{/if}}
+                {{else}}
+                <div class="detail-row">
+                    <span class="label">Payment Method:</span>
+                    <span class="value">Pay on Arrival</span>
+                </div>
+                {{/if}}
                 <div class="detail-row">
                     <span class="label">Booking ID:</span>
                     <span class="value">{{booking.id}}</span>
@@ -93,10 +140,23 @@
             
             <h3 style="font-family: 'Playfair Display', serif;">Need to Make Changes?</h3>
             <p>If you need to cancel or reschedule your visit, please use the link below:</p>
-            
+
             <a href="https://bgbouquet.com/cancel?token={{booking.metadata.cancellationToken}}" class="button">
                 Manage Your Booking
             </a>
+
+            <!-- Refund Policy for Paid Bookings -->
+            {{#if (eq booking.payment.status "completed")}}
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <h4 style="margin-top: 0; color: #856404;">Refund Policy</h4>
+                <p style="margin: 5px 0; color: #856404; font-size: 14px;">
+                    For paid bookings, refunds are processed manually. If you need to cancel, please contact us directly to initiate the refund process.
+                </p>
+                <p style="margin: 5px 0; color: #856404; font-size: 14px;">
+                    <a href="https://bgbouquet.com/refund-policy" style="color: #856404; text-decoration: underline;">View Full Refund Policy</a>
+                </p>
+            </div>
+            {{/if}}
             
             <p>We look forward to sharing the beauty of our garden with you!</p>
             

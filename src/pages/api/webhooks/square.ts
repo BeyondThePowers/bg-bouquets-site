@@ -26,16 +26,35 @@ function verifySquareSignature(body: string, signature: string, webhookKey: stri
   }
 }
 
-// Send booking data to Make.com webhook
-async function sendToMakeWebhook(bookingData: any, webhookType: 'payment_success' | 'payment_failed') {
-  const webhookUrl = webhookType === 'payment_success' 
-    ? import.meta.env.WEBHOOK_PAYMENT_SUCCESS_URL 
-    : import.meta.env.WEBHOOK_PAYMENT_FAILED_URL;
+// Send booking confirmation using the standardized webhook format
+// This will use the same Make.com scenario as pay-on-arrival confirmations
+async function sendPaymentConfirmationWebhook(bookingData: any, paymentDetails: any) {
+  // Import the standardized webhook service
+  const { sendBookingConfirmation } = await import('../../utils/webhookService');
 
-  if (!webhookUrl) {
-    console.log(`No webhook URL configured for ${webhookType}`);
-    return;
-  }
+  // Format booking data to match the standard confirmation format
+  const standardizedBookingData = {
+    id: bookingData.id,
+    fullName: bookingData.full_name,
+    email: bookingData.email,
+    phone: bookingData.phone,
+    visitDate: bookingData.date,
+    preferredTime: bookingData.time,
+    numberOfVisitors: bookingData.number_of_visitors,
+    totalAmount: bookingData.total_amount,
+    paymentMethod: bookingData.payment_method,
+    createdAt: bookingData.created_at,
+    // Add payment completion details
+    paymentCompletedAt: bookingData.payment_completed_at,
+    squareOrderId: bookingData.square_order_id,
+    squarePaymentId: bookingData.square_payment_id,
+    paymentDetails: paymentDetails
+  };
+
+  // Send using the standard booking confirmation webhook
+  // This will go to the same Make.com scenario as pay-on-arrival confirmations
+  return await sendBookingConfirmation(standardizedBookingData, bookingData.cancellation_token);
+}
 
   try {
     const response = await fetch(webhookUrl, {
@@ -172,8 +191,20 @@ export const POST: APIRoute = async ({ request }) => {
           });
 
           if (updatedBooking) {
-            // Send success webhook to Make.com
-            await sendToMakeWebhook(updatedBooking, 'payment_success');
+            // Send payment confirmation email using standardized webhook format
+            console.log('Sending payment confirmation email for completed payment');
+            try {
+              await sendPaymentConfirmationWebhook(updatedBooking, {
+                payment_id: payment.id,
+                amount_money: payment.amount_money,
+                status: 'COMPLETED',
+                created_at: payment.created_at,
+                updated_at: payment.updated_at
+              });
+              console.log('Payment confirmation email sent successfully');
+            } catch (error) {
+              console.error('Failed to send payment confirmation email:', error);
+            }
           }
 
         } else if (status === 'FAILED' || status === 'CANCELED') {

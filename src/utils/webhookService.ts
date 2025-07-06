@@ -102,6 +102,10 @@ export async function sendBookingConfirmation(bookingData: BookingData, cancella
     return false;
   }
 
+  // Determine payment status and details
+  const isPaymentCompleted = bookingData.paymentMethod === 'pay_now' &&
+    (bookingData.paymentCompletedAt || bookingData.squarePaymentId);
+
   const payload: WebhookPayload = {
     event: 'booking_confirmed',
     booking: {
@@ -116,10 +120,16 @@ export async function sendBookingConfirmation(bookingData: BookingData, cancella
         time: bookingData.preferredTime,
         visitors: bookingData.numberOfVisitors,
         amount: bookingData.totalAmount,
+        bouquets: bookingData.numberOfVisitors, // Each visitor gets one bouquet
       },
       payment: {
         method: bookingData.paymentMethod,
-        status: bookingData.paymentMethod === 'pay_on_arrival' ? 'pending' : 'completed',
+        status: isPaymentCompleted ? 'completed' : 'pending',
+        // Include Square payment details if available
+        ...(bookingData.squareOrderId && { squareOrderId: bookingData.squareOrderId }),
+        ...(bookingData.squarePaymentId && { squarePaymentId: bookingData.squarePaymentId }),
+        ...(bookingData.paymentCompletedAt && { completedAt: bookingData.paymentCompletedAt }),
+        ...(bookingData.paymentDetails && { details: bookingData.paymentDetails }),
       },
       metadata: {
         createdAt: bookingData.createdAt || new Date().toISOString(),
