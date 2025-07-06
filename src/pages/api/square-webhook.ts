@@ -10,12 +10,21 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Square webhook signature verification (correct method)
-function verifySquareSignature(body: string, signature: string, webhookKey: string): boolean {
+// Square webhook signature verification (correct method with notification URL)
+function verifySquareSignature(body: string, signature: string, webhookKey: string, notificationUrl: string): boolean {
   try {
+    // Square signature calculation: HMAC-SHA256(signature_key, notification_url + body)
     const hmac = crypto.createHmac('sha256', webhookKey);
-    hmac.update(body);
+    hmac.update(notificationUrl + body);
     const expectedSignature = hmac.digest('base64');
+
+    console.log('Square signature verification:', {
+      notificationUrl,
+      bodyLength: body.length,
+      providedSignature: signature.substring(0, 20) + '...',
+      expectedSignature: expectedSignature.substring(0, 20) + '...',
+      webhookKeyLength: webhookKey.length
+    });
 
     return crypto.timingSafeEqual(
       Buffer.from(signature, 'base64'),
@@ -47,10 +56,10 @@ export const POST: APIRoute = async ({ request, url }) => {
     const rawBody = await request.text();
     console.log('Raw webhook body length:', rawBody.length);
 
-    // Get the Square signature from headers
-    const signature = request.headers.get('x-square-signature');
+    // Get the Square signature from headers (correct header name)
+    const signature = request.headers.get('x-square-hmacsha256-signature');
     if (!signature) {
-      console.error('Missing Square signature header');
+      console.error('Missing Square signature header (x-square-hmacsha256-signature)');
       return new Response('Missing signature', { status: 400 });
     }
 
@@ -61,7 +70,10 @@ export const POST: APIRoute = async ({ request, url }) => {
       return new Response('Webhook not configured', { status: 500 });
     }
 
-    const isValidSignature = verifySquareSignature(rawBody, signature, webhookKey);
+    // Get the notification URL (this should match what's configured in Square Dashboard)
+    const notificationUrl = 'https://bgbouquet.com/api/square-webhook';
+
+    const isValidSignature = verifySquareSignature(rawBody, signature, webhookKey, notificationUrl);
     if (!isValidSignature) {
       console.error('Invalid Square webhook signature');
       return new Response('Invalid signature', { status: 401 });
