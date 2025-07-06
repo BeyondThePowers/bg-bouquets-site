@@ -175,7 +175,7 @@ async function handlePaymentEvent(webhookData: any) {
 
       // Send confirmation email
       console.log('Sending booking confirmation email for paid booking');
-      
+
       const bookingData = {
         id: booking.id,
         fullName: booking.full_name,
@@ -187,6 +187,15 @@ async function handlePaymentEvent(webhookData: any) {
         totalAmount: booking.total_amount,
         paymentMethod: booking.payment_method,
         createdAt: booking.created_at,
+        // Include Square payment completion data
+        squareOrderId: booking.square_order_id,
+        squarePaymentId: paymentId,
+        paymentCompletedAt: new Date().toISOString(),
+        paymentDetails: {
+          payment_id: paymentId,
+          amount_money: amountMoney,
+          status: status
+        }
       };
 
       // Send webhook with retry logic in background
