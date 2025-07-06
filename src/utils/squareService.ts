@@ -113,7 +113,7 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
         }]
       },
       checkout_options: {
-        redirect_url: `${process.env.PUBLIC_URL || 'http://localhost:4321'}/booking-success`,
+        redirect_url: `${getBaseUrl()}/booking-success`,
         ask_for_shipping_address: false
       }
     };
@@ -212,13 +212,33 @@ export function verifyWebhookSignature(body: string, signature: string, url: str
  * Get the base URL for redirects
  */
 function getBaseUrl(): string {
-  // In production, use the actual domain
+  // Check multiple environment variables for production URL
+  const productionUrl = process.env.PUBLIC_URL ||
+                       process.env.SITE_URL ||
+                       import.meta.env.PUBLIC_URL ||
+                       import.meta.env.SITE_URL;
+
+  // If we have a production URL, use it
+  if (productionUrl && productionUrl !== 'http://localhost:4321') {
+    return productionUrl;
+  }
+
+  // In browser context, use current origin
   if (typeof window !== 'undefined') {
     return window.location.origin;
   }
-  
-  // Server-side fallback
-  return process.env.SITE_URL || 'http://localhost:4321';
+
+  // Check if we're in production environment
+  const isProduction = process.env.NODE_ENV === 'production' ||
+                      import.meta.env.PROD;
+
+  if (isProduction) {
+    // Default production URL - update this to your actual domain
+    return 'https://bgbouquet.com';
+  }
+
+  // Development fallback
+  return 'http://localhost:4321';
 }
 
 /**
