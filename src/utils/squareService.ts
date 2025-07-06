@@ -139,6 +139,8 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
 
     const paymentLinkResponse = await response.json();
 
+    console.log('🔍 Full Square API Response:', JSON.stringify(paymentLinkResponse, null, 2));
+
     if (!paymentLinkResponse.payment_link?.url) {
       console.error('Failed to create Square payment link:', paymentLinkResponse);
       return {
@@ -149,10 +151,15 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
 
     console.log('Square payment link created successfully:', paymentLinkResponse.payment_link.url);
 
+    // Extract order ID from related_resources (this is where Square puts the actual order ID)
+    const orderId = paymentLinkResponse.related_resources?.orders?.[0]?.id || 'unknown';
+    console.log('🎯 Square order ID extracted:', orderId);
+    console.log('🔍 Related resources structure:', JSON.stringify(paymentLinkResponse.related_resources, null, 2));
+
     return {
       success: true,
       paymentUrl: paymentLinkResponse.payment_link.url,
-      orderId: paymentLinkResponse.payment_link.order_id || 'unknown'
+      orderId: orderId
     };
 
   } catch (error) {

@@ -1,12 +1,46 @@
 // src/pages/api/square-webhook.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
-import { verifyWebhookSignature } from '../../utils/squareService';
+import { createClient } from '@supabase/supabase-js';
 import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
+import crypto from 'crypto';
+
+// Initialize Supabase admin client for server-side operations
+const supabaseAdmin = createClient(
+  process.env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+// Square webhook signature verification (correct method)
+function verifySquareSignature(body: string, signature: string, webhookKey: string): boolean {
+  try {
+    const hmac = crypto.createHmac('sha256', webhookKey);
+    hmac.update(body);
+    const expectedSignature = hmac.digest('base64');
+
+    return crypto.timingSafeEqual(
+      Buffer.from(signature, 'base64'),
+      Buffer.from(expectedSignature, 'base64')
+    );
+  } catch (error) {
+    console.error('Error verifying Square signature:', error);
+    return false;
+  }
+}
+
+// Add GET endpoint for testing
+export const GET: APIRoute = async () => {
+  return new Response(JSON.stringify({
+    message: 'Square webhook endpoint is accessible',
+    timestamp: new Date().toISOString()
+  }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
 
 export const POST: APIRoute = async ({ request, url }) => {
   try {
-    console.log('Square webhook received');
+    console.log('🔥 OLD SQUARE WEBHOOK ENDPOINT CALLED: /api/square-webhook');
     console.log('Request headers:', Object.fromEntries(request.headers.entries()));
 
     // Get the raw body for signature verification
@@ -20,8 +54,14 @@ export const POST: APIRoute = async ({ request, url }) => {
       return new Response('Missing signature', { status: 400 });
     }
 
-    // Verify the webhook signature
-    const isValidSignature = verifyWebhookSignature(rawBody, signature, url.toString());
+    // Verify the webhook signature using the correct Square method
+    const webhookKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY || import.meta.env.SQUARE_WEBHOOK_SIGNATURE_KEY;
+    if (!webhookKey) {
+      console.error('Square webhook signature key not configured');
+      return new Response('Webhook not configured', { status: 500 });
+    }
+
+    const isValidSignature = verifySquareSignature(rawBody, signature, webhookKey);
     if (!isValidSignature) {
       console.error('Invalid Square webhook signature');
       return new Response('Invalid signature', { status: 401 });
@@ -89,7 +129,7 @@ async function handlePaymentEvent(webhookData: any) {
     });
 
     // Find the booking by Square order ID
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await supabaseAdmin
       .from('bookings')
       .select('*')
       .eq('square_order_id', orderId)
@@ -107,7 +147,7 @@ async function handlePaymentEvent(webhookData: any) {
       console.log('Payment completed, updating booking status');
       
       // Update booking to paid status
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from('bookings')
         .update({
           payment_status: 'paid',
@@ -163,7 +203,7 @@ async function handlePaymentEvent(webhookData: any) {
       console.log('Payment failed or canceled, updating booking status');
       
       // Update booking to failed status
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from('bookings')
         .update({
           payment_status: 'failed',
@@ -205,7 +245,7 @@ async function handleOrderEvent(webhookData: any) {
     });
 
     // Find the booking by Square order ID
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await supabaseAdmin
       .from('bookings')
       .select('id, payment_status')
       .eq('square_order_id', orderId)

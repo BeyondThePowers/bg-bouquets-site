@@ -31,6 +31,15 @@ interface BookingData {
   totalAmount: number;
   paymentMethod: string;
   createdAt?: string;
+  // Square payment integration fields
+  squareOrderId?: string;
+  squarePaymentId?: string;
+  paymentCompletedAt?: string;
+  paymentDetails?: {
+    payment_id?: string;
+    amount_money?: { amount: number; currency: string };
+    status?: string;
+  };
 }
 
 interface CancellationData extends BookingData {

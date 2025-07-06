@@ -1,65 +1,117 @@
 // src/pages/api/migrate-square.ts
 // Temporary API endpoint to run Square integration migration
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
-export const POST: APIRoute = async ({ request }) => {
+async function runMigration() {
   try {
-    console.log('Running Square integration migration...');
-
-    // Add Square-specific columns to bookings table
-    const migrations = [
-      `ALTER TABLE bookings 
-       ADD COLUMN IF NOT EXISTS square_order_id VARCHAR(255) NULL,
-       ADD COLUMN IF NOT EXISTS square_payment_id VARCHAR(255) NULL,
-       ADD COLUMN IF NOT EXISTS payment_completed_at TIMESTAMPTZ NULL;`,
-      
-      `CREATE INDEX IF NOT EXISTS idx_bookings_square_order_id ON bookings(square_order_id);`,
-      `CREATE INDEX IF NOT EXISTS idx_bookings_square_payment_id ON bookings(square_payment_id);`,
-      `CREATE INDEX IF NOT EXISTS idx_bookings_payment_completed_at ON bookings(payment_completed_at);`,
-      
-      `UPDATE bookings 
-       SET payment_completed_at = created_at 
-       WHERE payment_status = 'paid' AND payment_completed_at IS NULL;`
-    ];
+    console.log('Checking Square integration migration status...');
 
     const results = [];
-    
-    for (const migration of migrations) {
-      try {
-        console.log('Executing:', migration);
-        const { data, error } = await supabase.rpc('exec_sql', { sql: migration });
-        
-        if (error) {
-          console.error('Migration error:', error);
-          results.push({ sql: migration, success: false, error: error.message });
-        } else {
-          console.log('Migration successful');
-          results.push({ sql: migration, success: true });
-        }
-      } catch (err) {
-        console.error('Migration exception:', err);
-        results.push({ sql: migration, success: false, error: err.message });
+
+    // Check if Square columns exist
+    try {
+      const { data: testData, error: testError } = await supabaseAdmin
+        .from('bookings')
+        .select('id, square_order_id, square_payment_id, payment_completed_at')
+        .limit(1);
+
+      if (testError && testError.code === '42703') {
+        // Columns don't exist
+        results.push({
+          check: 'square_columns',
+          success: false,
+          error: 'Square columns do not exist',
+          action_required: 'Run the SQL migration manually'
+        });
+      } else if (testError) {
+        // Other error
+        results.push({
+          check: 'square_columns',
+          success: false,
+          error: testError.message
+        });
+      } else {
+        // Columns exist
+        results.push({
+          check: 'square_columns',
+          success: true,
+          message: 'Square columns exist'
+        });
       }
+    } catch (err) {
+      results.push({
+        check: 'square_columns',
+        success: false,
+        error: err.message
+      });
     }
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: 'Migration completed',
-      results
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // Check existing data
+    try {
+      const { data: bookings, error: bookingsError } = await supabaseAdmin
+        .from('bookings')
+        .select('id, payment_method, payment_status, square_order_id, square_payment_id')
+        .eq('payment_method', 'pay_now')
+        .limit(10);
+
+      if (bookingsError) {
+        results.push({
+          check: 'existing_data',
+          success: false,
+          error: bookingsError.message
+        });
+      } else {
+        const withSquareOrderId = bookings?.filter(b => b.square_order_id) || [];
+        const withSquarePaymentId = bookings?.filter(b => b.square_payment_id) || [];
+
+        results.push({
+          check: 'existing_data',
+          success: true,
+          total_pay_now_bookings: bookings?.length || 0,
+          with_square_order_id: withSquareOrderId.length,
+          with_square_payment_id: withSquarePaymentId.length
+        });
+      }
+    } catch (err) {
+      results.push({
+        check: 'existing_data',
+        success: false,
+        error: err.message
+      });
+    }
+
+    const allChecksSuccessful = results.every(r => r.success);
+
+    return {
+      success: allChecksSuccessful,
+      message: allChecksSuccessful ? 'Migration checks passed' : 'Migration required',
+      results,
+      manual_migration_required: !allChecksSuccessful,
+      sql_file: 'database/square-migration.sql'
+    };
 
   } catch (error) {
     console.error('Migration API error:', error);
-    return new Response(JSON.stringify({
+    return {
       success: false,
       error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    };
   }
+}
+
+export const GET: APIRoute = async () => {
+  const result = await runMigration();
+  return new Response(JSON.stringify(result), {
+    status: result.success ? 200 : 500,
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
+
+export const POST: APIRoute = async ({ request }) => {
+  const result = await runMigration();
+  return new Response(JSON.stringify(result), {
+    status: result.success ? 200 : 500,
+    headers: { 'Content-Type': 'application/json' }
+  });
 };

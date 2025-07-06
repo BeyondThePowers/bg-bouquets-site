@@ -1,6 +1,7 @@
 // src/pages/api/bookings.ts
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
 import { createPaymentLink, validateSquareConfig } from '../../utils/squareService';
 
@@ -256,18 +257,32 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       // Store the Square order ID in the booking for reference
-      if (paymentResult.orderId) {
+      console.log('Payment result orderId:', paymentResult.orderId);
+      if (paymentResult.orderId && paymentResult.orderId !== 'unknown') {
         try {
-          await supabase
+          console.log('🔄 Updating booking with Square order ID:', paymentResult.orderId, 'for booking ID:', insertedBooking.id);
+
+          const { data: updatedBooking, error: updateError } = await supabaseAdmin
             .from('bookings')
             .update({
               square_order_id: paymentResult.orderId
             })
-            .eq('id', insertedBooking.id);
+            .eq('id', insertedBooking.id)
+            .select();
+
+          if (updateError) {
+            console.error('❌ Failed to update square_order_id:', updateError);
+          } else if (updatedBooking && updatedBooking.length > 0) {
+            console.log('✅ Successfully stored Square order ID:', paymentResult.orderId, 'for booking:', insertedBooking.id);
+            console.log('📋 Updated booking data:', updatedBooking[0]);
+          } else {
+            console.warn('⚠️ Update succeeded but no rows returned. Booking ID:', insertedBooking.id);
+          }
         } catch (updateError) {
-          console.warn('Could not update square_order_id (column may not exist yet):', updateError);
-          // Continue without storing the order ID - the booking is still valid
+          console.error('💥 Exception updating square_order_id:', updateError);
         }
+      } else {
+        console.warn('⚠️ No valid Square order ID to store:', paymentResult.orderId);
       }
 
       console.log('Square payment link created successfully:', paymentResult.paymentUrl);
