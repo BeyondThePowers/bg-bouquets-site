@@ -4,13 +4,14 @@
  */
 
 // Webhook configuration for easy future modifications
-// Consolidated to 2 scenarios for Make.com free plan (2 scenario limit)
+// CONSOLIDATED: All events now route to single Make.com scenario (MAKE_BOOKING_WEBHOOK_URL)
+// This allows for unified scenario management with event-based filtering
 const WEBHOOK_CONFIG = {
-  booking_confirmed: 'MAKE_BOOKING_WEBHOOK_URL',        // Scenario 1: Confirmations + Errors
-  booking_error: 'MAKE_BOOKING_WEBHOOK_URL',            // Scenario 1: Confirmations + Errors
-  booking_cancelled: 'MAKE_CANCELLATION_WEBHOOK_URL',   // Scenario 2: Cancellations + Reschedules + Admin
-  booking_rescheduled: 'MAKE_CANCELLATION_WEBHOOK_URL', // Scenario 2: Cancellations + Reschedules + Admin
-  booking_cancelled_admin: 'MAKE_CANCELLATION_WEBHOOK_URL' // Scenario 2: Cancellations + Reschedules + Admin
+  booking_confirmed: 'MAKE_BOOKING_WEBHOOK_URL',        // All events → Single scenario
+  booking_error: 'MAKE_BOOKING_WEBHOOK_URL',            // All events → Single scenario
+  booking_cancelled: 'MAKE_BOOKING_WEBHOOK_URL',        // All events → Single scenario
+  booking_rescheduled: 'MAKE_BOOKING_WEBHOOK_URL',      // All events → Single scenario
+  booking_cancelled_admin: 'MAKE_BOOKING_WEBHOOK_URL'   // All events → Single scenario
 } as const;
 
 // Helper function to get webhook URL for event type
@@ -18,6 +19,110 @@ function getWebhookUrl(eventType: keyof typeof WEBHOOK_CONFIG): string | undefin
   const envVarName = WEBHOOK_CONFIG[eventType];
   // In server-side contexts (like Netlify Functions), non-PUBLIC_ env vars are only available via process.env
   return process.env[envVarName] || import.meta.env[envVarName];
+}
+
+/**
+ * Create standardized webhook payload with all possible fields
+ * This ensures consistent data structure across all Make.com scenarios
+ */
+function createStandardizedPayload(
+  eventType: string,
+  bookingData: BookingData,
+  options: {
+    cancellationToken?: string;
+    cancellationReason?: string;
+    rescheduleReason?: string;
+    originalDate?: string;
+    originalTime?: string;
+    errorInfo?: { message: string; type: string };
+    emailType?: string;
+  } = {}
+): StandardizedWebhookPayload {
+  const {
+    cancellationToken,
+    cancellationReason,
+    rescheduleReason,
+    originalDate,
+    originalTime,
+    errorInfo,
+    emailType
+  } = options;
+
+  // Determine payment status and details
+  const isPaymentCompleted = bookingData.paymentMethod === 'pay_now' &&
+    (bookingData.paymentCompletedAt || bookingData.squarePaymentId);
+
+  const basePayload: StandardizedWebhookPayload = {
+    event: eventType,
+    booking: {
+      id: bookingData.id,
+      customer: {
+        name: bookingData.fullName,
+        email: bookingData.email,
+        phone: bookingData.phone || null,
+      },
+      visit: {
+        date: bookingData.visitDate,
+        time: bookingData.preferredTime,
+        visitors: bookingData.numberOfVisitors || null,
+        amount: bookingData.totalAmount || null,
+        ...(eventType === 'booking_confirmed' && { bouquets: bookingData.numberOfVisitors }),
+      },
+      payment: {
+        method: bookingData.paymentMethod || null,
+        status: eventType.includes('cancelled') ? 'cancelled' :
+                eventType === 'booking_rescheduled' ? 'confirmed' :
+                isPaymentCompleted ? 'completed' : 'pending',
+        // Include Square payment details if available
+        ...(bookingData.squareOrderId && { squareOrderId: bookingData.squareOrderId }),
+        ...(bookingData.squarePaymentId && { squarePaymentId: bookingData.squarePaymentId }),
+        ...(bookingData.paymentCompletedAt && { completedAt: bookingData.paymentCompletedAt }),
+        ...(bookingData.paymentDetails && { details: bookingData.paymentDetails }),
+      },
+      // Add event-specific sections
+      ...(originalDate && originalTime && {
+        original: { date: originalDate, time: originalTime }
+      }),
+      ...(eventType === 'booking_rescheduled' && {
+        new: {
+          date: bookingData.visitDate,
+          time: bookingData.preferredTime,
+          visitors: bookingData.numberOfVisitors,
+          amount: bookingData.totalAmount,
+        }
+      }),
+      ...(cancellationReason && {
+        cancellation: {
+          reason: cancellationReason,
+          cancelledAt: new Date().toISOString(),
+        }
+      }),
+      ...(rescheduleReason && {
+        reschedule: {
+          reason: rescheduleReason,
+          rescheduledAt: new Date().toISOString(),
+        }
+      }),
+      ...(errorInfo && {
+        error: {
+          message: errorInfo.message,
+          type: errorInfo.type,
+        }
+      }),
+      metadata: {
+        createdAt: bookingData.createdAt || new Date().toISOString(),
+        source: 'website',
+        ...(emailType && { emailType }),
+        ...(cancellationToken && { cancellationToken }),
+        ...(eventType === 'booking_cancelled_admin' && {
+          adminEmail: process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL
+        }),
+        ...(errorInfo && { timestamp: new Date().toISOString() }),
+      },
+    },
+  };
+
+  return basePayload;
 }
 
 interface BookingData {
@@ -54,50 +159,76 @@ interface RescheduleData extends BookingData {
   cancellationToken?: string;
 }
 
-interface WebhookPayload {
+/**
+ * Standardized webhook payload structure for all event types
+ * All fields are included in every payload with null values when not applicable
+ * This ensures consistent data structure across all Make.com scenarios
+ */
+interface StandardizedWebhookPayload {
   event: string;
   booking: {
     id: string;
     customer: {
       name: string;
       email: string;
-      phone: string;
+      phone: string | null;
     };
     visit: {
+      date: string;
+      time: string;
+      visitors: number | null;
+      amount: number | null;
+      bouquets?: number | null; // Only for booking confirmations
+    };
+    payment: {
+      method: string | null;
+      status: string;
+      // Square payment details (only for online payments)
+      squareOrderId?: string | null;
+      squarePaymentId?: string | null;
+      completedAt?: string | null;
+      details?: {
+        payment_id?: string;
+        amount_money?: { amount: number; currency: string };
+        status?: string;
+      } | null;
+    };
+    // Original booking details (only for reschedules)
+    original?: {
+      date: string;
+      time: string;
+    } | null;
+    // New booking details (only for reschedules)
+    new?: {
       date: string;
       time: string;
       visitors: number;
       amount: number;
-    };
-    payment: {
-      method: string;
-      status: string;
-    };
+    } | null;
+    // Cancellation details (only for cancellations)
+    cancellation?: {
+      reason: string;
+      cancelledAt: string;
+    } | null;
+    // Reschedule details (only for reschedules)
+    reschedule?: {
+      reason: string;
+      rescheduledAt: string;
+    } | null;
+    // Error details (only for error events)
+    error?: {
+      message: string;
+      type: string;
+    } | null;
     metadata: {
-      createdAt: string;
+      createdAt: string | null;
       source: string;
+      emailType?: string | null;
+      cancellationToken?: string | null;
+      adminEmail?: string | null;
+      timestamp?: string | null; // For error events
     };
   };
-}
-
-interface ErrorPayload {
-  event: string;
-  booking: {
-    id: string;
-    customer: {
-      name: string;
-      email: string;
-    };
-    visit: {
-      date: string;
-      time: string;
-    };
-  };
-  error: {
-    message: string;
-    type: string;
-  };
-  timestamp: string;
 }
 
 /**
@@ -111,42 +242,9 @@ export async function sendBookingConfirmation(bookingData: BookingData, cancella
     return false;
   }
 
-  // Determine payment status and details
-  const isPaymentCompleted = bookingData.paymentMethod === 'pay_now' &&
-    (bookingData.paymentCompletedAt || bookingData.squarePaymentId);
-
-  const payload: WebhookPayload = {
-    event: 'booking_confirmed',
-    booking: {
-      id: bookingData.id,
-      customer: {
-        name: bookingData.fullName,
-        email: bookingData.email,
-        phone: bookingData.phone,
-      },
-      visit: {
-        date: bookingData.visitDate,
-        time: bookingData.preferredTime,
-        visitors: bookingData.numberOfVisitors,
-        amount: bookingData.totalAmount,
-        bouquets: bookingData.numberOfVisitors, // Each visitor gets one bouquet
-      },
-      payment: {
-        method: bookingData.paymentMethod,
-        status: isPaymentCompleted ? 'completed' : 'pending',
-        // Include Square payment details if available
-        ...(bookingData.squareOrderId && { squareOrderId: bookingData.squareOrderId }),
-        ...(bookingData.squarePaymentId && { squarePaymentId: bookingData.squarePaymentId }),
-        ...(bookingData.paymentCompletedAt && { completedAt: bookingData.paymentCompletedAt }),
-        ...(bookingData.paymentDetails && { details: bookingData.paymentDetails }),
-      },
-      metadata: {
-        createdAt: bookingData.createdAt || new Date().toISOString(),
-        source: 'website',
-        cancellationToken: cancellationToken,
-      },
-    },
-  };
+  const payload = createStandardizedPayload('booking_confirmed', bookingData, {
+    cancellationToken,
+  });
 
   try {
     console.log('Sending booking confirmation webhook:', payload.booking.id);
@@ -189,29 +287,13 @@ export async function sendErrorNotification(
   const webhookUrl = getWebhookUrl('booking_error');
 
   if (!webhookUrl) {
-    console.error('MAKE_ERROR_WEBHOOK_URL not configured');
+    console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
     return false;
   }
 
-  const payload: ErrorPayload = {
-    event: 'booking_error',
-    booking: {
-      id: bookingData.id,
-      customer: {
-        name: bookingData.fullName,
-        email: bookingData.email,
-      },
-      visit: {
-        date: bookingData.visitDate,
-        time: bookingData.preferredTime,
-      },
-    },
-    error: {
-      message: errorInfo.message,
-      type: errorInfo.type,
-    },
-    timestamp: new Date().toISOString(),
-  };
+  const payload = createStandardizedPayload('booking_error', bookingData, {
+    errorInfo,
+  });
 
   try {
     console.log('Sending error notification webhook:', payload.booking.id);
@@ -274,40 +356,15 @@ export async function sendCancellationConfirmation(cancellationData: Cancellatio
   const webhookUrl = getWebhookUrl('booking_cancelled');
 
   if (!webhookUrl) {
-    console.error('MAKE_CANCELLATION_WEBHOOK_URL not configured');
+    console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
     return false;
   }
 
-  const payload = {
-    event: 'booking_cancelled',
-    booking: {
-      id: cancellationData.id,
-      customer: {
-        name: cancellationData.fullName,
-        email: cancellationData.email,
-        phone: cancellationData.phone,
-      },
-      visit: {
-        date: cancellationData.visitDate,
-        time: cancellationData.preferredTime,
-        visitors: cancellationData.numberOfVisitors,
-        amount: cancellationData.totalAmount,
-      },
-      payment: {
-        method: cancellationData.paymentMethod,
-        status: 'cancelled',
-      },
-      cancellation: {
-        reason: cancellationData.cancellationReason || 'No reason provided',
-        cancelledAt: new Date().toISOString(),
-      },
-      metadata: {
-        source: 'website',
-        emailType: 'customer_cancellation_confirmation',
-        cancellationToken: cancellationData.cancellationToken,
-      },
-    },
-  };
+  const payload = createStandardizedPayload('booking_cancelled', cancellationData, {
+    cancellationReason: cancellationData.cancellationReason || 'No reason provided',
+    cancellationToken: cancellationData.cancellationToken,
+    emailType: 'customer_cancellation_confirmation',
+  });
 
   try {
     console.log('Sending cancellation confirmation webhook:', payload.booking.id);
@@ -340,41 +397,15 @@ export async function sendCancellationNotification(cancellationData: Cancellatio
   const webhookUrl = getWebhookUrl('booking_cancelled_admin');
 
   if (!webhookUrl) {
-    console.error('MAKE_ERROR_WEBHOOK_URL not configured');
+    console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
     return false;
   }
 
-  const payload = {
-    event: 'booking_cancelled_admin',
-    booking: {
-      id: cancellationData.id,
-      customer: {
-        name: cancellationData.fullName,
-        email: cancellationData.email,
-        phone: cancellationData.phone,
-      },
-      visit: {
-        date: cancellationData.visitDate,
-        time: cancellationData.preferredTime,
-        visitors: cancellationData.numberOfVisitors,
-        amount: cancellationData.totalAmount,
-      },
-      payment: {
-        method: cancellationData.paymentMethod,
-        status: 'cancelled',
-      },
-      cancellation: {
-        reason: cancellationData.cancellationReason || 'No reason provided',
-        cancelledAt: new Date().toISOString(),
-      },
-      metadata: {
-        source: 'website',
-        emailType: 'admin_cancellation_notification',
-        adminEmail: process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL,
-        cancellationToken: cancellationData.cancellationToken,
-      },
-    },
-  };
+  const payload = createStandardizedPayload('booking_cancelled_admin', cancellationData, {
+    cancellationReason: cancellationData.cancellationReason || 'No reason provided',
+    cancellationToken: cancellationData.cancellationToken,
+    emailType: 'admin_cancellation_notification',
+  });
 
   try {
     console.log('Sending admin cancellation notification webhook:', payload.booking.id);
@@ -407,44 +438,17 @@ export async function sendRescheduleConfirmation(rescheduleData: RescheduleData)
   const webhookUrl = getWebhookUrl('booking_rescheduled');
 
   if (!webhookUrl) {
-    console.error('MAKE_RESCHEDULE_WEBHOOK_URL not configured');
+    console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
     return false;
   }
 
-  const payload = {
-    event: 'booking_rescheduled',
-    booking: {
-      id: rescheduleData.id,
-      customer: {
-        name: rescheduleData.fullName,
-        email: rescheduleData.email,
-        phone: rescheduleData.phone,
-      },
-      original: {
-        date: rescheduleData.originalDate,
-        time: rescheduleData.originalTime,
-      },
-      new: {
-        date: rescheduleData.visitDate,
-        time: rescheduleData.preferredTime,
-        visitors: rescheduleData.numberOfVisitors,
-        amount: rescheduleData.totalAmount,
-      },
-      payment: {
-        method: rescheduleData.paymentMethod,
-        status: 'confirmed',
-      },
-      reschedule: {
-        reason: rescheduleData.rescheduleReason || 'No reason provided',
-        rescheduledAt: new Date().toISOString(),
-      },
-      metadata: {
-        source: 'website',
-        emailType: 'booking_updated',
-        cancellationToken: rescheduleData.cancellationToken,
-      },
-    },
-  };
+  const payload = createStandardizedPayload('booking_rescheduled', rescheduleData, {
+    originalDate: rescheduleData.originalDate,
+    originalTime: rescheduleData.originalTime,
+    rescheduleReason: rescheduleData.rescheduleReason || 'No reason provided',
+    cancellationToken: rescheduleData.cancellationToken,
+    emailType: 'booking_updated',
+  });
 
   try {
     console.log('Sending reschedule confirmation webhook:', payload.booking.id);

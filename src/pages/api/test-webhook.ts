@@ -111,8 +111,9 @@ export const GET: APIRoute = async () => {
     },
     environment: {
       bookingWebhookConfigured: !!(process.env.MAKE_BOOKING_WEBHOOK_URL || import.meta.env.MAKE_BOOKING_WEBHOOK_URL),
-      cancellationWebhookConfigured: !!(process.env.MAKE_CANCELLATION_WEBHOOK_URL || import.meta.env.MAKE_CANCELLATION_WEBHOOK_URL),
+      // Note: MAKE_CANCELLATION_WEBHOOK_URL is deprecated - all events now use MAKE_BOOKING_WEBHOOK_URL
       adminEmailConfigured: !!(process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL),
+      consolidatedWebhooks: true // All events now route to single webhook URL
     }
   }), {
     status: 200,

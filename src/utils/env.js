@@ -7,7 +7,7 @@ export function validateEnvironment() {
 
   const optionalEnvVars = {
     MAKE_BOOKING_WEBHOOK_URL: process.env.MAKE_BOOKING_WEBHOOK_URL,
-    MAKE_CANCELLATION_WEBHOOK_URL: process.env.MAKE_CANCELLATION_WEBHOOK_URL,
+    // MAKE_CANCELLATION_WEBHOOK_URL: Deprecated - all events now route to MAKE_BOOKING_WEBHOOK_URL
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     // Square payment integration (optional for pay-on-arrival only bookings)
     SQUARE_APPLICATION_ID: process.env.SQUARE_APPLICATION_ID,
@@ -63,7 +63,7 @@ export function validateEnvironment() {
       console.warn('💳 Square payment integration disabled - only "pay on arrival" bookings will work');
     }
     if (missingWebhooks.length > 0) {
-      console.warn('📧 Email automation will not work without Make.com webhook URLs');
+      console.warn('📧 Email automation will not work without MAKE_BOOKING_WEBHOOK_URL (consolidated webhook endpoint)');
     }
   }
 

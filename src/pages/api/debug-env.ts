@@ -11,13 +11,18 @@ export const GET: APIRoute = async () => {
       // Private variables (server-side only)
       hasServiceRoleKey: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY),
       hasBookingWebhook: !!(process.env.MAKE_BOOKING_WEBHOOK_URL || import.meta.env.MAKE_BOOKING_WEBHOOK_URL),
+      // Note: MAKE_CANCELLATION_WEBHOOK_URL is deprecated - all events now use MAKE_BOOKING_WEBHOOK_URL
       hasCancellationWebhook: !!(process.env.MAKE_CANCELLATION_WEBHOOK_URL || import.meta.env.MAKE_CANCELLATION_WEBHOOK_URL),
       hasAdminEmail: !!(process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL),
       
       // Show actual values (first few characters only for security)
       bookingWebhookPreview: (process.env.MAKE_BOOKING_WEBHOOK_URL || import.meta.env.MAKE_BOOKING_WEBHOOK_URL)?.substring(0, 30) + '...',
-      cancellationWebhookPreview: (process.env.MAKE_CANCELLATION_WEBHOOK_URL || import.meta.env.MAKE_CANCELLATION_WEBHOOK_URL)?.substring(0, 30) + '...',
+      cancellationWebhookPreview: (process.env.MAKE_CANCELLATION_WEBHOOK_URL || import.meta.env.MAKE_CANCELLATION_WEBHOOK_URL)?.substring(0, 30) + '... (DEPRECATED)',
       adminEmailPreview: (process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL)?.substring(0, 10) + '...',
+
+      // Consolidated webhook info
+      consolidatedWebhooks: true,
+      allEventsRouteToBookingWebhook: true,
       
       // Debug info
       nodeEnv: process.env.NODE_ENV || import.meta.env.NODE_ENV || 'development',
