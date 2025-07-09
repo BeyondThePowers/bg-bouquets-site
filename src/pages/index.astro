@@ -1516,6 +1516,13 @@ import Layout from '../layouts/Layout.astro';
 		let selectedDate = '';
 		let isInitializing = false;
 
+		// Business timezone helper - Alberta, Canada (Mountain Time)
+		function getBusinessToday(): string {
+			return new Date().toLocaleDateString('en-CA', {
+				timeZone: 'America/Edmonton'
+			}); // Returns YYYY-MM-DD format
+		}
+
 		// Fetch availability from API and initialize custom calendar
 		async function loadAvailability() {
 			try {
@@ -1531,9 +1538,9 @@ import Layout from '../layouts/Layout.astro';
 				// Initialize custom calendar
 				initializeCustomCalendar();
 
-				// Auto-select first available date
-				const today = new Date().toISOString().split('T')[0];
-				const firstValid = validDates.find(d => d >= today);
+				// Auto-select first available date (using business timezone)
+				const businessToday = getBusinessToday();
+				const firstValid = validDates.find(d => d >= businessToday);
 				if (firstValid) {
 					isInitializing = true;
 					selectDate(firstValid);
@@ -1753,11 +1760,12 @@ import Layout from '../layouts/Layout.astro';
 			const [year, month, day] = selectedDateStr.split('-').map(Number);
 			const selectedDateObj = new Date(year, month - 1, day); // month is 0-indexed
 			const selectedYear = selectedDateObj.getFullYear();
-			const currentYear = new Date().getFullYear();
+			const businessToday = getBusinessToday();
+			const currentYear = parseInt(businessToday.split('-')[0]);
 
-			// Create today's date for comparison
-			const today = new Date();
-			const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+			// Create today's date for comparison (using business timezone)
+			const [todayYear, todayMonth, todayDay] = businessToday.split('-').map(Number);
+			const todayDateOnly = new Date(todayYear, todayMonth - 1, todayDay);
 
 			// Create selected date for comparison (date only, no time)
 			const selectedDateOnly = new Date(year, month - 1, day);
@@ -1905,19 +1913,12 @@ import Layout from '../layouts/Layout.astro';
 
 			if (selectedDateStr) {
 				const selectedDateObj = new Date(selectedDateStr);
-				const currentYear = new Date().getFullYear();
+				const businessToday = getBusinessToday();
+				const currentYear = parseInt(businessToday.split('-')[0]);
 				const selectedYear = selectedDateObj.getFullYear();
 
-				// Create today's date with time reset for accurate comparison
-				const today = new Date();
-				today.setHours(0, 0, 0, 0);
-
-				// Reset time on selected date for fair comparison
-				const selectedDateForComparison = new Date(selectedDateObj);
-				selectedDateForComparison.setHours(0, 0, 0, 0);
-
-				// Check if date is in the past
-				if (selectedDateForComparison < today) {
+				// Check if date is in the past (using business timezone)
+				if (selectedDateStr < businessToday) {
 					alert('You cannot book a date in the past. Please select a future date.');
 					visitDateInput.classList.add('border-red-500');
 					valid = false;
@@ -2049,7 +2050,9 @@ import Layout from '../layouts/Layout.astro';
 			const successEmailMessage = document.getElementById('success-email-message');
 
 			// Format date and time for display
-			const visitDate = new Date(booking.visitDate);
+			// Parse the date string as local date to avoid timezone issues
+			const [year, month, day] = booking.visitDate.split('-').map(Number);
+			const visitDate = new Date(year, month - 1, day); // month is 0-indexed
 			const formattedDate = visitDate.toLocaleDateString('en-US', {
 				weekday: 'long',
 				year: 'numeric',

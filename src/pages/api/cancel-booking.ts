@@ -3,6 +3,13 @@ import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 import { sendCancellationConfirmation, sendCancellationNotification } from '../../utils/webhookService';
 
+// Business timezone helper - Alberta, Canada (Mountain Time)
+function getBusinessToday(): string {
+  return new Date().toLocaleDateString('en-CA', {
+    timeZone: 'America/Edmonton'
+  }); // Returns YYYY-MM-DD format
+}
+
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     console.log('Cancellation API called');
@@ -166,12 +173,10 @@ export const GET: APIRoute = async ({ url }) => {
       });
     }
 
-    // Check if booking is in the past
-    const bookingDate = new Date(booking.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    if (bookingDate < today) {
+    // Check if booking is in the past (using business timezone)
+    const businessToday = getBusinessToday();
+
+    if (booking.date < businessToday) {
       return new Response(JSON.stringify({ 
         error: 'Cannot cancel bookings for past dates' 
       }), {

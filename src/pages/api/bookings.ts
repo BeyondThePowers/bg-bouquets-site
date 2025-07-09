@@ -5,6 +5,13 @@ import { supabaseAdmin } from '../../../lib/supabase-admin';
 import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
 import { createPaymentLink, validateSquareConfig } from '../../utils/squareService';
 
+// Business timezone helper - Alberta, Canada (Mountain Time)
+function getBusinessToday(): string {
+  return new Date().toLocaleDateString('en-CA', {
+    timeZone: 'America/Edmonton'
+  }); // Returns YYYY-MM-DD format
+}
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     console.log('Booking API called');
@@ -64,11 +71,9 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Validate date is not in the past
-    const visitDateObj = new Date(visitDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (visitDateObj < today) {
+    // Validate date is not in the past (using business timezone)
+    const businessToday = getBusinessToday();
+    if (visitDate < businessToday) {
       return new Response(JSON.stringify({ error: 'Cannot book for past dates.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }

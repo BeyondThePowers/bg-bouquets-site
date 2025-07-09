@@ -1,6 +1,13 @@
 // Booking functionality module
 export class BookingManager {
   private readonly PRICE_PER_BOUQUET = 35;
+
+  // Business timezone helper - Alberta, Canada (Mountain Time)
+  private getBusinessToday(): string {
+    return new Date().toLocaleDateString('en-CA', {
+      timeZone: 'America/Edmonton'
+    }); // Returns YYYY-MM-DD format
+  }
   private bookingForm: HTMLFormElement | null = null;
   private bookNowBtn: HTMLButtonElement | null = null;
   private bookingBtnText: HTMLElement | null = null;
@@ -54,7 +61,7 @@ export class BookingManager {
     const validDates = Object.keys(availability);
     if (!this.visitDateInput || validDates.length === 0) return;
 
-    this.visitDateInput.min = validDates[0] ?? new Date().toISOString().split('T')[0];
+    this.visitDateInput.min = validDates[0] ?? this.getBusinessToday();
     this.visitDateInput.max = validDates.at(-1) ?? '';
 
     this.visitDateInput.addEventListener('change', (e: Event) => {
@@ -63,9 +70,9 @@ export class BookingManager {
       this.populateTimes(availability[selected] || []);
     });
 
-    // Set first available date
-    const today = new Date().toISOString().split('T')[0];
-    const firstValid = validDates.find((d: string) => d >= today);
+    // Set first available date (using business timezone)
+    const businessToday = this.getBusinessToday();
+    const firstValid = validDates.find((d: string) => d >= businessToday);
     if (firstValid) {
       this.visitDateInput.value = firstValid;
       this.populateTimes(availability[firstValid] || []);

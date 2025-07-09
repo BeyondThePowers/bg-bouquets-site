@@ -3,6 +3,13 @@ import type { APIRoute } from 'astro';
 import { supabase } from '../../../../lib/supabase';
 import { sendRescheduleConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../../utils/webhookService';
 
+// Business timezone helper - Alberta, Canada (Mountain Time)
+function getBusinessToday(): string {
+  return new Date().toLocaleDateString('en-CA', {
+    timeZone: 'America/Edmonton'
+  }); // Returns YYYY-MM-DD format
+}
+
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {
   try {
@@ -71,11 +78,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
     }
 
-    // Validate new date is not in the past
-    const newDateObj = new Date(newDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (newDateObj < today) {
+    // Validate new date is not in the past (using business timezone)
+    const businessToday = getBusinessToday();
+    if (newDate < businessToday) {
       return new Response(JSON.stringify({ 
         error: 'Cannot reschedule to past dates' 
       }), {

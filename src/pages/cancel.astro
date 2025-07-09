@@ -892,7 +892,10 @@
 			if (customerNameEl) customerNameEl.textContent = booking.customerName;
 			if (customerEmailEl) customerEmailEl.textContent = booking.email;
 			if (visitDateEl) {
-				visitDateEl.textContent = new Date(booking.date).toLocaleDateString('en-US', {
+				// Parse the date string as local date to avoid timezone issues
+				const [year, month, day] = booking.date.split('-').map(Number);
+				const visitDate = new Date(year, month - 1, day); // month is 0-indexed
+				visitDateEl.textContent = visitDate.toLocaleDateString('en-US', {
 					weekday: 'long',
 					year: 'numeric',
 					month: 'long',
@@ -920,7 +923,10 @@
 
 				// Show current booking info
 				if (currentBookingData && currentDateDisplay && currentTimeDisplay) {
-					const formattedDate = new Date(currentBookingData.date).toLocaleDateString('en-US', {
+					// Parse the date string as local date to avoid timezone issues
+					const [year, month, day] = currentBookingData.date.split('-').map(Number);
+					const visitDate = new Date(year, month - 1, day); // month is 0-indexed
+					const formattedDate = visitDate.toLocaleDateString('en-US', {
 						weekday: 'long',
 						month: 'long',
 						day: 'numeric'
@@ -1046,7 +1052,10 @@
 						const successText = document.querySelector('#success-state p');
 						if (successTitle) successTitle.textContent = 'Booking Rescheduled Successfully (Test Mode)';
 						if (successText) {
-							const formattedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+							// Parse the date string as local date to avoid timezone issues
+							const [year, month, day] = selectedDate.split('-').map(Number);
+							const visitDate = new Date(year, month - 1, day); // month is 0-indexed
+							const formattedDate = visitDate.toLocaleDateString('en-US', {
 								weekday: 'long',
 								year: 'numeric',
 								month: 'long',
@@ -1087,12 +1096,16 @@
 					const successText = document.querySelector('#success-state p');
 					if (successTitle) successTitle.textContent = 'Booking Rescheduled Successfully';
 					if (successText) {
-						successText.textContent = `Your booking has been rescheduled to ${new Date(selectedDate).toLocaleDateString('en-US', {
+						// Parse the date string as local date to avoid timezone issues
+						const [year, month, day] = selectedDate.split('-').map(Number);
+						const visitDate = new Date(year, month - 1, day); // month is 0-indexed
+						const formattedDate = visitDate.toLocaleDateString('en-US', {
 							weekday: 'long',
 							year: 'numeric',
 							month: 'long',
 							day: 'numeric'
-						})} at ${selectedTime}. You will receive a confirmation email shortly.`;
+						});
+						successText.textContent = `Your booking has been rescheduled to ${formattedDate} at ${selectedTime}. You will receive a confirmation email shortly.`;
 					}
 
 				} catch (error: unknown) {
@@ -1373,7 +1386,10 @@
 		function updateSelectionSummary(): void {
 			if (!selectedDate || !selectedTime || !selectionSummary || !selectedSummaryText) return;
 
-			const formattedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+			// Parse the date string as local date to avoid timezone issues
+			const [year, month, day] = selectedDate.split('-').map(Number);
+			const visitDate = new Date(year, month - 1, day); // month is 0-indexed
+			const formattedDate = visitDate.toLocaleDateString('en-US', {
 				weekday: 'long',
 				month: 'long',
 				day: 'numeric'

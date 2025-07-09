@@ -259,8 +259,10 @@
 				statusText = 'Active';
 			}
 
-			// Format date
-			const bookingDate = new Date(booking.date).toLocaleDateString('en-US', {
+			// Format date - parse as local date to avoid timezone issues
+			const [year, month, day] = booking.date.split('-').map(Number);
+			const visitDate = new Date(year, month - 1, day); // month is 0-indexed
+			const bookingDate = visitDate.toLocaleDateString('en-US', {
 				weekday: 'short',
 				month: 'short',
 				day: 'numeric'

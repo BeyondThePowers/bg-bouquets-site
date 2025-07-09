@@ -1,6 +1,13 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 
+// Business timezone helper - Alberta, Canada (Mountain Time)
+function getBusinessToday(): string {
+  return new Date().toLocaleDateString('en-CA', {
+    timeZone: 'America/Edmonton'
+  }); // Returns YYYY-MM-DD format
+}
+
 export const GET: APIRoute = async () => {
   try {
     console.log('Availability API called');
@@ -23,12 +30,15 @@ export const GET: APIRoute = async () => {
 
     console.log('Schedule settings:', { maxBookingsPerSlot, maxVisitorsPerSlot });
 
-    // Step 2: Get open days
+    // Step 2: Get open days (using business timezone for "today")
+    const businessToday = getBusinessToday();
+    console.log('Business today:', businessToday);
+
     const { data: openDays, error: openError } = await supabase
       .from('open_days')
       .select('date')
       .eq('is_open', true)
-      .gte('date', new Date().toISOString().split('T')[0]) // Only future dates
+      .gte('date', businessToday) // Only future dates in business timezone
       .order('date', { ascending: true });
 
     console.log('Open days query result:', { openDays, openError });
