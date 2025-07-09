@@ -835,53 +835,77 @@ import Layout from '../layouts/Layout.astro';
 					<!-- Flower Request Form -->
 					<div class="shabby-card p-6 distressed-shadow">
 						<h4 class="text-xl font-playfair font-bold mb-4" style="color: #333333;">Request a Flower</h4>
-						<form id="flowerRequestForm" class="space-y-4" aria-label="Request a flower">
-							<div class="grid md:grid-cols-2 gap-4">
-								<div>
-									<label for="requestedFlower" class="sr-only">Flower name</label>
-									<input
-										type="text"
-										id="requestedFlower"
-										name="requestedFlower"
-										placeholder="Flower name"
-										class="shabby-input px-3 py-2 font-roboto"
-										required
-										aria-describedby="flower-help"
-									>
+
+						<!-- Flower Request Form Container -->
+						<div id="flower-request-form-container" class="transition-all duration-500 ease-in-out">
+							<form id="flowerRequestForm" class="space-y-4" aria-label="Request a flower">
+								<div class="grid md:grid-cols-2 gap-4">
+									<div>
+										<label for="requestedFlower" class="sr-only">Flower name</label>
+										<input
+											type="text"
+											id="requestedFlower"
+											name="requestedFlower"
+											placeholder="Flower name"
+											class="shabby-input px-3 py-2 font-roboto"
+											required
+											aria-describedby="flower-help"
+										>
+									</div>
+									<div>
+										<label for="requesterEmail" class="sr-only">Your email</label>
+										<input
+											type="email"
+											id="requesterEmail"
+											name="requesterEmail"
+											placeholder="Your email"
+											class="shabby-input px-3 py-2 font-roboto"
+											required
+											aria-describedby="email-help"
+										>
+									</div>
 								</div>
 								<div>
-									<label for="requesterEmail" class="sr-only">Your email</label>
-									<input
-										type="email"
-										id="requesterEmail"
-										name="requesterEmail"
-										placeholder="Your email"
-										class="shabby-input px-3 py-2 font-roboto"
-										required
-										aria-describedby="email-help"
-									>
+									<label for="requestNotes" class="sr-only">Additional notes</label>
+									<textarea
+										id="requestNotes"
+										name="requestNotes"
+										placeholder="Tell us more about what you're looking for..."
+										rows="3"
+										class="w-full shabby-input px-3 py-2 font-roboto"
+										aria-describedby="notes-help"
+									></textarea>
 								</div>
+								<div id="flower-help" class="sr-only">Enter the name of the flower you're looking for</div>
+								<div id="email-help" class="sr-only">We'll contact you about availability</div>
+								<div id="notes-help" class="sr-only">Optional additional details about your flower request</div>
+								<div class="flex flex-col sm:flex-row gap-3 justify-center">
+									<button type="submit" id="flower-request-submit-btn" class="vintage-button px-6 py-3 font-playfair font-semibold relative">
+										<span id="flower-request-btn-text">Send Request</span>
+										<span id="flower-request-spinner" class="hidden absolute inset-0 items-center justify-center">
+											<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+											</svg>
+										</span>
+									</button>
+								</div>
+							</form>
+						</div>
+
+						<!-- Success Message (hidden by default) -->
+						<div id="flower-request-success-message" class="hidden text-center py-8">
+							<div class="mb-4">
+								<svg class="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
 							</div>
-							<div>
-								<label for="requestNotes" class="sr-only">Additional notes</label>
-								<textarea
-									id="requestNotes"
-									name="requestNotes"
-									placeholder="Tell us more about what you're looking for..."
-									rows="3"
-									class="w-full shabby-input px-3 py-2 font-roboto"
-									aria-describedby="notes-help"
-								></textarea>
-							</div>
-							<div id="flower-help" class="sr-only">Enter the name of the flower you're looking for</div>
-							<div id="email-help" class="sr-only">We'll contact you about availability</div>
-							<div id="notes-help" class="sr-only">Optional additional details about your flower request</div>
-							<div class="flex flex-col sm:flex-row gap-3 justify-center">
-								<button type="submit" class="vintage-button px-6 py-3 font-playfair font-semibold">
-									Send Request
-								</button>
-							</div>
-						</form>
+							<h4 class="text-xl font-playfair font-bold mb-2" style="color: #333333;">Request Sent!</h4>
+							<p id="flower-request-success-text" class="text-sm font-roboto mb-4" style="color: #333333;">Thank you for your flower request! We'll get back to you about availability.</p>
+							<button id="flower-request-send-another" class="vintage-button px-6 py-2 text-sm font-playfair font-semibold rounded-sm">
+								Send Another Request
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -1179,27 +1203,50 @@ import Layout from '../layouts/Layout.astro';
 
 					<!-- Contact Form -->
 					<div class="shabby-card p-6 distressed-shadow">
-						<form class="space-y-4">
-							<div>
-								<label for="contact-name" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Name *</label>
-								<input type="text" id="contact-name" name="name" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="Your full name">
+						<!-- Contact Form Container -->
+						<div id="contact-form-container" class="transition-all duration-500 ease-in-out">
+							<form id="contact-form" class="space-y-4">
+								<div>
+									<label for="contact-name" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Name *</label>
+									<input type="text" id="contact-name" name="name" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="Your full name">
+								</div>
+								<div>
+									<label for="contact-email" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Email *</label>
+									<input type="email" id="contact-email" name="email" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="your@email.com">
+								</div>
+								<div>
+									<label for="contact-subject" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Subject</label>
+									<input type="text" id="contact-subject" name="subject" class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="What's this about?">
+								</div>
+								<div>
+									<label for="contact-message" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Message *</label>
+									<textarea id="contact-message" name="message" rows="5" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm resize-none" placeholder="Tell us how we can help..."></textarea>
+								</div>
+								<button type="submit" id="contact-submit-btn" class="w-full vintage-button px-6 py-3 text-sm font-playfair font-semibold rounded-sm relative">
+									<span id="contact-btn-text">Send Message</span>
+									<span id="contact-spinner" class="hidden absolute inset-0 items-center justify-center">
+										<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										</svg>
+									</span>
+								</button>
+							</form>
+						</div>
+
+						<!-- Success Message (hidden by default) -->
+						<div id="contact-success-message" class="hidden text-center py-8">
+							<div class="mb-4">
+								<svg class="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
 							</div>
-							<div>
-								<label for="contact-email" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Email *</label>
-								<input type="email" id="contact-email" name="email" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="your@email.com">
-							</div>
-							<div>
-								<label for="contact-subject" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Subject</label>
-								<input type="text" id="contact-subject" name="subject" class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm" placeholder="What's this about?">
-							</div>
-							<div>
-								<label for="contact-message" class="block text-sm font-playfair font-medium mb-1" style="color: #333333;">Message *</label>
-								<textarea id="contact-message" name="message" rows="5" required class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm resize-none" placeholder="Tell us how we can help..."></textarea>
-							</div>
-							<button type="submit" class="w-full vintage-button px-6 py-3 text-sm font-playfair font-semibold rounded-sm">
-								Send Message
+							<h4 class="text-xl font-playfair font-bold mb-2" style="color: #333333;">Message Sent!</h4>
+							<p class="text-sm font-roboto mb-4" style="color: #333333;">Thank you for reaching out. We'll get back to you soon.</p>
+							<button id="contact-send-another" class="vintage-button px-6 py-2 text-sm font-playfair font-semibold rounded-sm">
+								Send Another Message
 							</button>
-						</form>
+						</div>
 					</div>
 
 				</div>
@@ -1295,10 +1342,138 @@ import Layout from '../layouts/Layout.astro';
 		});
 	}
 
+	// Contact form functionality
+	function initializeContactForm() {
+		const contactForm = document.getElementById('contact-form') as HTMLFormElement;
+		const contactFormContainer = document.getElementById('contact-form-container') as HTMLElement;
+		const contactSuccessMessage = document.getElementById('contact-success-message') as HTMLElement;
+		const contactSubmitBtn = document.getElementById('contact-submit-btn') as HTMLButtonElement;
+		const contactBtnText = document.getElementById('contact-btn-text') as HTMLElement;
+		const contactSpinner = document.getElementById('contact-spinner') as HTMLElement;
+		const sendAnotherBtn = document.getElementById('contact-send-another') as HTMLButtonElement;
+
+		if (!contactForm || !contactFormContainer || !contactSuccessMessage ||
+			!contactSubmitBtn || !contactBtnText || !contactSpinner || !sendAnotherBtn) {
+			console.error('Contact form elements not found');
+			return;
+		}
+
+		// Form validation
+		function validateContactForm(): boolean {
+			let valid = true;
+			const requiredFields = ['contact-name', 'contact-email', 'contact-message'];
+
+			requiredFields.forEach(id => {
+				const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement;
+				if (!el.value.trim()) {
+					el.classList.add('border-red-500');
+					valid = false;
+				} else {
+					el.classList.remove('border-red-500');
+				}
+			});
+
+			// Email validation
+			const emailInput = document.getElementById('contact-email') as HTMLInputElement;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (emailInput.value && !emailRegex.test(emailInput.value)) {
+				emailInput.classList.add('border-red-500');
+				valid = false;
+			}
+
+			return valid;
+		}
+
+		// Show loading state
+		function showLoadingState() {
+			contactSubmitBtn.disabled = true;
+			contactBtnText.classList.add('invisible');
+			contactSpinner.classList.remove('hidden');
+			contactSpinner.classList.add('flex');
+		}
+
+		// Hide loading state
+		function hideLoadingState() {
+			contactSubmitBtn.disabled = false;
+			contactBtnText.classList.remove('invisible');
+			contactSpinner.classList.add('hidden');
+			contactSpinner.classList.remove('flex');
+		}
+
+		// Show success message
+		function showSuccessMessage() {
+			contactFormContainer.classList.add('hidden');
+			contactSuccessMessage.classList.remove('hidden');
+		}
+
+		// Show form (hide success message)
+		function showForm() {
+			contactFormContainer.classList.remove('hidden');
+			contactSuccessMessage.classList.add('hidden');
+			contactForm.reset();
+			// Remove any error styling
+			const inputs = contactForm.querySelectorAll('input, textarea');
+			inputs.forEach(input => input.classList.remove('border-red-500'));
+		}
+
+		// Form submission
+		contactForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			if (!validateContactForm()) {
+				alert('Please complete all required fields correctly.');
+				return;
+			}
+
+			showLoadingState();
+
+			try {
+				const formData = new FormData(contactForm);
+				const contactData = {
+					name: formData.get('name'),
+					email: formData.get('email'),
+					subject: formData.get('subject'),
+					message: formData.get('message')
+				};
+
+				console.log('Submitting contact form:', contactData);
+
+				const response = await fetch('/api/contact', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(contactData),
+				});
+
+				const result = await response.json();
+
+				if (!response.ok) {
+					throw new Error(result.error || 'Failed to send message');
+				}
+
+				console.log('Contact form submitted successfully:', result);
+				showSuccessMessage();
+
+			} catch (error) {
+				console.error('Contact form submission error:', error);
+				alert(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
+			} finally {
+				hideLoadingState();
+			}
+		});
+
+		// Send another message button
+		sendAnotherBtn.addEventListener('click', showForm);
+	}
+
 	// Booking form functionality
 	document.addEventListener('DOMContentLoaded', () => {
 		// Initialize FAQ accordion
 		initializeFAQ();
+
+		// Initialize contact form
+		initializeContactForm();
 
 		const bookingForm = document.getElementById('booking-form') as HTMLFormElement;
 		const bookNowBtn = document.getElementById('bookNowBtn') as HTMLButtonElement;
@@ -2622,20 +2797,101 @@ import Layout from '../layouts/Layout.astro';
 			flowerNavDropdown?.classList.add('hidden');
 		}
 
-		function handleFlowerRequest(e: Event) {
+		async function handleFlowerRequest(e: Event) {
 			e.preventDefault();
 
+			// Get form elements
+			const flowerRequestFormContainer = document.getElementById('flower-request-form-container') as HTMLElement;
+			const flowerRequestSuccessMessage = document.getElementById('flower-request-success-message') as HTMLElement;
+			const flowerRequestSubmitBtn = document.getElementById('flower-request-submit-btn') as HTMLButtonElement;
+			const flowerRequestBtnText = document.getElementById('flower-request-btn-text') as HTMLElement;
+			const flowerRequestSpinner = document.getElementById('flower-request-spinner') as HTMLElement;
+			const flowerRequestSuccessText = document.getElementById('flower-request-success-text') as HTMLElement;
+			const sendAnotherFlowerBtn = document.getElementById('flower-request-send-another') as HTMLButtonElement;
+
+			if (!flowerRequestFormContainer || !flowerRequestSuccessMessage ||
+				!flowerRequestSubmitBtn || !flowerRequestBtnText || !flowerRequestSpinner ||
+				!flowerRequestSuccessText || !sendAnotherFlowerBtn) {
+				console.error('Flower request form elements not found');
+				return;
+			}
+
+			// Validate form
 			const formData = new FormData(flowerRequestForm);
-			const requestData = {
-				flower: formData.get('requestedFlower'),
-				email: formData.get('requesterEmail'),
-				notes: formData.get('requestNotes')
+			const flower = formData.get('requestedFlower') as string;
+			const email = formData.get('requesterEmail') as string;
+			const notes = formData.get('requestNotes') as string;
+
+			if (!flower?.trim() || !email?.trim()) {
+				alert('Please fill in both flower name and email address.');
+				return;
+			}
+
+			// Email validation
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(email)) {
+				alert('Please enter a valid email address.');
+				return;
+			}
+
+			// Show loading state
+			flowerRequestSubmitBtn.disabled = true;
+			flowerRequestBtnText.classList.add('invisible');
+			flowerRequestSpinner.classList.remove('hidden');
+			flowerRequestSpinner.classList.add('flex');
+
+			try {
+				const requestData = {
+					flower: flower.trim(),
+					email: email.trim(),
+					notes: notes?.trim() || undefined
+				};
+
+				console.log('Submitting flower request:', requestData);
+
+				const response = await fetch('/api/flower-request', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(requestData),
+				});
+
+				const result = await response.json();
+
+				if (!response.ok) {
+					throw new Error(result.error || 'Failed to send flower request');
+				}
+
+				console.log('Flower request submitted successfully:', result);
+
+				// Update success message with specific flower name
+				flowerRequestSuccessText.textContent = result.message || `Thank you for your flower request! We'll get back to you about "${flower}" availability.`;
+
+				// Show success message
+				flowerRequestFormContainer.classList.add('hidden');
+				flowerRequestSuccessMessage.classList.remove('hidden');
+
+			} catch (error) {
+				console.error('Flower request submission error:', error);
+				alert(error instanceof Error ? error.message : 'Failed to send flower request. Please try again.');
+			} finally {
+				// Hide loading state
+				flowerRequestSubmitBtn.disabled = false;
+				flowerRequestBtnText.classList.remove('invisible');
+				flowerRequestSpinner.classList.add('hidden');
+				flowerRequestSpinner.classList.remove('flex');
+			}
+
+			// Setup send another request button
+			sendAnotherFlowerBtn.onclick = () => {
+				flowerRequestFormContainer.classList.remove('hidden');
+				flowerRequestSuccessMessage.classList.add('hidden');
+				flowerRequestForm.reset();
+				// Remove any error styling
+				const inputs = flowerRequestForm.querySelectorAll('input, textarea');
+				inputs.forEach(input => input.classList.remove('border-red-500'));
 			};
-
-			// Simulate form submission
-			alert(`Thank you for your flower request!\n\nFlower: ${requestData.flower}\nEmail: ${requestData.email}\n\nWe'll get back to you soon about availability.`);
-
-			flowerRequestForm.reset();
 		}
 
 		// Handle window resize

@@ -14,9 +14,11 @@
     "@astrojs/netlify": "^6.4.0",
     "@supabase/supabase-js": "^2.50.0",
     "@tailwindcss/vite": "^4.1.8",
+    "@types/uuid": "^10.0.0",
     "astro": "^5.9.1",
     "square-connect": "^6.20201216.0",
-    "tailwindcss": "^4.1.8"
+    "tailwindcss": "^4.1.8",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@astrojs/node": "^9.2.2"

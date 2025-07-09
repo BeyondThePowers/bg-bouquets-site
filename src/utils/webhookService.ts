@@ -4,14 +4,16 @@
  */
 
 // Webhook configuration for easy future modifications
-// CONSOLIDATED: All events now route to single Make.com scenario (MAKE_BOOKING_WEBHOOK_URL)
-// This allows for unified scenario management with event-based filtering
+// CONSOLIDATED: Booking events route to MAKE_BOOKING_WEBHOOK_URL
+// Contact forms route to dedicated MAKE_CONTACT_WEBHOOK_URL
 const WEBHOOK_CONFIG = {
-  booking_confirmed: 'MAKE_BOOKING_WEBHOOK_URL',        // All events → Single scenario
-  booking_error: 'MAKE_BOOKING_WEBHOOK_URL',            // All events → Single scenario
-  booking_cancelled: 'MAKE_BOOKING_WEBHOOK_URL',        // All events → Single scenario
-  booking_rescheduled: 'MAKE_BOOKING_WEBHOOK_URL',      // All events → Single scenario
-  booking_cancelled_admin: 'MAKE_BOOKING_WEBHOOK_URL'   // All events → Single scenario
+  booking_confirmed: 'MAKE_BOOKING_WEBHOOK_URL',        // Booking events → Booking scenario
+  booking_error: 'MAKE_BOOKING_WEBHOOK_URL',            // Booking events → Booking scenario
+  booking_cancelled: 'MAKE_BOOKING_WEBHOOK_URL',        // Booking events → Booking scenario
+  booking_rescheduled: 'MAKE_BOOKING_WEBHOOK_URL',      // Booking events → Booking scenario
+  booking_cancelled_admin: 'MAKE_BOOKING_WEBHOOK_URL',  // Booking events → Booking scenario
+  contact_message: 'MAKE_BOOKING_WEBHOOK_URL',          // Legacy - will be deprecated
+  contact_form: 'MAKE_CONTACT_WEBHOOK_URL'              // Contact forms → Contact scenario
 } as const;
 
 // Helper function to get webhook URL for event type
@@ -125,6 +127,54 @@ function createStandardizedPayload(
   return basePayload;
 }
 
+/**
+ * Create standardized contact message payload
+ */
+function createContactMessagePayload(contactData: ContactData): ContactMessagePayload {
+  return {
+    event: 'contact_message',
+    contact: {
+      id: contactData.id,
+      name: contactData.name,
+      email: contactData.email,
+      subject: contactData.subject || null,
+      message: contactData.message,
+      metadata: {
+        createdAt: contactData.createdAt || new Date().toISOString(),
+        source: 'website'
+      }
+    }
+  };
+}
+
+/**
+ * Create unified contact form payload for all contact forms
+ */
+function createContactFormPayload(contactFormData: ContactFormData): ContactFormPayload {
+  return {
+    event: 'contact_message',
+    contact: {
+      id: contactFormData.id,
+      type: contactFormData.type,
+      customer: {
+        name: contactFormData.name,
+        email: contactFormData.email,
+      },
+      message: {
+        subject: contactFormData.subject || null,
+        content: contactFormData.message,
+        flower: contactFormData.flower || null,
+        notes: contactFormData.notes || null,
+      },
+      metadata: {
+        createdAt: contactFormData.createdAt || new Date().toISOString(),
+        source: 'website',
+        formType: contactFormData.type,
+      },
+    },
+  };
+}
+
 interface BookingData {
   id: string;
   fullName: string;
@@ -157,6 +207,71 @@ interface RescheduleData extends BookingData {
   originalTime: string;
   rescheduleReason?: string;
   cancellationToken?: string;
+}
+
+interface ContactData {
+  id: string;
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+  createdAt?: string;
+}
+
+interface ContactFormData {
+  id: string;
+  type: 'general_contact' | 'flower_request' | string;
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+  flower?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
+/**
+ * Contact message payload structure for contact form submissions
+ */
+interface ContactMessagePayload {
+  event: 'contact_message';
+  contact: {
+    id: string;
+    name: string;
+    email: string;
+    subject: string | null;
+    message: string;
+    metadata: {
+      createdAt: string;
+      source: string;
+    };
+  };
+}
+
+/**
+ * Unified contact form payload structure for all contact forms
+ */
+interface ContactFormPayload {
+  event: 'contact_message';
+  contact: {
+    id: string;
+    type: 'general_contact' | 'flower_request' | string;
+    customer: {
+      name: string;
+      email: string;
+    };
+    message: {
+      subject?: string | null;
+      content: string;
+      flower?: string | null;
+      notes?: string | null;
+    };
+    metadata: {
+      createdAt: string;
+      source: string;
+      formType: string;
+    };
+  };
 }
 
 /**
@@ -475,11 +590,85 @@ export async function sendRescheduleConfirmation(rescheduleData: RescheduleData)
 }
 
 /**
+ * Send contact message webhook to Make.com (Legacy - use sendContactFormMessage instead)
+ */
+export async function sendContactMessage(contactData: ContactData): Promise<boolean> {
+  const webhookUrl = getWebhookUrl('contact_message');
+
+  if (!webhookUrl) {
+    console.error('MAKE_BOOKING_WEBHOOK_URL not configured');
+    return false;
+  }
+
+  const payload = createContactMessagePayload(contactData);
+
+  try {
+    console.log('Sending contact message webhook:', payload.contact.id);
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10000), // 10 second timeout
+    });
+
+    if (!response.ok) {
+      throw new Error(`Contact webhook failed with status: ${response.status}`);
+    }
+
+    console.log('Contact message webhook sent successfully');
+    return true;
+  } catch (error) {
+    console.error('Failed to send contact message webhook:', error);
+    return false;
+  }
+}
+
+/**
+ * Send contact form message webhook to Make.com (New unified approach)
+ */
+export async function sendContactFormMessage(contactFormData: ContactFormData): Promise<boolean> {
+  const webhookUrl = getWebhookUrl('contact_form');
+
+  if (!webhookUrl) {
+    console.error('MAKE_CONTACT_WEBHOOK_URL not configured');
+    return false;
+  }
+
+  const payload = createContactFormPayload(contactFormData);
+
+  try {
+    console.log('Sending contact form message webhook:', payload.contact.id, 'type:', payload.contact.type);
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10000), // 10 second timeout
+    });
+
+    if (!response.ok) {
+      throw new Error(`Contact form webhook failed with status: ${response.status}`);
+    }
+
+    console.log('Contact form message webhook sent successfully');
+    return true;
+  } catch (error) {
+    console.error('Failed to send contact form message webhook:', error);
+    return false;
+  }
+}
+
+/**
  * Log webhook attempt to database (for tracking)
  */
 export async function logWebhookAttempt(
   bookingId: string,
-  webhookType: 'confirmation' | 'error' | 'cancellation' | 'reschedule',
+  webhookType: 'confirmation' | 'error' | 'cancellation' | 'reschedule' | 'contact',
   success: boolean,
   errorMessage?: string
 ): Promise<void> {
