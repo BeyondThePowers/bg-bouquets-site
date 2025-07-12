@@ -1661,9 +1661,9 @@ input[type="number"] {
 /* Galaxy S25 and similar phone optimizations */
 @media (max-width: 430px) {
   .calendar-day {
-    min-height: 26px; /* Ultra-compact for very small phones */
-    height: 26px;
-    max-width: 26px; /* Strict width limit */
+    min-height: 24px; /* Ultra-compact for very small phones */
+    height: 24px;
+    max-width: 2px; /* Strict width limit */
     font-size: 0.65rem; /* Smaller but still readable */
     border-width: 0.5px; /* Thinner borders to save space */
   }
@@ -1695,9 +1695,9 @@ input[type="number"] {
 /* Ultra-small phones (iPhone SE, etc.) */
 @media (max-width: 375px) {
   .calendar-day {
-    min-height: 24px; /* Maximum compactness */
-    height: 24px;
-    max-width: 24px;
+    min-height: 22px; /* Maximum compactness */
+    height: 22px;
+    max-width: 22px;
     font-size: 0.6rem;
     border-radius: 0.25rem; /* Smaller border radius */
   }
