@@ -1658,7 +1658,7 @@ input[type="number"] {
     min-height: 45px; /* Ultra-compact for very small phones */
     height: 45px;
     max-width: 45px; /* Strict width limit */
-    font-size: 0.75rem; /* Smaller but still readable */
+    font-size: 0.8rem; /* Smaller but still readable */
     border-width: 0.5px; /* Thinner borders to save space */
   }
 
@@ -1689,10 +1689,10 @@ input[type="number"] {
 /* Ultra-small phones (iPhone SE, etc.) */
 @media (max-width: 375px) {
   .calendar-day {
-    min-height: 45px; /* Maximum compactness */
-    height: 45px;
-    max-width: 45px;
-    font-size: 0.7rem;
+    min-height: 42px; /* Maximum compactness */
+    height: 42px;
+    max-width: 42px;
+    font-size: 0.8rem;
     border-radius: 0.25rem; /* Smaller border radius */
   }
 
