@@ -1416,11 +1416,122 @@ input[type="number"] {
 .calendar-grid {
   touch-action: pan-y; /* Allow vertical scrolling but capture horizontal swipes */
   user-select: none; /* Prevent text selection during swipes */
+  position: relative;
+  overflow: hidden;
 }
 
-/* Add subtle transition for smooth swipe feedback */
-.calendar-grid.swiping {
-  transition: transform 0.1s ease-out;
+/* Calendar container for slide animations */
+.calendar-column .bg-white {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Slide animation states with easing for smooth, obvious transitions */
+.calendar-grid.slide-left {
+  animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calendar-grid.slide-right {
+  animation: slideOutRight 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calendar-grid.slide-in-left {
+  animation: slideInLeft 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.calendar-grid.slide-in-right {
+  animation: slideInRight 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Slide animations with scale for more obvious feedback */
+@keyframes slideOutLeft {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-30%) scale(0.95);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(-100%) scale(0.9);
+    opacity: 0.2;
+  }
+}
+
+@keyframes slideOutRight {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(30%) scale(0.95);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(100%) scale(0.9);
+    opacity: 0.2;
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(100%) scale(0.9);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateX(30%) scale(0.95);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(-100%) scale(0.9);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateX(-30%) scale(0.95);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Month header animation */
+#currentMonth {
+  transition: all 0.2s ease-in-out;
+}
+
+#currentMonth.changing {
+  opacity: 0.4;
+  transform: scale(0.95);
+}
+
+/* Calendar container pulse effect for swipe feedback */
+.calendar-column .bg-white.swipe-feedback {
+  animation: swipePulse 0.15s ease-out;
+}
+
+@keyframes swipePulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 10px 15px -3px rgba(232, 180, 184, 0.3), 0 4px 6px -2px rgba(232, 180, 184, 0.2);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
 }
 
 /* Mobile swipe hint - only show on touch devices */

@@ -1226,18 +1226,70 @@
 					return;
 				}
 
-				// Determine swipe direction and navigate
+				// Determine swipe direction and navigate with animation
 				if (horizontalDistance > 0) {
 					// Swipe right - go to previous month (if not disabled)
 					if (prevMonthBtn && !prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
-						navigateToMonth(-1);
+						animateMonthChange(-1, 'right');
 					}
 				} else {
 					// Swipe left - go to next month (if not disabled)
 					if (nextMonthBtn && !nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
-						navigateToMonth(1);
+						animateMonthChange(1, 'left');
 					}
 				}
+			}
+
+			// Animate month change with slide effect
+			function animateMonthChange(direction: number, swipeDirection: string): void {
+				if (!calendarGrid) return;
+
+				const currentMonthEl = document.getElementById('currentMonth');
+				const calendarContainer = calendarGrid.closest('.bg-white');
+
+				// Add pulse feedback to calendar container
+				if (calendarContainer) {
+					calendarContainer.classList.add('swipe-feedback');
+					setTimeout(() => {
+						calendarContainer.classList.remove('swipe-feedback');
+					}, 150);
+				}
+
+				// Add changing class to month header
+				if (currentMonthEl) {
+					currentMonthEl.classList.add('changing');
+				}
+
+				// Add slide out animation
+				const slideOutClass = swipeDirection === 'left' ? 'slide-left' : 'slide-right';
+				calendarGrid.classList.add(slideOutClass);
+
+				// After slide out animation, change month and slide in
+				setTimeout(() => {
+					if (!calendarGrid) return;
+
+					// Remove slide out class
+					calendarGrid.classList.remove(slideOutClass);
+
+					// Navigate to new month
+					navigateToMonth(direction);
+
+					// Add slide in animation
+					const slideInClass = swipeDirection === 'left' ? 'slide-in-left' : 'slide-in-right';
+					calendarGrid.classList.add(slideInClass);
+
+					// Remove month header changing class
+					if (currentMonthEl) {
+						currentMonthEl.classList.remove('changing');
+					}
+
+					// Clean up slide in animation
+					setTimeout(() => {
+						if (calendarGrid) {
+							calendarGrid.classList.remove(slideInClass);
+						}
+					}, 350);
+				}, 350);
 			}
 		}
 
