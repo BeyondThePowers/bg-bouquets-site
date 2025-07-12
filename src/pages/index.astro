@@ -2149,20 +2149,20 @@ import Layout from '../layouts/Layout.astro';
 			let touchEndX = 0;
 			let touchEndY = 0;
 
-			// Minimum swipe distance (in pixels)
-			const minSwipeDistance = 50;
+			// Minimum swipe distance (in pixels) - reduced for easier detection
+			const minSwipeDistance = 30;
 			// Maximum vertical movement allowed for horizontal swipe
-			const maxVerticalMovement = 100;
+			const maxVerticalMovement = 150;
 
 			calendarGrid.addEventListener('touchstart', (e) => {
-				touchStartX = e.changedTouches[0].screenX;
-				touchStartY = e.changedTouches[0].screenY;
+				touchStartX = e.changedTouches[0].clientX;
+				touchStartY = e.changedTouches[0].clientY;
 				calendarGrid.classList.add('swiping');
 			}, { passive: true });
 
 			calendarGrid.addEventListener('touchend', (e) => {
-				touchEndX = e.changedTouches[0].screenX;
-				touchEndY = e.changedTouches[0].screenY;
+				touchEndX = e.changedTouches[0].clientX;
+				touchEndY = e.changedTouches[0].clientY;
 				calendarGrid.classList.remove('swiping');
 				handleSwipeGesture();
 			}, { passive: true });
@@ -2180,14 +2180,14 @@ import Layout from '../layouts/Layout.astro';
 					return;
 				}
 
-				// Determine swipe direction and navigate with animation
+				// Determine swipe direction and navigate
 				if (horizontalDistance > 0) {
-					// Swipe right - go to previous month (if not disabled)
+					// Swipe right - go to previous month
 					if (prevMonthBtn && !prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
 						animateMonthChange(-1, 'right');
 					}
-				} else {
-					// Swipe left - go to next month (if not disabled)
+				} else if (horizontalDistance < 0) {
+					// Swipe left - go to next month
 					if (nextMonthBtn && !nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
 						animateMonthChange(1, 'left');
 					}
