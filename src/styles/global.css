@@ -1359,7 +1359,7 @@ input[type="number"] {
 }
 
 .calendar-day.available {
-  border: 2px solid var(--color-dusty-rose);
+  border: 1px solid var(--color-dusty-rose);
   color: var(--color-charcoal);
   background-color: white;
 }
@@ -1613,19 +1613,13 @@ input[type="number"] {
   /* Ensure form inputs are properly sized for mobile */
   .booking-step input,
   .booking-step select {
-    min-height: 48px; /* Better touch targets */
+
     font-size: 16px; /* Prevents zoom on iOS */
   }
 
   /* Better spacing for mobile */
   .booking-step {
     padding: 1rem;
-  }
-
-  /* Improve button spacing on mobile */
-  .booking-step button {
-    min-height: 48px;
-    padding: 0.75rem 1.5rem;
   }
 
   /* Extra compact calendar for small screens */
@@ -1661,9 +1655,9 @@ input[type="number"] {
 /* Galaxy S25 and similar phone optimizations */
 @media (max-width: 430px) {
   .calendar-day {
-    min-height: 10px; /* Ultra-compact for very small phones */
-    height: 10px;
-    max-width: 10px; /* Strict width limit */
+    min-height: 45px; /* Ultra-compact for very small phones */
+    height: 45px;
+    max-width: 45px; /* Strict width limit */
     font-size: 0.75rem; /* Smaller but still readable */
     border-width: 0.5px; /* Thinner borders to save space */
   }
@@ -1695,9 +1689,9 @@ input[type="number"] {
 /* Ultra-small phones (iPhone SE, etc.) */
 @media (max-width: 375px) {
   .calendar-day {
-    min-height: 20px; /* Maximum compactness */
-    height: 20px;
-    max-width: 20px;
+    min-height: 45px; /* Maximum compactness */
+    height: 45px;
+    max-width: 45px;
     font-size: 0.7rem;
     border-radius: 0.25rem; /* Smaller border radius */
   }
