@@ -727,6 +727,22 @@
 						<div class="weekday" aria-label="Saturday">Sat</div>
 					</div>
 					<div id="calendar-days" class="calendar-grid" role="grid" aria-label="Calendar"></div>
+
+					<!-- Calendar Help Text for Rescheduling -->
+					<div class="calendar-help-text">
+						<div class="help-step">
+							<span class="step-number">1</span>
+							<span class="step-text">Select a new date</span>
+						</div>
+						<div class="help-step">
+							<span class="step-number">2</span>
+							<span class="step-text">Choose a new time slot</span>
+						</div>
+						<div class="help-step">
+							<span class="step-number">3</span>
+							<span class="step-text">Confirm your changes</span>
+						</div>
+					</div>
 				</div>
 
 				<!-- Time Selection -->
@@ -1163,6 +1179,65 @@
 
 			if (nextMonthBtn) {
 				nextMonthBtn.addEventListener('click', () => navigateToMonth(1));
+			}
+
+			// Set up swipe navigation for mobile
+			setupSwipeNavigation();
+		}
+
+		// Swipe navigation setup
+		function setupSwipeNavigation(): void {
+			const calendarGrid = document.getElementById('calendar-days');
+			if (!calendarGrid) return;
+
+			let touchStartX = 0;
+			let touchStartY = 0;
+			let touchEndX = 0;
+			let touchEndY = 0;
+
+			// Minimum swipe distance (in pixels)
+			const minSwipeDistance = 50;
+			// Maximum vertical movement allowed for horizontal swipe
+			const maxVerticalMovement = 100;
+
+			calendarGrid.addEventListener('touchstart', (e: TouchEvent) => {
+				touchStartX = e.changedTouches[0].screenX;
+				touchStartY = e.changedTouches[0].screenY;
+				calendarGrid.classList.add('swiping');
+			}, { passive: true });
+
+			calendarGrid.addEventListener('touchend', (e: TouchEvent) => {
+				touchEndX = e.changedTouches[0].screenX;
+				touchEndY = e.changedTouches[0].screenY;
+				calendarGrid.classList.remove('swiping');
+				handleSwipeGesture();
+			}, { passive: true });
+
+			calendarGrid.addEventListener('touchcancel', () => {
+				calendarGrid.classList.remove('swiping');
+			}, { passive: true });
+
+			function handleSwipeGesture(): void {
+				const horizontalDistance = touchEndX - touchStartX;
+				const verticalDistance = Math.abs(touchEndY - touchStartY);
+
+				// Check if this is a horizontal swipe (not vertical scroll)
+				if (Math.abs(horizontalDistance) < minSwipeDistance || verticalDistance > maxVerticalMovement) {
+					return;
+				}
+
+				// Determine swipe direction and navigate
+				if (horizontalDistance > 0) {
+					// Swipe right - go to previous month (if not disabled)
+					if (prevMonthBtn && !prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
+						navigateToMonth(-1);
+					}
+				} else {
+					// Swipe left - go to next month (if not disabled)
+					if (nextMonthBtn && !nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
+						navigateToMonth(1);
+					}
+				}
 			}
 		}
 

@@ -228,6 +228,22 @@ import Layout from '../layouts/Layout.astro';
 													</div>
 												</div>
 
+												<!-- Calendar Help Text -->
+												<div class="calendar-help-text">
+													<div class="help-step">
+														<span class="step-number">1</span>
+														<span class="step-text">Select a date</span>
+													</div>
+													<div class="help-step">
+														<span class="step-number">2</span>
+														<span class="step-text">Choose a time slot</span>
+													</div>
+													<div class="help-step">
+														<span class="step-number">3</span>
+														<span class="step-text">Continue to complete booking</span>
+													</div>
+												</div>
+
 												<!-- Legend -->
 												<div class="pt-4 border-t border-gray-200">
 													<div class="flex items-center justify-center space-x-4 text-xs font-roboto">
@@ -2074,7 +2090,66 @@ import Layout from '../layouts/Layout.astro';
 				navigateToMonth(1);
 			});
 
+			// Set up swipe navigation for mobile
+			setupSwipeNavigation();
+
 			calendarEventListenersSetup = true;
+		}
+
+		// Swipe navigation setup
+		function setupSwipeNavigation() {
+			const calendarGrid = document.getElementById('calendarGrid');
+			if (!calendarGrid) return;
+
+			let touchStartX = 0;
+			let touchStartY = 0;
+			let touchEndX = 0;
+			let touchEndY = 0;
+
+			// Minimum swipe distance (in pixels)
+			const minSwipeDistance = 50;
+			// Maximum vertical movement allowed for horizontal swipe
+			const maxVerticalMovement = 100;
+
+			calendarGrid.addEventListener('touchstart', (e) => {
+				touchStartX = e.changedTouches[0].screenX;
+				touchStartY = e.changedTouches[0].screenY;
+				calendarGrid.classList.add('swiping');
+			}, { passive: true });
+
+			calendarGrid.addEventListener('touchend', (e) => {
+				touchEndX = e.changedTouches[0].screenX;
+				touchEndY = e.changedTouches[0].screenY;
+				calendarGrid.classList.remove('swiping');
+				handleSwipeGesture();
+			}, { passive: true });
+
+			calendarGrid.addEventListener('touchcancel', () => {
+				calendarGrid.classList.remove('swiping');
+			}, { passive: true });
+
+			function handleSwipeGesture() {
+				const horizontalDistance = touchEndX - touchStartX;
+				const verticalDistance = Math.abs(touchEndY - touchStartY);
+
+				// Check if this is a horizontal swipe (not vertical scroll)
+				if (Math.abs(horizontalDistance) < minSwipeDistance || verticalDistance > maxVerticalMovement) {
+					return;
+				}
+
+				// Determine swipe direction and navigate
+				if (horizontalDistance > 0) {
+					// Swipe right - go to previous month (if not disabled)
+					if (!prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
+						navigateToMonth(-1);
+					}
+				} else {
+					// Swipe left - go to next month (if not disabled)
+					if (!nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
+						navigateToMonth(1);
+					}
+				}
+			}
 		}
 
 		// Render calendar for current month
