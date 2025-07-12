@@ -34,6 +34,9 @@
   --color-shabby-pink: #F8E7E8;
   --color-shabby-blue: #EFF9FA;
   --color-dusty-rose: #E8B4B8;
+  --color-dusty-rose-dark: #D4969B; /* Better contrast for text */
+  --color-dusty-rose-darker: #B8787E; /* Even better contrast */
+  --color-dusty-rose-light: #F5E1E3; /* Subtle backgrounds */
   --color-sage-green: #B8C5B8;
   --color-lavender: #E8E0F0;
   --color-cream: #FAF7F4;
@@ -740,6 +743,185 @@ select.shabby-input {
   background-image: none;
 }
 
+/* Hide native number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Bouquet Counter Component - Mobile First */
+.bouquet-counter {
+  width: 100%;
+}
+
+.counter-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Consistent form spacing */
+  flex-wrap: wrap;
+}
+
+.counter-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Left align instead of center */
+  gap: 0;
+  border: 2px solid var(--color-shabby-pink);
+  border-radius: 0.5rem;
+  background-color: var(--color-cream);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.counter-controls:focus-within {
+  border-color: var(--color-dusty-rose);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.1);
+}
+
+.counter-btn {
+  background: none;
+  border: none;
+  padding: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 56px; /* Mobile touch target */
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-roboto);
+}
+
+.counter-btn:hover:not(:disabled) {
+  background-color: rgba(232, 180, 184, 0.1);
+  color: var(--color-dusty-rose-dark);
+}
+
+.counter-btn:active:not(:disabled) {
+  background-color: rgba(232, 180, 184, 0.2);
+  transform: scale(0.95);
+}
+
+.counter-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.counter-input {
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  font-family: var(--font-playfair);
+  width: 80px;
+  padding: 1rem 0.5rem;
+  min-height: 56px; /* Match button height */
+  outline: none;
+}
+
+.counter-input:focus {
+  outline: none;
+}
+
+.counter-price {
+  font-size: 1.375rem; /* Emphasized size - larger than counter */
+  font-weight: 600; /* Semi-bold for trust and clarity */
+  color: var(--color-charcoal); /* Neutral, honest color */
+  font-family: var(--font-playfair);
+  transition: transform 0.15s ease-out;
+  flex-shrink: 0; /* Prevent shrinking */
+  min-width: fit-content;
+}
+
+.counter-price.updating {
+  animation: pulse 0.5s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.counter-message {
+  font-size: 0.875rem;
+  color: var(--color-charcoal);
+  font-family: var(--font-roboto);
+  font-style: italic;
+  opacity: 0.8;
+  transition: opacity 0.3s ease-in-out;
+  flex-shrink: 0;
+}
+
+.counter-message.hidden {
+  display: none;
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .counter-row {
+    flex-wrap: nowrap; /* Keep inline on desktop */
+  }
+
+  .counter-controls {
+    max-width: none; /* Remove width constraint */
+    margin: 0; /* Remove centering */
+  }
+
+  .counter-btn {
+    min-height: 52px; /* Larger for desktop/laptop */
+    min-width: 52px;
+    padding: 0.875rem;
+    font-size: 1.375rem; /* Larger for better usability */
+  }
+
+  .counter-input {
+    min-height: 52px; /* Match button height */
+    width: 70px; /* Slightly wider for larger buttons */
+    font-size: 1.25rem;
+  }
+
+  .counter-price {
+    font-size: 1.5rem; /* Larger on desktop for emphasis */
+  }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767px) {
+  .counter-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .counter-message {
+    width: 100%;
+    text-align: left;
+  }
+}
+
 /* Hover effects for filter controls */
 .hover\:bg-dusty-rose:hover {
   background-color: var(--color-dusty-rose);
@@ -800,25 +982,29 @@ select.shabby-input {
   background: rgba(255, 255, 255, 0.98);
 }
 
-/* Calendar Days Grid */
-#calendarDays {
-  gap: 4px;
-  padding: 2px;
-}
 
-/* Month Navigation Buttons */
+
+/* Month Navigation Buttons - Fixed sizing to prevent wrapping */
 #prevMonth, #nextMonth {
-  background: rgba(248, 231, 232, 0.1);
-  border: 1px solid transparent;
+  background: rgba(248, 231, 232, 0.1) !important;
+  border: 1px solid transparent !important;
+  width: 2.5rem !important; /* Fixed width */
+  height: 2.5rem !important; /* Fixed height */
+  flex-shrink: 0 !important; /* Prevent shrinking */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important; /* Override any padding */
+  border-radius: 50% !important; /* Ensure round shape */
 }
 
 #prevMonth:hover, #nextMonth:hover {
-  background: var(--color-dusty-rose);
-  border-color: var(--color-dusty-rose);
+  background: var(--color-dusty-rose) !important;
+  border-color: var(--color-dusty-rose) !important;
 }
 
 #prevMonth:hover svg, #nextMonth:hover svg {
-  color: white;
+  color: white !important;
 }
 
 /* Calendar Day Buttons Base */
@@ -883,8 +1069,532 @@ select.shabby-input {
   padding-left:3rem;
 }
 
+/* Map container styling */
+.map-container {
+  border: 2px solid var(--color-shabby-pink);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.map-container:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Ensure map image scales properly */
+.map-container img {
+  transition: transform 0.3s ease;
+}
+
+.map-container:hover img {
+  transform: scale(1.02);
+}
+
 .flower-card img {
   height:100%;
+}
+
+/* ============================================================================
+   MULTI-STEP BOOKING FORM STYLING
+   ============================================================================ */
+
+/* Flexible Two-Column Layout - Content-Driven Sizing */
+.booking-columns {
+  display: flex;
+  flex-direction: column; /* Mobile: Stack vertically */
+  gap: 1.5rem; /* 24px gap */
+}
+
+/* Desktop: Side-by-side flexbox layout */
+@media (min-width: 768px) {
+  .booking-columns {
+    flex-direction: row;
+    gap: 2rem; /* 32px gap on desktop */
+    align-items: stretch; /* Make columns same height */
+  }
+
+  .calendar-column {
+    flex: 0 0 auto; /* Size to content, don't grow or shrink */
+    min-width: min-content; /* Fit calendar naturally */
+    display: flex; /* Make inner content flexible */
+    flex-direction: column;
+  }
+
+  .time-slots-column {
+    flex: 1 1 0; /* Fill remaining space */
+    min-width: 0; /* Allow shrinking if needed */
+    display: flex; /* Make inner content flexible */
+    flex-direction: column;
+  }
+
+  /* Make the inner containers fill their parent columns */
+  .calendar-column > .bg-white,
+  .time-slots-column > #time-slots-container {
+    flex: 1; /* Fill the column height */
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Column styling */
+.calendar-column,
+.time-slots-column {
+  min-height: 380px;
+}
+
+/* Time slots content area should fill available space */
+#time-slots-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Mobile Slide Transition System - Following Calendly/HubSpot UX */
+@media (max-width: 767px) {
+  .booking-columns {
+    position: relative;
+    overflow: hidden;
+    min-height: 500px; /* Ensure space for both views */
+  }
+
+  .calendar-column,
+  .time-slots-column {
+    transition: transform 0.3s ease-in-out;
+    width: 100%;
+  }
+
+  /* Time slots initially positioned off-screen to the right */
+  .time-slots-column {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    transform: translateX(0);
+  }
+
+  /* When showing time slots, slide calendar left and time slots into view */
+  .booking-columns.show-time-slots .calendar-column {
+    transform: translateX(-100%);
+  }
+
+  .booking-columns.show-time-slots .time-slots-column {
+    transform: translateX(-100%);
+  }
+
+  /* Back button for mobile time slots view */
+  .mobile-back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: 1px solid #333333; /* Black border for better contrast */
+    border-radius: 0.375rem;
+    color: var(--color-charcoal);
+    font-family: var(--font-roboto);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-back-button:hover {
+    background-color: #333333;
+    color: white;
+    border-color: #333333;
+  }
+
+  .mobile-back-button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+/* Hide back button on desktop */
+@media (min-width: 768px) {
+  .mobile-back-button {
+    display: none;
+  }
+}
+
+/* Calendar container with enhanced card design - Flexible content fitting */
+.calendar-column .bg-white {
+  width: 100%; /* Take full column width */
+  /* Border and styling now handled by HTML classes for consistency */
+}
+
+/* Combined Calendar Grid - Mobile First Approach */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* Responsive columns on mobile */
+  gap: 0.25rem;
+  justify-content: center;
+  max-width: 100%;
+  width: 100%; /* Ensure full width usage */
+}
+
+/* Weekday headers styling */
+.weekday-header {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  padding: 8px 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-roboto);
+}
+
+/* Calendar days container - no additional grid, inherits from parent */
+#calendarDaysContainer {
+  display: contents; /* Makes children participate in parent grid */
+}
+
+/* Responsive calendar sizing - Optimized for full width */
+@media (min-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: repeat(7, minmax(50px, 1fr)); /* Minimum 50px, but can grow */
+    justify-content: center;
+    max-width: 400px; /* Reasonable max size for desktop */
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr); /* Equal columns, use full width */
+    gap: 2px; /* Minimal gap for mobile like Calendly */
+    width: 100%; /* Use full available width */
+    padding: 0 4px; /* Minimal side padding */
+  }
+}
+
+/* Calendar day styling - Works with new grid structure */
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  font-family: var(--font-playfair);
+  width: 100%; /* Fill the grid cell */
+  min-height: 42px; /* Minimum height for mobile */
+  position: relative; /* Enable z-index stacking */
+  margin: 1px; /* Small margin to accommodate border width changes */
+}
+
+/* Desktop (768px+) - Larger calendar days */
+@media (min-width: 768px) {
+  .calendar-day {
+    min-height: 50px;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile (<768px) - Optimized calendar days following Calendly/HubSpot patterns */
+@media (max-width: 767px) {
+  .calendar-day {
+    min-height: 44px; /* Increased from 42px for better touch targets */
+    height: 44px; /* Fixed height for consistency */
+    font-size: 0.875rem;
+    border-width: 1px; /* Thinner borders on mobile */
+  }
+
+  /* Ensure calendar uses optimal mobile width */
+  .calendar-column .bg-white {
+    padding: 1rem; /* Reduced padding on mobile */
+    margin: 0; /* Remove any margins */
+  }
+
+  /* Mobile calendar container optimization */
+  .calendar-grid {
+    margin: 0; /* Remove any margins */
+  }
+}
+
+.calendar-day:hover {
+  background-color: rgba(232, 180, 184, 0.1);
+}
+
+.calendar-day.available {
+  border: 2px solid var(--color-dusty-rose);
+  color: var(--color-charcoal);
+  background-color: white;
+}
+
+.calendar-day.available:hover {
+  background-color: rgba(232, 180, 184, 0.2);
+  transform: scale(1.05);
+}
+
+.calendar-day.selected {
+  background-color: var(--color-dusty-rose-dark);
+  border: 3px solid var(--color-dusty-rose-darker);
+  color: white;
+  transform: scale(1.05); /* Reduced scale to minimize layout impact */
+  font-weight: 700; /* Bolder text for better contrast */
+  font-size: 1.1em; /* Slightly larger text for better visibility */
+  box-shadow: 0 6px 16px rgba(184, 120, 126, 0.4);
+  z-index: 10; /* Ensure selected date appears above others */
+}
+
+.calendar-day.unavailable {
+  background-color: #f9fafb;
+  color: #d1d5db;
+  cursor: not-allowed;
+  border: 1px solid #e5e7eb;
+}
+
+.calendar-day.other-month {
+  color: #d1d5db;
+  cursor: default;
+  font-weight: 400;
+  opacity: 0.5;
+}
+
+.calendar-day.prev-next-month {
+  color: #d1d5db;
+  cursor: default;
+  font-weight: 400;
+  opacity: 0.4;
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+
+/* Time slots styling - Mobile first responsive approach */
+#time-slots.grid {
+  display: grid !important;
+  grid-template-columns: 1fr; /* Single column on mobile */
+  gap: 0.75rem;
+}
+
+/* Desktop: Two columns for time slots */
+@media (min-width: 768px) {
+  #time-slots.grid {
+    grid-template-columns: 1fr 1fr; /* Two columns on desktop */
+  }
+}
+
+/* Compact time slot cards for better viewport fit */
+.time-slot-card {
+  border: 2px solid var(--color-shabby-pink);
+  background: var(--color-cream);
+  padding: 0.625rem; /* More compact */
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-height: 60px; /* Reduced height for viewport fit */
+}
+
+/* No date selected state */
+#no-date-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Step Progress Indicator */
+.step-indicator {
+  transition: all 0.3s ease;
+}
+
+.step-indicator.active {
+  background-color: var(--color-dusty-rose-dark) !important;
+  border-color: var(--color-dusty-rose-darker) !important;
+  color: white !important;
+  box-shadow: 0 4px 8px rgba(184, 120, 126, 0.3);
+}
+
+.step-indicator.completed {
+  background-color: var(--color-dusty-rose-dark) !important;
+  border-color: var(--color-dusty-rose-darker) !important;
+  color: white !important;
+  box-shadow: 0 4px 8px rgba(184, 120, 126, 0.3);
+}
+
+.step-indicator.completed::after {
+  content: '✓';
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Booking Steps */
+.booking-step {
+  transition: all 0.5s ease;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.booking-step.hidden {
+  display: none !important;
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.booking-step.active {
+  display: block !important;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Time Slot Cards - Layout shift prevention */
+.time-slot-card {
+  border: 2px solid var(--color-shabby-pink);
+  background: var(--color-cream);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  position: relative; /* Enable z-index stacking */
+  margin: 1px; /* Small margin to accommodate border width changes */
+}
+
+.time-slot-card:hover {
+  border-color: var(--color-dusty-rose);
+  background: rgba(232, 180, 184, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(232, 180, 184, 0.2);
+}
+
+.time-slot-card.selected {
+  border-color: var(--color-dusty-rose-darker);
+  background: var(--color-dusty-rose-dark);
+  color: white;
+  transform: translateY(-2px) scale(1.02); /* Subtle lift and scale without layout shift */
+  box-shadow: 0 6px 16px rgba(184, 120, 126, 0.4);
+  font-weight: 700; /* Bolder text for better contrast */
+  font-size: 1.05em; /* Slightly larger text for better visibility */
+  border-width: 2px;
+  z-index: 10; /* Ensure selected card appears above others */
+}
+
+.time-slot-card.unavailable {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.time-slot-card.unavailable:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+/* Enhanced form inputs for multi-step */
+.booking-step input,
+.booking-step select {
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+/* Step labels with better contrast */
+#step-1-label.active,
+#step-2-label.active,
+#step-3-label.active {
+  color: var(--color-dusty-rose-darker) !important;
+  font-weight: 700;
+}
+
+/* Mobile optimizations for multi-step form */
+@media (max-width: 768px) {
+  /* Mobile: Stack calendar and time slots vertically */
+  .calendar-column,
+  .time-slots-column {
+    min-height: auto;
+  }
+
+  /* Center calendar on mobile too */
+  .calendar-column {
+    display: flex;
+    justify-content: center;
+  }
+
+
+
+  .calendar-column .bg-white {
+    padding: 1rem;
+  }
+
+  #currentMonth {
+    font-size: 1rem;
+  }
+
+  /* Mobile time slots - larger for touch */
+  .time-slot-card {
+    padding: 1rem;
+    font-size: 16px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .step-indicator {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  #step-progress .flex {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  #step-progress .flex-1 {
+    display: none;
+  }
+
+  .booking-step h3 {
+    font-size: 1.25rem;
+  }
+
+  .booking-step p {
+    font-size: 0.875rem;
+  }
+
+  /* Ensure form inputs are properly sized for mobile */
+  .booking-step input,
+  .booking-step select {
+    min-height: 48px; /* Better touch targets */
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Better spacing for mobile */
+  .booking-step {
+    padding: 1rem;
+  }
+
+  /* Improve button spacing on mobile */
+  .booking-step button {
+    min-height: 48px;
+    padding: 0.75rem 1.5rem;
+  }
+
+  /* Extra compact calendar for small screens */
+  .calendar-day {
+    min-height: 28px;
+    font-size: 0.7rem;
+  }
+
+  /* Stack navigation buttons on very small screens */
+  @media (max-width: 480px) {
+    .booking-step .flex.justify-between {
+      flex-direction: row;
+      gap: 1rem;
+    }
+
+    .booking-step .flex.justify-between button {
+      width: 100%;
+    }
+  }
 }
 
 @media screen and (max-width: 767px) {
@@ -911,4 +1621,66 @@ select.shabby-input {
     padding-bottom: 6rem!important;
   }
 
+}
+
+/* Modern Booking Form Transitions - Following Calendly/HubSpot UX patterns */
+
+/* Full-width booking container - Let sections handle their own spacing */
+#booking-form-container,
+#booking-form {
+  position: relative;
+  overflow: hidden;
+  min-height: 600px; /* Prevent layout shift during transitions */
+  width: 100%; /* Full width on all devices */
+  margin: 0; /* No centering needed */
+}
+
+/* Booking step container for slide transitions */
+.booking-steps-container {
+  display: flex;
+  width: 200%; /* Two steps side by side */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* Individual booking steps */
+.booking-step {
+  width: 50%; /* Each step takes half of the container */
+  flex-shrink: 0;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Step 1 (Calendar & Time Slots) */
+.booking-step.step-1 {
+  padding-right: 1rem; /* Space between steps */
+}
+
+/* Step 2 (Details & Payment) - Asymmetric padding removed for visual balance */
+
+/* Slide transitions */
+.booking-steps-container.show-step-1 {
+  transform: translateX(0%);
+}
+
+.booking-steps-container.show-step-2 {
+  transform: translateX(-50%);
+}
+
+/* Smooth opacity transitions for step content */
+.booking-step.transitioning {
+  opacity: 0.7;
+}
+
+/* Mobile responsive transitions */
+@media (max-width: 768px) {
+  #booking-form {
+    min-height: 500px; /* Smaller min-height on mobile */
+  }
+
+  .booking-step.step-1,
+  .booking-step.step-2 {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }

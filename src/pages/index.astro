@@ -37,7 +37,13 @@ import Layout from '../layouts/Layout.astro';
 								</div>
 								<div>
 									<p class="font-playfair font-semibold" style="color: #333333;">Location</p>
-									<p class="font-roboto" style="color: #333333;">123 Garden Lane, Flower Valley</p>
+									<a href="https://maps.google.com/?q=49.333472,-113.634417" target="_blank" class="font-roboto hover:underline transition-all duration-300 flex items-center space-x-1 group" style="color: #333333;">
+										<span>Hill Spring Area, Southern Alberta</span>
+										<svg class="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity duration-300" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+											<path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+											<path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"></path>
+										</svg>
+									</a>
 								</div>
 							</div>
 							<div class="flex items-top space-x-3">
@@ -59,8 +65,8 @@ import Layout from '../layouts/Layout.astro';
 									</svg>
 								</div>
 								<div>
-									<p class="font-playfair font-semibold" style="color: #333333;">Contact</p>
-									<p class="font-roboto" style="color: #333333;">(555) 123-4567</p>
+									<p class="font-playfair font-semibold" style="color: #333333;">Email</p>
+									<p class="font-roboto" style="color: #333333;">(403) 393-8285</p>
 								</div>
 							</div>
 							<div class="flex items-top space-x-3">
@@ -70,8 +76,8 @@ import Layout from '../layouts/Layout.astro';
 									</svg>
 								</div>
 								<div>
-									<p class="font-playfair font-semibold" style="color: #333333;">Parking</p>
-									<p class="font-roboto" style="color: #333333;">Free on-site parking</p>
+									<p class="font-playfair font-semibold" style="color: #333333;">Email</p>
+									<p class="font-roboto" style="color: #333333;">bev@bgbouquet.com</p>
 								</div>
 							</div>
 						</div>
@@ -117,7 +123,7 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</div>
 
-					<a href="#home" class="vintage-button px-8 py-4 text-lg font-playfair font-semibold inline-block rounded-sm">
+					<a href="#pricing" class="vintage-button px-8 py-4 text-lg font-playfair font-semibold inline-block rounded-sm">
 						Book Your Bouquet Experience
 					</a>
 				</div>
@@ -141,11 +147,10 @@ import Layout from '../layouts/Layout.astro';
 		</div>
 		<!--- WTF -->	
 
-		<div class="max-w-4xl mx-auto px-4 pricing-content" style="z-index: 2; position: relative;">
+		<div class="max-w-[75rem] mx-auto px-4 pricing-content" style="z-index: 2; position: relative;">
 
 				<!-- Right Column - Booking Form -->
 				<div class="lg:col-span-2" style="height: 100%;">
-					<div class="shabby-card p-6 lg:p-8 distressed-shadow">
 
 
 						<div class="text-center mb-4 lg:mb-6">
@@ -159,225 +164,292 @@ import Layout from '../layouts/Layout.astro';
 						<!--<div class="wheel-barrow">
 						</div> -->
 
-						<!-- Booking Form -->
-						<!-- Booking Form Container -->
+						<!-- Modern Multi-Step Booking Form - Unified Width -->
 						<div id="booking-form-container" class="transition-all duration-500 ease-in-out">
-							<form id="booking-form" class="space-y-3">
-								<!-- Desktop: 2-column layout, Mobile: single column -->
-								<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-								<div>
-									<label for="fullName" class="block text-sm font-playfair font-medium text-charcoal mb-1">Full Name *</label>
-									<input
-										type="text"
-										id="fullName"
-										name="fullName"
-										required
-										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm"
-										placeholder="Your full name"
-									>
+							<!-- Step Progress Indicator - Streamlined 2-Step Flow -->
+							<div id="step-progress" class="mb-8" role="progressbar" aria-label="Booking progress" aria-valuenow="1" aria-valuemin="1" aria-valuemax="2">
+								<div class="flex items-center justify-center space-x-4 mb-4">
+									<div class="flex items-center">
+										<div id="step-1-indicator" class="step-indicator active flex items-center justify-center w-8 h-8 rounded-full border-2 border-dusty-rose bg-dusty-rose text-white font-playfair font-semibold text-sm transition-all duration-300" aria-label="Step 1: Date and Time Selection">
+											1
+										</div>
+										<span id="step-1-label" class="ml-2 text-sm font-playfair font-medium text-charcoal">Date & Time</span>
+									</div>
+									<div class="flex-1 h-0.5 bg-shabby-pink mx-4" aria-hidden="true"></div>
+									<div class="flex items-center">
+										<div id="step-2-indicator" class="step-indicator flex items-center justify-center w-8 h-8 rounded-full border-2 border-shabby-pink bg-white text-charcoal font-playfair font-semibold text-sm transition-all duration-300" aria-label="Step 2: Details and Payment">
+											2
+										</div>
+										<span id="step-2-label" class="ml-2 text-sm font-playfair font-medium text-gray-400">Details & Payment</span>
+									</div>
 								</div>
-								<div>
-									<label for="email" class="block text-sm font-playfair font-medium text-charcoal mb-1">Email *</label>
-									<input
-										type="email"
-										id="email"
-										name="email"
-										required
-										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm"
-										placeholder="your@email.com"
-									>
-								</div>
-								<div>
-									<label for="phone" class="block text-sm font-playfair font-medium text-charcoal mb-1">Phone Number *</label>
-									<input
-										type="tel"
-										id="phone"
-										name="phone"
-										required
-										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm"
-										placeholder="(555) 123-4567"
-									>
-								</div>
-								<div class="relative">
-									<label for="visitDate" class="block text-sm font-playfair font-medium text-charcoal mb-1">Visit Date *</label>
-									<input
-										type="text"
-										id="visitDate"
-										name="visitDate"
-										required
-										readonly
-										placeholder="Select a date"
-										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm cursor-pointer"
-									>
-									<!-- Custom Calendar Dropdown -->
-									<div id="customCalendar" class="hidden absolute top-full left-0 right-0 bg-white border border-dusty-rose rounded-lg shadow-xl z-50 mt-2 min-w-80">
-										<div class="p-5">
-											<!-- Month Navigation Header -->
-											<div class="flex items-center justify-between mb-6">
-												<button type="button" id="prevMonth" class="p-2 hover:bg-dusty-rose hover:bg-opacity-20 rounded-full transition-colors duration-200">
-													<svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-													</svg>
-												</button>
-												<h3 id="currentMonth" class="font-playfair font-semibold text-xl text-charcoal"></h3>
-												<button type="button" id="nextMonth" class="p-2 hover:bg-dusty-rose hover:bg-opacity-20 rounded-full transition-colors duration-200">
-													<svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-													</svg>
-												</button>
-											</div>
+							</div>
 
-											<!-- Day Headers -->
-											<div class="grid grid-cols-7 mb-3">
-												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Sun</div>
-												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Mon</div>
-												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Tue</div>
-												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Wed</div>
-												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Thu</div>
-												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Fri</div>
-												<div class="text-center text-sm font-medium text-gray-600 py-3 font-roboto">Sat</div>
-											</div>
+							<form id="booking-form" class="space-y-6">
+								<!-- Sliding Container for Modern Transitions -->
+								<div class="booking-steps-container show-step-1">
+									<!-- Step 1: Date & Time Selection -->
+									<div id="step-1" class="booking-step step-1 active" role="tabpanel" aria-labelledby="step-1-label" aria-hidden="false">
 
-											<!-- Calendar Days Grid -->
-											<div id="calendarDays" class="grid grid-cols-7">
-												<!-- Days will be populated by JavaScript -->
-											</div>
+									<!-- Two-Column Layout: Calendar + Time Slots (Flexible Content-Driven) -->
+									<div id="booking-columns" class="booking-columns mb-6">
+										<!-- Left Column: Always-Visible Calendar (50% width) -->
+										<div class="calendar-column">
+											<div class="bg-white border border-dusty-rose-dark rounded-lg p-6 shadow-md">
+												<!-- Month Navigation Header -->
+												<div class="flex items-center justify-between mb-6">
+													<button type="button" id="prevMonth" class="hover:bg-dusty-rose hover:bg-opacity-20 rounded-full transition-colors duration-200" aria-label="Previous month">
+														<svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+														</svg>
+													</button>
+													<h3 id="currentMonth" class="font-playfair font-semibold text-lg text-charcoal flex-1 text-center"></h3>
+													<button type="button" id="nextMonth" class="hover:bg-dusty-rose hover:bg-opacity-20 rounded-full transition-colors duration-200" aria-label="Next month">
+														<svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+														</svg>
+													</button>
+												</div>
 
-											<!-- Legend -->
-											<div class="mt-4 pt-4 border-t border-gray-200">
-												<div class="flex items-center justify-center space-x-4 text-xs font-roboto">
-													<div class="flex items-center space-x-2">
-														<div class="w-3 h-3 border-2 border-charcoal rounded"></div>
-														<span class="text-gray-600">Available</span>
+												<!-- Combined Calendar Grid: Headers + Days -->
+												<div id="calendarGrid" class="calendar-grid mb-4">
+													<!-- Weekday Headers (first row) -->
+													<div class="weekday-header">Sun</div>
+													<div class="weekday-header">Mon</div>
+													<div class="weekday-header">Tue</div>
+													<div class="weekday-header">Wed</div>
+													<div class="weekday-header">Thu</div>
+													<div class="weekday-header">Fri</div>
+													<div class="weekday-header">Sat</div>
+
+													<!-- Calendar Days Container (populated by JavaScript) -->
+													<div id="calendarDaysContainer">
+														<!-- Days will be populated by JavaScript -->
 													</div>
-													<div class="flex items-center space-x-2">
-														<div class="w-3 h-3 bg-dusty-rose rounded"></div>
-														<span class="text-gray-600">Selected</span>
-													</div>
-													<div class="flex items-center space-x-2">
-														<div class="w-3 h-3 bg-gray-200 rounded"></div>
-														<span class="text-gray-600">Unavailable</span>
+												</div>
+
+												<!-- Legend -->
+												<div class="pt-4 border-t border-gray-200">
+													<div class="flex items-center justify-center space-x-4 text-xs font-roboto">
+														<div class="flex items-center space-x-1">
+															<div class="w-3 h-3 border-2 rounded" style="border-color: var(--color-dusty-rose);"></div>
+															<span class="text-gray-600">Available</span>
+														</div>
+														<div class="flex items-center space-x-1">
+															<div class="w-3 h-3 bg-dusty-rose rounded"></div>
+															<span class="text-gray-600">Selected</span>
+														</div>
+														<div class="flex items-center space-x-1">
+															<div class="w-3 h-3 bg-gray-200 rounded"></div>
+															<span class="text-gray-600">Unavailable</span>
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
+
+										<!-- Right Column: Time Slots -->
+										<div class="time-slots-column">
+											<div id="time-slots-container" class="bg-white p-6 rounded-lg shadow-md border border-dusty-rose-dark">
+												<!-- Mobile Back Button -->
+												<button type="button" id="mobile-back-btn" class="mobile-back-button">
+													<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+													</svg>
+													Back to Calendar
+												</button>
+
+												<fieldset>
+													<legend class="w-full block text-base font-playfair font-medium text-charcoal mb-4 text-center">Available Time Slots</legend>
+													<div id="time-slots-content">
+														<!-- Default state: No date selected -->
+														<div id="no-date-selected" class="text-center py-12 px-4">
+															<div class="text-gray-400 mb-4">
+																<svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+																</svg>
+															</div>
+															<h4 class="font-playfair font-medium text-charcoal mb-2">Select a date</h4>
+															<p class="text-sm font-roboto text-gray-500">Choose a date from the calendar to see available time slots</p>
+														</div>
+														<!-- Time slot cards will be populated here by JavaScript -->
+														<div id="time-slots" class="hidden" role="radiogroup" aria-label="Select a time slot">
+														</div>
+													</div>
+												</fieldset>
+												<input type="hidden" id="preferredTime" name="preferredTime" required>
+												<input type="hidden" id="visitDate" name="visitDate" required>
+											</div>
+										</div>
+									</div>
+
+									<!-- Step 1 Navigation - Full Width Below Both Columns -->
+									<div class="flex justify-center">
+										<button
+											type="button"
+											id="step-1-next"
+											class="w-full max-w-md px-6 py-3 vintage-button bg-dusty-rose text-white font-playfair font-semibold rounded-lg transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-dusty-rose focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+											disabled
+										>
+											Continue to Details
+											<svg class="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+											</svg>
+										</button>
 									</div>
 								</div>
-								<div>
-									<label for="preferredTime" class="block text-sm font-playfair font-medium text-charcoal mb-1">Preferred Time *</label>
-									<select
-										id="preferredTime"
-										name="preferredTime"
-										required
-										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm"
-									>
-										<option value="">Select time</option>
-										<option value="9:00 AM">9:00 AM</option>
-										<option value="10:00 AM">10:00 AM</option>
-										<option value="11:00 AM">11:00 AM</option>
-										<option value="12:00 PM">12:00 PM</option>
-										<option value="1:00 PM">1:00 PM</option>
-										<option value="2:00 PM">2:00 PM</option>
-										<option value="3:00 PM">3:00 PM</option>
-										<option value="4:00 PM">4:00 PM</option>
-										<option value="5:00 PM">5:00 PM</option>
-									</select>
-								</div>
-								<div>
-									<label for="numberOfVisitors" class="block text-sm font-playfair font-medium text-charcoal mb-1">Bouquets</label>
-									<select
-										id="numberOfVisitors"
-										name="numberOfVisitors"
-										class="w-full px-3 py-2.5 shabby-input text-sm font-roboto rounded-sm"
-									>
-										<option value="1">1 bouquet $35</option>
-										<option value="2">2 bouquets $70 </option>
-										<option value="3">3 bouquets $105</option>
-										<option value="4">4 bouquets $140</option>
-										<option value="5">5 bouquets $175</option>
-										<option value="6">6 bouquets $210</option>
-										<option value="7">7 bouquets $245</option>
-										<option value="8">8 bouquets $280</option>
-										<option value="9">9 bouquets $315</option>
-										<option value="10+">10+ bouquets (call us)</option>
-									</select>
-								</div>
-							</div>
 
-							<!-- Payment Method Choice -->
-							<div class="space-y-4 pt-4 border-t border-shabby-pink">
-
-								<div class="space-y-3">
-									<label class="block text-sm font-playfair font-medium text-charcoal mb-3">How would you like to pay?</label>
-
-									<!-- Payment Options -->
-									<div class="space-y-2">
-										<label class="flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:bg-shabby-pink" style="border-color: #E8B4B8;">
-											<input
-												type="radio"
-												name="paymentMethod"
-												value="pay_on_arrival"
-												checked
-												class="sr-only"
-											>
-											<div class="payment-radio-custom mr-3"></div>
-											<div class="flex-1">
-												<div class="flex items-center">
-													<span class="font-playfair font-semibold text-charcoal">Pay on Arrival</span>
-												</div>
-												<p class="text-xs font-roboto text-charcoal mt-1">Cash or card accepted</p>
-											</div>
-										</label>
-
-										<label class="flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:bg-shabby-pink payment-now-option" style="border-color: #E8B4B8;">
-											<input
-												type="radio"
-												name="paymentMethod"
-												value="pay_now"
-												class="sr-only"
-											>
-											<div class="payment-radio-custom mr-3"></div>
-											<div class="flex-1">
-												<div class="flex items-center">
-													<span class="font-playfair font-semibold text-charcoal">Pay Now</span>
-													<span class="ml-2 px-2 py-1 text-xs rounded-full font-roboto" style="background-color: #F8E7E8; color: #333">Recommended</span>
-												</div>
-												<p class="text-xs font-roboto text-charcoal mt-1">Secure online payment for faster check-in</p>
-											</div>
-										</label>
+								<!-- Step 2: Personal Details -->
+								<div id="step-2" class="booking-step step-2" role="tabpanel" aria-labelledby="step-2-label" aria-hidden="true">
+									<div class="text-center mb-6">
+										<h3 class="text-xl font-playfair font-semibold text-charcoal mb-2">Details & Payment</h3>
+										<p class="text-sm font-roboto text-gray-600">Complete your information and secure your visit</p>
 									</div>
+
+									<!-- Personal Information -->
+									<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+										<div>
+											<label for="fullName" class="block text-sm font-playfair font-medium text-charcoal mb-2">Full Name *</label>
+											<input
+												type="text"
+												id="fullName"
+												name="fullName"
+												required
+												class="w-full px-4 py-3 shabby-input text-base font-roboto rounded-lg"
+												placeholder="Your full name"
+											>
+										</div>
+										<div>
+											<label for="email" class="block text-sm font-playfair font-medium text-charcoal mb-2">Email *</label>
+											<input
+												type="email"
+												id="email"
+												name="email"
+												required
+												class="w-full px-4 py-3 shabby-input text-base font-roboto rounded-lg"
+												placeholder="your@email.com"
+											>
+										</div>
+										<div>
+											<label for="phone" class="block text-sm font-playfair font-medium text-charcoal mb-2">Phone Number <span class="text-gray-500 font-normal">(optional)</span></label>
+											<input
+												type="tel"
+												id="phone"
+												name="phone"
+												class="w-full px-4 py-3 shabby-input text-base font-roboto rounded-lg"
+												placeholder="(555) 123-4567"
+											>
+										</div>
+									</div>
+
+									<!-- Bouquet Selection -->
+									<div class="mb-6">
+										<label for="numberOfVisitors" class="block text-sm font-playfair font-medium text-charcoal mb-3">Number of Bouquets *</label>
+										<div class="bouquet-counter">
+											<div class="counter-row">
+												<div class="counter-controls">
+													<button type="button" id="counter-minus" class="counter-btn minus" aria-label="Decrease bouquet count">−</button>
+													<input
+														type="number"
+														id="numberOfVisitors"
+														name="numberOfVisitors"
+														value="1"
+														min="1"
+														max="30"
+														readonly
+														required
+														class="counter-input"
+														aria-label="Number of bouquets"
+													>
+													<button type="button" id="counter-plus" class="counter-btn plus" aria-label="Increase bouquet count">+</button>
+												</div>
+												<div class="counter-price" id="counter-price">$35 CAD</div>
+												<div class="counter-message hidden" id="counter-message">For 30+ bouquets, please call us to confirm availability</div>
+											</div>
+										</div>
+
+									</div>
+
+									<!-- Payment Method Choice -->
+									<div class="space-y-4 mb-6">
+										<label class="block text-base font-playfair font-medium text-charcoal mb-3">How would you like to pay?</label>
+
+										<!-- Payment Options -->
+										<div class="space-y-3">
+											<label class="flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:bg-shabby-pink" style="border-color: #E8B4B8;">
+												<input
+													type="radio"
+													name="paymentMethod"
+													value="pay_on_arrival"
+													checked
+													class="sr-only"
+												>
+												<div class="payment-radio-custom mr-3"></div>
+												<div class="flex-1">
+													<div class="flex items-center">
+														<span class="font-playfair font-semibold text-charcoal">Pay on Arrival</span>
+													</div>
+													<p class="text-sm font-roboto text-charcoal mt-1">Cash or card accepted at the garden</p>
+												</div>
+											</label>
+
+											<label class="flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:bg-shabby-pink payment-now-option" style="border-color: #E8B4B8;">
+												<input
+													type="radio"
+													name="paymentMethod"
+													value="pay_now"
+													class="sr-only"
+												>
+												<div class="payment-radio-custom mr-3"></div>
+												<div class="flex-1">
+													<div class="flex items-center">
+														<span class="font-playfair font-semibold text-charcoal">Pay Now</span>
+														<span class="ml-2 px-2 py-1 text-xs rounded-full font-roboto" style="background-color: #F8E7E8; color: #333">Recommended</span>
+													</div>
+													<p class="text-sm font-roboto text-charcoal mt-1">Secure online payment for faster check-in</p>
+												</div>
+											</label>
+										</div>
+									</div>
+
+									<!-- Step 2 Navigation -->
+									<div class="flex justify-between">
+										<button
+											type="button"
+											id="step-2-back"
+											class="px-6 py-3 border-2 border-charcoal text-charcoal font-playfair font-semibold rounded-lg transition-all duration-300 hover:bg-charcoal hover:text-white focus:outline-none focus:border-charcoal active:border-charcoal"
+										>
+											<svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+											</svg>
+											Back
+										</button>
+										<button
+											type="submit"
+											id="bookNowBtn"
+											class="px-6 py-3 vintage-button bg-dusty-rose text-white font-playfair font-semibold rounded-lg transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-dusty-rose focus:ring-opacity-50"
+										>
+											<span id="bookingBtnText">Complete Booking</span>
+											<span id="bookingSpinner" class="hidden">
+												<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+													<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+													<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+												</svg>
+												Processing...
+											</span>
+										</button>
+									</div>
+
+									<p class="text-xs font-roboto text-charcoal text-center mt-4">
+										Secure payment powered by Square. Your information is protected.
+									</p>
 								</div>
-							</div>
 
-							<!-- Action Buttons - Side by side on desktop, stacked on mobile -->
-							<div class="grid grid-cols-1 lg:grid-cols-2 gap-2 pt-2">
-								<button
-									type="submit"
-									id="bookNowBtn"
-									class="vintage-button px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm lg:text-base floral-accent relative rounded-sm"
-								>
-									<span id="bookingBtnText">Book My Bouquet!</span>
-									<span id="bookingSpinner" class="hidden">
-										<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-										</svg>
-										Processing...
-									</span>
-								</button>
-								<a
-									href="#what-to-expect"
-									class="border-2 border-charcoal bg-cream px-6 py-3 rounded-sm font-playfair font-semibold hover:bg-shabby-pink transition-all duration-300 text-center text-sm lg:text-base"
-								>
-									What to Expect
-								</a>
-							</div>
 
-							<p class="text-xs font-roboto text-charcoal text-center mt-2">
-								Secure payment powered by Stripe. Your information is protected.
-							</p>
+							</div>
+							<!-- End of sliding container -->
+							</div>
 						</form>
-						</div>
 
 						<!-- Success Message (Hidden by default) -->
 						<div id="booking-success" class="hidden transition-all duration-500 ease-in-out opacity-0 transform translate-y-4">
@@ -641,7 +713,7 @@ import Layout from '../layouts/Layout.astro';
 			<!-- Call to Action -->
 			<div class="text-center mt-12">
 				<p class="font-roboto text-lg mb-6" style="color: #333333;">Ready to create your perfect bouquet?</p>
-				<a href="#home" class="vintage-button px-8 py-4 text-lg font-playfair font-semibold inline-block rounded-sm">
+				<a href="#pricing" class="vintage-button px-8 py-4 text-lg font-playfair font-semibold inline-block rounded-sm">
 					Book My Bouquet Experience!
 				</a>
 			</div>
@@ -944,10 +1016,10 @@ import Layout from '../layouts/Layout.astro';
 					<h3 class="text-2xl font-playfair font-bold mb-6 center-mobile-text keep-centered" style="color: #333333;">Our Story</h3>
 					<div class="space-y-4">
 						<p class="font-roboto leading-relaxed center-mobile-text" style="color: #333333;">
-							BG Bouquets is a welcoming, cut-your-own bouquet farm tucked in the sunny foothills of Southern Alberta — minutes from Hill Spring, Cardston, and Waterton Lakes National Park. Whether you're local or just passing through, our flower field is a place to slow down, breathe deep, and build something beautiful with your own hands.
+							BG Bouquets is a welcoming, cut-your-own bouquet farm tucked in the sunny foothills of Southern Alberta, only minutes from Hill Spring, Cardston, and Waterton Lakes National Park. Whether you're local or just passing through, our flower field is a place to slow down, breathe deep, and build something beautiful with your own hands.
 						</p>
 						<p class="font-roboto leading-relaxed center-mobile-text" style="color: #333333;">
-							We're proud to share the simple joys of our family farm in full bloom. Pick from a wide variety of seasonal flowers — including sunflowers, sweet peas, snapdragons, lavender, roses, and more — all grown with care in our prairie soil and perfect for creating your own custom bouquet.
+							We're proud to share the simple joys of our family farm in full bloom. Pick from a wide variety of seasonal flowers, including sunflowers, sweet peas, snapdragons, lavender, roses, and more. All grown with care in our prairie soil and perfect for creating your own custom bouquet.
 						</p>
 					</div>
 
@@ -1020,8 +1092,26 @@ import Layout from '../layouts/Layout.astro';
 								</svg>
 							</div>
 							<div>
-								<p class="font-playfair font-semibold mb-1" style="color: #333333;">Address</p>
-								<p class="font-roboto" style="color: #333333;">123 Garden Lane, Flower Valley, State 12345</p>
+								<p class="font-playfair font-semibold mb-1" style="color: #333333;">Location</p>
+								<p class="font-roboto" style="color: #333333;">Hill Spring Area, Southern Alberta</p>
+								<p class="font-roboto text-sm" style="color: #666;">49°20'00.5"N 113°38'03.9"W</p>
+							</div>
+						</div>
+
+						<div class="flex items-start space-x-4">
+							<div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #F8E7E8;">
+								<svg class="w-6 h-6" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.05 3.05A7 7 0 1119 10a7 7 0 01-13.95-6.95zM10 12a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+								</svg>
+							</div>
+							<div>
+								<p class="font-playfair font-semibold mb-1" style="color: #333333;">Distances</p>
+								<div class="font-roboto text-sm space-y-1" style="color: #333333;">
+									<p>• Cardston: 25 minutes (30 km)</p>
+									<p>• Pincher Creek: 35 minutes (45 km)</p>
+									<p>• Lethbridge: 45 minutes (60 km)</p>
+									<p>• Waterton National Park: 20 minutes</p>
+								</div>
 							</div>
 						</div>
 
@@ -1054,38 +1144,67 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</div>
 
-					<!-- Additional Info -->
-					<div class="mt-8 pt-6 border-t" style="border-color: #F8E7E8;">
-						<div class="grid md:grid-cols-2 gap-4">
-							<div class="flex items-center space-x-2">
-								<div class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: #F8E7E8;">
-									<svg class="w-3 h-3" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
-										<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-									</svg>
-								</div>
-								<span class="font-roboto text-sm" style="color: #333333;">Wheelchair accessible</span>
+					<!-- Driving Directions -->
+					<div class="mt-8 pt-6 border-t-2" style="border-color: #F8E7E8;">
+						<h4 class="text-lg font-playfair font-semibold mb-4" style="color: #333333;">Driving Directions</h4>
+						<div class="space-y-3 font-roboto text-sm" style="color: #333333;">
+							<div class="flex items-start space-x-3">
+								<div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white" style="background-color: #E8B4B8;">1</div>
+								<p><strong>From Lethbridge:</strong> Take Highway 5 south, then Highway 6 south towards Waterton National Park, then take Highway 505 east, then range road 280 north</p>
 							</div>
-							<div class="flex items-center space-x-2">
-								<div class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: #F8E7E8;">
-									<svg class="w-3 h-3" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
-										<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-									</svg>
-								</div>
-								<span class="font-roboto text-sm" style="color: #333333;">Restroom facilities</span>
+							<div class="flex items-start space-x-3">
+								<div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white" style="background-color: #E8B4B8;">2</div>
+								<p><strong>From Cardston:</strong> Take Highway 2 north, then Highway 505 west towards Waterton National Park, then range road 280 north</p>
+							</div>
+							<div class="flex items-start space-x-3">
+								<div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white" style="background-color: #E8B4B8;">3</div>
+								<p><strong>From Pincher Creek:</strong> Take Highway 6 south, then Highway 2 north, then highway 505 west, then north on range road 280</p>
+							</div>
+							<div class="flex items-start space-x-3">
+								<div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white" style="background-color: #E8B4B8;">4</div>
+								<p><strong>Look for:</strong> Range road entrance off Highway 505 near Hill Spring on the way to Waterton Reservoir and Waterton National Park</p>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<!-- Map Placeholder -->
+				<!-- Interactive Map -->
 				<div class="shabby-card p-8 distressed-shadow">
-					<div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
-						<span class="text-gray-500 font-roboto">Map Placeholder</span>
+					<div class="relative">
+						<!-- Static Map Image -->
+						<div class="map-container relative overflow-hidden rounded-lg" style="height: 400px; width: 100%; display: block;">
+							<img
+								src="/images/bg-bouquet-location.webp?v=2"
+								alt="BG Bouquet Garden Location Map - Hill Spring Area, Alberta"
+								class="w-full h-full object-cover cursor-pointer transition-transform duration-300 hover:scale-105 block"
+								onclick="openMaps()"
+								loading="lazy"
+								style="min-height: 100%; min-width: 100%;"
+							/>
+						</div>
 					</div>
-					<div class="mt-6 text-center">
-						<a href="#" class="vintage-button px-6 py-3 text-sm font-playfair font-semibold rounded-sm inline-block">
-							Get Directions
-						</a>
+
+					<!-- Navigation Buttons -->
+					<div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<button
+							onclick="openGoogleMaps()"
+							class="vintage-button px-4 py-3 text-sm font-playfair font-semibold rounded-sm flex items-center justify-center space-x-2"
+						>
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+							</svg>
+							<span>Google Maps</span>
+						</button>
+
+						<button
+							onclick="openAppleMaps()"
+							class="vintage-button px-4 py-3 text-sm font-playfair font-semibold rounded-sm flex items-center justify-center space-x-2"
+						>
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+							</svg>
+							<span>Apple Maps</span>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -1276,7 +1395,6 @@ import Layout from '../layouts/Layout.astro';
 
 			<!-- Contact Information Section -->
 			<div class="text-center">
-				<h3 class="text-2xl font-playfair font-bold mb-8" style="color: #333333;">Contact Information</h3>
 				<div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
 					<div class="flex flex-col items-center">
 						<div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background-color: #F8E7E8;">
@@ -1285,7 +1403,7 @@ import Layout from '../layouts/Layout.astro';
 							</svg>
 						</div>
 						<h4 class="font-playfair font-semibold mb-2" style="color: #333333;">Phone</h4>
-						<p class="font-roboto" style="color: #333333;">(555) 123-4567</p>
+						<p class="font-roboto" style="color: #333333;">(403) 393-8285</p>
 					</div>
 
 					<div class="flex flex-col items-center">
@@ -1296,7 +1414,7 @@ import Layout from '../layouts/Layout.astro';
 							</svg>
 						</div>
 						<h4 class="font-playfair font-semibold mb-2" style="color: #333333;">Email</h4>
-						<p class="font-roboto" style="color: #333333;">info@bouquetgarden.com</p>
+						<p class="font-roboto" style="color: #333333;">bev@bgbouquet.com</p>
 					</div>
 
 					<div class="flex flex-col items-center">
@@ -1485,7 +1603,7 @@ import Layout from '../layouts/Layout.astro';
 		sendAnotherBtn.addEventListener('click', showForm);
 	}
 
-	// Booking form functionality
+	// Modern Multi-Step Booking Form Functionality
 	document.addEventListener('DOMContentLoaded', () => {
 		// Initialize FAQ accordion
 		initializeFAQ();
@@ -1493,27 +1611,62 @@ import Layout from '../layouts/Layout.astro';
 		// Initialize contact form
 		initializeContactForm();
 
+		// Multi-step booking form elements
 		const bookingForm = document.getElementById('booking-form') as HTMLFormElement;
 		const bookNowBtn = document.getElementById('bookNowBtn') as HTMLButtonElement;
 		const bookingBtnText = document.getElementById('bookingBtnText') as HTMLElement;
 		const bookingSpinner = document.getElementById('bookingSpinner') as HTMLElement;
-		const visitDateInput = document.getElementById('visitDate') as HTMLInputElement;
-		const preferredTimeSelect = document.getElementById('preferredTime') as HTMLSelectElement;
-		const visitorsSelect = document.getElementById('numberOfVisitors') as HTMLSelectElement;
 
-		// Custom calendar elements
-		const customCalendar = document.getElementById('customCalendar') as HTMLElement;
+		// Step elements (2-step flow)
+		const step1 = document.getElementById('step-1') as HTMLElement;
+		const step2 = document.getElementById('step-2') as HTMLElement;
+
+		// Step indicators (2-step flow)
+		const step1Indicator = document.getElementById('step-1-indicator') as HTMLElement;
+		const step2Indicator = document.getElementById('step-2-indicator') as HTMLElement;
+		const step1Label = document.getElementById('step-1-label') as HTMLElement;
+		const step2Label = document.getElementById('step-2-label') as HTMLElement;
+
+		// Navigation buttons
+		const step1Next = document.getElementById('step-1-next') as HTMLButtonElement;
+		const step2Back = document.getElementById('step-2-back') as HTMLButtonElement;
+
+		// Form inputs
+		const visitDateInput = document.getElementById('visitDate') as HTMLInputElement;
+		const preferredTimeInput = document.getElementById('preferredTime') as HTMLInputElement;
+		const visitorsSelect = document.getElementById('numberOfVisitors') as HTMLSelectElement;
+		const fullNameInput = document.getElementById('fullName') as HTMLInputElement;
+		const emailInput = document.getElementById('email') as HTMLInputElement;
+		const phoneInput = document.getElementById('phone') as HTMLInputElement;
+
+		// Always-visible calendar elements
 		const currentMonthEl = document.getElementById('currentMonth') as HTMLElement;
-		const calendarDays = document.getElementById('calendarDays') as HTMLElement;
+		const calendarDaysContainer = document.getElementById('calendarDaysContainer') as HTMLElement;
 		const prevMonthBtn = document.getElementById('prevMonth') as HTMLButtonElement;
 		const nextMonthBtn = document.getElementById('nextMonth') as HTMLButtonElement;
+		const timeSlotsContainer = document.getElementById('time-slots') as HTMLElement;
+		const noDateSelected = document.getElementById('no-date-selected') as HTMLElement;
+
+		// Mobile slide transition elements
+		const bookingColumns = document.getElementById('booking-columns') as HTMLElement;
+		const mobileBackBtn = document.getElementById('mobile-back-btn') as HTMLButtonElement;
+
+		// Counter elements
+		const counterMinusBtn = document.getElementById('counter-minus') as HTMLButtonElement;
+		const counterPlusBtn = document.getElementById('counter-plus') as HTMLButtonElement;
+		const counterPrice = document.getElementById('counter-price') as HTMLElement;
+		const counterMessage = document.getElementById('counter-message') as HTMLElement;
+
+
 
 		const PRICE_PER_BOUQUET = 35;
 
-		// Global variables for availability data
+		// Global variables for multi-step form
+		let currentStep = 1;
 		let availabilityData: Record<string, string[]> = {};
 		let currentDate = new Date();
 		let selectedDate = '';
+		let selectedTime = '';
 		let isInitializing = false;
 
 		// Business timezone helper - Alberta, Canada (Mountain Time)
@@ -1522,6 +1675,353 @@ import Layout from '../layouts/Layout.astro';
 				timeZone: 'America/Edmonton'
 			}); // Returns YYYY-MM-DD format
 		}
+
+		// Modern Multi-step form management with smooth slide transitions
+		function showStep(stepNumber: number, shouldFocus: boolean = true) {
+			const stepsContainer = document.querySelector('.booking-steps-container') as HTMLElement;
+			const steps = [step1, step2];
+
+			if (!stepsContainer) return;
+
+			// Add transitioning class for smooth opacity effect
+			steps.forEach(step => step.classList.add('transitioning'));
+
+			// Update container class for slide transition
+			stepsContainer.classList.remove('show-step-1', 'show-step-2');
+			stepsContainer.classList.add(`show-step-${stepNumber}`);
+
+			// Update aria attributes for accessibility
+			steps.forEach((step, index) => {
+				if (index + 1 === stepNumber) {
+					step.setAttribute('aria-hidden', 'false');
+					step.classList.add('active');
+				} else {
+					step.setAttribute('aria-hidden', 'true');
+					step.classList.remove('active');
+				}
+			});
+
+			// Update step indicators and progress
+			updateStepIndicators(stepNumber);
+
+			// Update progress bar
+			const progressBar = document.getElementById('step-progress');
+			if (progressBar) {
+				progressBar.setAttribute('aria-valuenow', stepNumber.toString());
+			}
+
+			currentStep = stepNumber;
+
+			// Remove transitioning class and focus management after transition
+			setTimeout(() => {
+				steps.forEach(step => step.classList.remove('transitioning'));
+
+				// Focus management for accessibility (only when explicitly requested)
+				if (shouldFocus) {
+					const currentStepElement = steps[stepNumber - 1];
+					const firstInput = currentStepElement.querySelector('input, select, button') as HTMLElement;
+					if (firstInput) {
+						firstInput.focus();
+					}
+				}
+			}, 400); // Match CSS transition duration
+		}
+
+		function updateStepIndicators(activeStep: number) {
+			const indicators = [step1Indicator, step2Indicator];
+			const labels = [step1Label, step2Label];
+
+			indicators.forEach((indicator, index) => {
+				const stepNum = index + 1;
+				indicator.classList.remove('active', 'completed');
+				labels[index].classList.remove('active');
+
+				if (stepNum === activeStep) {
+					indicator.classList.add('active');
+					labels[index].classList.add('active');
+				} else if (stepNum < activeStep) {
+					indicator.classList.add('completed');
+				}
+			});
+		}
+
+		function validateStep1(): boolean {
+			return !!(selectedDate && selectedTime);
+		}
+
+		function validateStep2(): boolean {
+			const name = fullNameInput.value.trim();
+			const email = emailInput.value.trim();
+			const phone = phoneInput.value.trim();
+
+			// Clear previous errors
+			[fullNameInput, emailInput, phoneInput].forEach(input => {
+				input.classList.remove('border-red-500');
+			});
+
+			let valid = true;
+
+			if (!name) {
+				fullNameInput.classList.add('border-red-500');
+				valid = false;
+			}
+
+			if (!email) {
+				emailInput.classList.add('border-red-500');
+				valid = false;
+			} else {
+				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if (!emailRegex.test(email)) {
+					emailInput.classList.add('border-red-500');
+					valid = false;
+				}
+			}
+
+			// Phone is now optional - only validate format if provided
+			if (phone && phone.length > 0) {
+				const phoneRegex = /^[\d\s\-\(\)\.]+$/;
+				if (!phoneRegex.test(phone)) {
+					phoneInput.classList.add('border-red-500');
+					valid = false;
+				}
+			}
+
+			return valid;
+		}
+
+
+
+		function updateTotalPrice() {
+			const count = parseInt(visitorsSelect.value) || 1;
+			const total = count * PRICE_PER_BOUQUET;
+
+			// Update counter price with pulse animation
+			if (counterPrice) {
+				counterPrice.classList.add('updating');
+				counterPrice.textContent = `$${total} CAD`;
+				setTimeout(() => counterPrice.classList.remove('updating'), 500);
+			}
+
+			// Handle 30+ bouquet message
+			if (counterMessage) {
+				if (count >= 30) {
+					counterMessage.classList.remove('hidden');
+				} else {
+					counterMessage.classList.add('hidden');
+				}
+			}
+
+			// Update button states
+			updateCounterButtons(count);
+		}
+
+		// Update counter button states
+		function updateCounterButtons(count: number) {
+			if (counterMinusBtn) {
+				counterMinusBtn.disabled = count <= 1;
+			}
+			if (counterPlusBtn) {
+				counterPlusBtn.disabled = count >= 30;
+			}
+		}
+
+		// Counter increment function
+		function incrementCounter() {
+			const currentValue = parseInt(visitorsSelect.value) || 1;
+			const newValue = Math.min(currentValue + 1, 30);
+			visitorsSelect.value = newValue.toString();
+			updateTotalPrice();
+		}
+
+		// Counter decrement function
+		function decrementCounter() {
+			const currentValue = parseInt(visitorsSelect.value) || 1;
+			const newValue = Math.max(currentValue - 1, 1);
+			visitorsSelect.value = newValue.toString();
+			updateTotalPrice();
+		}
+
+		// Create time slot cards
+		function createTimeSlotCards(times: string[]) {
+			// Clear previous time slots
+			timeSlotsContainer.innerHTML = '';
+
+			if (times.length === 0) {
+				// Show "no slots available" message
+				noDateSelected.style.display = 'none';
+				timeSlotsContainer.classList.add('hidden');
+				timeSlotsContainer.innerHTML = '<div class="text-center py-8 px-4"><div class="text-gray-400 mb-2"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><h4 class="font-playfair font-medium text-charcoal mb-1">No available times</h4><p class="text-sm font-roboto text-gray-500">This date is fully booked. Please select another date.</p></div>';
+				timeSlotsContainer.classList.remove('hidden');
+				return;
+			}
+
+			// Hide the "select a date" message and show time slots
+			noDateSelected.style.display = 'none';
+			timeSlotsContainer.classList.remove('hidden');
+			timeSlotsContainer.className = 'grid gap-3';
+
+			// Trigger mobile slide transition to time slots
+			showMobileTimeSlots();
+
+			times.forEach((time) => {
+				const card = document.createElement('div');
+				card.className = 'time-slot-card';
+				card.setAttribute('role', 'radio');
+				card.setAttribute('aria-checked', 'false');
+				card.setAttribute('tabindex', '0');
+				card.setAttribute('aria-label', `Select ${time} time slot`);
+				card.innerHTML = `
+					<div class="font-playfair font-semibold text-lg">${time}</div>
+					<div class="text-sm font-roboto mt-1">Available</div>
+				`;
+
+				// Click handler
+				const selectTimeSlot = () => {
+					// Remove selection from other cards
+					document.querySelectorAll('.time-slot-card').forEach(c => {
+						c.classList.remove('selected');
+						c.setAttribute('aria-checked', 'false');
+					});
+					// Select this card
+					card.classList.add('selected');
+					card.setAttribute('aria-checked', 'true');
+					selectedTime = time;
+					preferredTimeInput.value = time;
+
+					// Enable next button
+					step1Next.disabled = false;
+				};
+
+				card.addEventListener('click', selectTimeSlot);
+
+				// Keyboard navigation
+				card.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						selectTimeSlot();
+					} else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+						e.preventDefault();
+						const nextCard = card.nextElementSibling as HTMLElement;
+						if (nextCard) nextCard.focus();
+					} else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+						e.preventDefault();
+						const prevCard = card.previousElementSibling as HTMLElement;
+						if (prevCard) prevCard.focus();
+					}
+				});
+
+				timeSlotsContainer.appendChild(card);
+			});
+		}
+
+		// Show the "select a date" prompt
+		function showSelectDatePrompt() {
+			noDateSelected.style.display = 'flex';
+			timeSlotsContainer.classList.add('hidden');
+			step1Next.disabled = true;
+
+			// Reset mobile view to calendar on mobile
+			if (window.innerWidth <= 767) {
+				showMobileCalendar();
+			}
+		}
+
+		// Mobile slide transition functions
+		function showMobileTimeSlots() {
+			if (window.innerWidth <= 767 && bookingColumns) {
+				bookingColumns.classList.add('show-time-slots');
+				// Add ARIA live region announcement
+				const announcement = document.createElement('div');
+				announcement.setAttribute('aria-live', 'polite');
+				announcement.setAttribute('aria-atomic', 'true');
+				announcement.className = 'sr-only';
+				announcement.textContent = 'Time slots view loaded';
+				document.body.appendChild(announcement);
+				setTimeout(() => document.body.removeChild(announcement), 1000);
+			}
+		}
+
+		function showMobileCalendar() {
+			if (window.innerWidth <= 767 && bookingColumns) {
+				bookingColumns.classList.remove('show-time-slots');
+			}
+		}
+
+		// Mobile back button handler
+		if (mobileBackBtn) {
+			mobileBackBtn.addEventListener('click', () => {
+				showMobileCalendar();
+				// Clear time selection when going back
+				selectedTime = '';
+				preferredTimeInput.value = '';
+				step1Next.disabled = true;
+				// Remove selection from time slot cards
+				document.querySelectorAll('.time-slot-card').forEach(card => {
+					card.classList.remove('selected');
+					card.setAttribute('aria-checked', 'false');
+				});
+			});
+		}
+
+		// Window resize handler to reset mobile transitions on desktop
+		window.addEventListener('resize', () => {
+			if (window.innerWidth > 767 && bookingColumns) {
+				// Reset mobile transitions when switching to desktop
+				bookingColumns.classList.remove('show-time-slots');
+			}
+		});
+
+		// Step navigation handlers
+		step1Next.addEventListener('click', () => {
+			if (validateStep1()) {
+				showStep(2);
+			} else {
+				alert('Please select both a date and time slot.');
+			}
+		});
+
+		step2Back.addEventListener('click', () => {
+			showStep(1);
+		});
+
+
+
+		// Counter button event listeners
+		if (counterPlusBtn) {
+			counterPlusBtn.addEventListener('click', incrementCounter);
+
+			// Keyboard support
+			counterPlusBtn.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					incrementCounter();
+				}
+			});
+		}
+
+		if (counterMinusBtn) {
+			counterMinusBtn.addEventListener('click', decrementCounter);
+
+			// Keyboard support
+			counterMinusBtn.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					decrementCounter();
+				}
+			});
+		}
+
+		// Initialize counter state
+		updateTotalPrice();
+
+		// Phone formatting
+		phoneInput.addEventListener('input', (e: Event) => {
+			const input = e.target as HTMLInputElement;
+			let v = input.value.replace(/\D/g, '');
+			if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d+)/, '($1) $2-$3');
+			else if (v.length > 3) v = v.replace(/(\d{3})(\d+)/, '($1) $2');
+			input.value = v;
+		});
 
 		// Fetch availability from API and initialize custom calendar
 		async function loadAvailability() {
@@ -1535,17 +2035,11 @@ import Layout from '../layouts/Layout.astro';
 				const validDates = Object.keys(availabilityData);
 				console.log('Valid dates:', validDates);
 
-				// Initialize custom calendar
+				// Initialize always-visible calendar
 				initializeCustomCalendar();
 
-				// Auto-select first available date (using business timezone)
-				const businessToday = getBusinessToday();
-				const firstValid = validDates.find(d => d >= businessToday);
-				if (firstValid) {
-					isInitializing = true;
-					selectDate(firstValid);
-					isInitializing = false;
-				}
+				// Show "select a date" prompt (no auto-selection)
+				showSelectDatePrompt();
 
 			} catch (error) {
 				console.error('Error loading availability:', error);
@@ -1576,24 +2070,13 @@ import Layout from '../layouts/Layout.astro';
 		function setupCalendarEventListeners() {
 			if (calendarEventListenersSetup) return;
 
-			// Event listeners
-			visitDateInput.addEventListener('click', () => {
-				customCalendar.classList.toggle('hidden');
-			});
-
+			// Event listeners for always-visible calendar
 			prevMonthBtn.addEventListener('click', () => {
 				navigateToMonth(-1);
 			});
 
 			nextMonthBtn.addEventListener('click', () => {
 				navigateToMonth(1);
-			});
-
-			// Close calendar when clicking outside
-			document.addEventListener('click', (e) => {
-				if (!visitDateInput.contains(e.target as Node) && !customCalendar.contains(e.target as Node)) {
-					customCalendar.classList.add('hidden');
-				}
 			});
 
 			calendarEventListenersSetup = true;
@@ -1614,20 +2097,27 @@ import Layout from '../layouts/Layout.astro';
 			updateNavigationButtons();
 
 			// Clear previous days
-			calendarDays.innerHTML = '';
+			calendarDaysContainer.innerHTML = '';
 
 			// Get first day of month and number of days
 			const firstDay = new Date(year, month, 1).getDay();
 			const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-			// Add empty cells for days before month starts
-			for (let i = 0; i < firstDay; i++) {
-				const emptyDay = document.createElement('div');
-				emptyDay.className = 'w-10 h-10 flex items-center justify-center';
-				calendarDays.appendChild(emptyDay);
+			// Calculate previous month info for filling empty cells
+			const prevMonth = month === 0 ? 11 : month - 1;
+			const prevYear = month === 0 ? year - 1 : year;
+			const daysInPrevMonth = new Date(prevYear, prevMonth + 1, 0).getDate();
+
+			// Add previous month days to fill the first week
+			for (let i = firstDay - 1; i >= 0; i--) {
+				const prevDay = daysInPrevMonth - i;
+				const dayEl = document.createElement('div');
+				dayEl.className = 'calendar-day prev-next-month';
+				dayEl.textContent = prevDay.toString();
+				calendarDaysContainer.appendChild(dayEl);
 			}
 
-			// Add days of the month
+			// Add days of the current month
 			for (let day = 1; day <= daysInMonth; day++) {
 				const dayEl = document.createElement('button');
 				dayEl.type = 'button';
@@ -1635,13 +2125,13 @@ import Layout from '../layouts/Layout.astro';
 
 				const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-				// Base styling for all day buttons
-				dayEl.className = 'calendar-day-btn w-10 h-10 flex items-center justify-center text-sm font-roboto rounded-lg';
+				// Base styling using new CSS classes
+				dayEl.className = 'calendar-day';
 
 				// Check if date is available
 				if (availabilityData[dateStr]) {
-					// Available date styling - gets border and interactive styling from CSS
-					dayEl.className += ' available cursor-pointer';
+					// Available date styling
+					dayEl.className += ' available';
 					dayEl.addEventListener('click', () => selectDate(dateStr));
 
 					// Highlight selected date
@@ -1649,12 +2139,24 @@ import Layout from '../layouts/Layout.astro';
 						dayEl.className += ' selected';
 					}
 				} else {
-					// Unavailable date styling - minimal, no border, faded
+					// Unavailable date styling
 					dayEl.className += ' unavailable';
 					dayEl.disabled = true;
 				}
 
-				calendarDays.appendChild(dayEl);
+				calendarDaysContainer.appendChild(dayEl);
+			}
+
+			// Fill remaining cells with next month days to complete 6 weeks (42 total cells)
+			const totalCells = 42;
+			const cellsUsed = firstDay + daysInMonth;
+			const remainingCells = totalCells - cellsUsed;
+
+			for (let day = 1; day <= remainingCells; day++) {
+				const dayEl = document.createElement('div');
+				dayEl.className = 'calendar-day prev-next-month';
+				dayEl.textContent = day.toString();
+				calendarDaysContainer.appendChild(dayEl);
 			}
 		}
 
@@ -1742,7 +2244,6 @@ import Layout from '../layouts/Layout.astro';
 		function selectDate(dateStr: string) {
 			selectedDate = dateStr;
 			visitDateInput.value = dateStr;
-			customCalendar.classList.add('hidden');
 			handleDateChange(dateStr);
 			renderCalendar(); // Re-render to update selection
 		}
@@ -1752,7 +2253,7 @@ import Layout from '../layouts/Layout.astro';
 
 			// Check if date is provided
 			if (!selectedDateStr) {
-				populateTimes([]);
+				createTimeSlotCards([]);
 				return;
 			}
 
@@ -1785,7 +2286,7 @@ import Layout from '../layouts/Layout.astro';
 				}
 				visitDateInput.value = '';
 				selectedDate = '';
-				populateTimes([]);
+				createTimeSlotCards([]);
 				return;
 			}
 
@@ -1798,7 +2299,7 @@ import Layout from '../layouts/Layout.astro';
 				}
 				visitDateInput.value = '';
 				selectedDate = '';
-				populateTimes([]);
+				createTimeSlotCards([]);
 				return;
 			}
 
@@ -1811,7 +2312,7 @@ import Layout from '../layouts/Layout.astro';
 				}
 				visitDateInput.value = '';
 				selectedDate = '';
-				populateTimes([]);
+				createTimeSlotCards([]);
 				return;
 			}
 
@@ -1831,7 +2332,7 @@ import Layout from '../layouts/Layout.astro';
 				if (!confirmed) {
 					visitDateInput.value = '';
 					selectedDate = '';
-					populateTimes([]);
+					createTimeSlotCards([]);
 					return;
 				}
 			}
@@ -1844,33 +2345,18 @@ import Layout from '../layouts/Layout.astro';
 				}
 				visitDateInput.value = '';
 				selectedDate = '';
-				populateTimes([]);
+				showSelectDatePrompt();
 				return;
 			}
 
-			// Date is valid - populate times
-			populateTimes(availabilityData[selectedDateStr] || []);
-		}
+			// Date is valid - create time slot cards
+			createTimeSlotCards(availabilityData[selectedDateStr] || []);
 
-		function populateTimes(times: string[]) {
-			preferredTimeSelect.innerHTML = '<option value="">Select time</option>';
-			times.forEach(time => {
-				const opt = document.createElement('option');
-				opt.value = time;
-				opt.textContent = time;
-				preferredTimeSelect.appendChild(opt);
-			});
+			// Reset time selection when date changes
+			selectedTime = '';
+			preferredTimeInput.value = '';
+			step1Next.disabled = true;
 		}
-
-		function updateTotalPrice() {
-			const count = parseInt(visitorsSelect.value) || 1;
-			const total = count * PRICE_PER_BOUQUET;
-			// Optional: update a visible total price element
-			// document.getElementById('totalPrice')!.textContent = `$${total}`;
-			return total;
-		}
-
-		visitorsSelect?.addEventListener('change', updateTotalPrice);
 
 		// Payment method selection handling
 		const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]') as NodeListOf<HTMLInputElement>;
@@ -1893,78 +2379,11 @@ import Layout from '../layouts/Layout.astro';
 			});
 		});
 
-		// Form validation
+		// Final form validation for submission
 		function validateForm(): boolean {
-			let valid = true;
-
-			// Check required fields
-			['fullName', 'email', 'phone', 'visitDate', 'preferredTime'].forEach(id => {
-				const el = document.getElementById(id) as HTMLInputElement | HTMLSelectElement;
-				if (!el.value.trim()) {
-					el.classList.add('border-red-500');
-					valid = false;
-				} else {
-					el.classList.remove('border-red-500');
-				}
-			});
-
-			// Additional validation for visit date
-			const selectedDateStr = visitDateInput.value;
-
-			if (selectedDateStr) {
-				const selectedDateObj = new Date(selectedDateStr);
-				const businessToday = getBusinessToday();
-				const currentYear = parseInt(businessToday.split('-')[0]);
-				const selectedYear = selectedDateObj.getFullYear();
-
-				// Check if date is in the past (using business timezone)
-				if (selectedDateStr < businessToday) {
-					alert('You cannot book a date in the past. Please select a future date.');
-					visitDateInput.classList.add('border-red-500');
-					valid = false;
-				}
-				// Check if date is in the past (before current year)
-				else if (selectedYear < currentYear) {
-					const yearDiff = currentYear - selectedYear;
-					const message = `You've selected a date from ${yearDiff} year${yearDiff > 1 ? 's' : ''} ago (${selectedYear}). Please select a date from the current flower season.`;
-					alert(message);
-					visitDateInput.classList.add('border-red-500');
-					valid = false;
-				}
-				// Check if date is too far in the future (more than next year)
-				else if (selectedYear > currentYear + 1) {
-					const yearDiff = selectedYear - currentYear;
-					const message = `You've selected a date ${yearDiff} year${yearDiff > 1 ? 's' : ''} in the future (${selectedYear}). Bookings are only available for the current and next flower season.`;
-					alert(message);
-					visitDateInput.classList.add('border-red-500');
-					valid = false;
-				}
-				// Check if date is in next year - ask for confirmation (but don't block submission if already confirmed)
-				else if (selectedYear > currentYear) {
-					// Note: If we reach this point during form submission, the user has already
-					// confirmed the next year date during selection, so we allow it to proceed
-					console.log(`Proceeding with next year booking for ${selectedYear}`);
-				}
-				// Check if date is available in our system
-				else if (!availabilityData[selectedDateStr]) {
-					alert('The selected date is not available for bookings. Please choose a different date.');
-					visitDateInput.classList.add('border-red-500');
-					valid = false;
-				}
-			}
-
-			// Additional validation for time slot
-			const selectedTime = preferredTimeSelect.value;
-			if (selectedDate && selectedTime && availabilityData[selectedDate]) {
-				const availableTimes = availabilityData[selectedDate];
-				if (!availableTimes.includes(selectedTime)) {
-					alert('The selected time is not available for the chosen date. Please select a different time.');
-					preferredTimeSelect.classList.add('border-red-500');
-					valid = false;
-				}
-			}
-
-			return valid;
+			// All validation is now handled in individual steps
+			// This is just a final check before submission
+			return validateStep1() && validateStep2();
 		}
 
 		// Phone formatting
@@ -2038,6 +2457,13 @@ import Layout from '../layouts/Layout.astro';
 			}
 		});
 
+		// Initialize multi-step form (without auto-focus to prevent page jumping)
+		showStep(1, false);
+		updateTotalPrice();
+
+		// Show initial "select a date" prompt
+		showSelectDatePrompt();
+
 		// Load available slots initially
 		loadAvailability();
 
@@ -2066,7 +2492,7 @@ import Layout from '../layouts/Layout.astro';
 			}
 			if (successVisitors) {
 				const visitorText = booking.numberOfVisitors === 1 ? 'bouquet' : 'bouquets';
-				successVisitors.textContent = `${booking.numberOfVisitors} ${visitorText} ($${booking.totalAmount})`;
+				successVisitors.textContent = `${booking.numberOfVisitors} ${visitorText} ($${booking.totalAmount} CAD)`;
 			}
 			if (successEmailMessage) {
 				successEmailMessage.textContent = message || 'You\'ll receive a confirmation email shortly.';
@@ -2948,6 +3374,32 @@ import Layout from '../layouts/Layout.astro';
 			console.log('Falling back to legacy implementation:', error);
 		}
 	}
+
+	// Map Navigation Functions
+	function openMaps() {
+		// Default to Google Maps
+		openGoogleMaps();
+	}
+
+	function openGoogleMaps() {
+		const lat = 49.333472;
+		const lng = -113.634417;
+		const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+		window.open(url, '_blank');
+	}
+
+	function openAppleMaps() {
+		const lat = 49.333472;
+		const lng = -113.634417;
+		// Use the proper Apple Maps URL format with pin
+		const url = `https://maps.apple.com/?ll=${lat},${lng}&q=Pin`;
+		window.open(url, '_blank');
+	}
+
+	// Make functions globally available
+	window.openMaps = openMaps;
+	window.openGoogleMaps = openGoogleMaps;
+	window.openAppleMaps = openAppleMaps;
 
 	// Initialize when DOM is ready
 	if (document.readyState === 'loading') {
