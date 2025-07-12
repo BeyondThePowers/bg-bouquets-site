@@ -600,6 +600,10 @@ input[name="paymentMethod"] {
  padding-bottom: 12rem;
 }
 
+#about {
+  padding-bottom: 3rem;
+}
+
 .pricing-content {
   z-index: 3;
 }
