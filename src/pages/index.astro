@@ -1874,6 +1874,11 @@ import Layout from '../layouts/Layout.astro';
 			// Trigger mobile slide transition to time slots
 			showMobileTimeSlots();
 
+			// Set up mobile scroll indicators after a brief delay
+			setTimeout(() => {
+				setupMobileScrollIndicators();
+			}, 100);
+
 			times.forEach((time) => {
 				const card = document.createElement('div');
 				card.className = 'time-slot-card';
@@ -1955,6 +1960,40 @@ import Layout from '../layouts/Layout.astro';
 		function showMobileCalendar() {
 			if (window.innerWidth <= 767 && bookingColumns) {
 				bookingColumns.classList.remove('show-time-slots');
+			}
+		}
+
+		// Set up mobile scroll indicators for time slots
+		function setupMobileScrollIndicators() {
+			if (window.innerWidth > 767) return; // Only on mobile
+
+			const timeSlotsContent = document.getElementById('time-slots-content');
+			if (!timeSlotsContent) return;
+
+			// Check if content is scrollable
+			const isScrollable = timeSlotsContent.scrollHeight > timeSlotsContent.clientHeight;
+
+			if (isScrollable) {
+				timeSlotsContent.classList.add('has-scroll');
+
+				// Add scroll event listener to hide indicator when scrolled to bottom
+				const handleScroll = () => {
+					const { scrollTop, scrollHeight, clientHeight } = timeSlotsContent;
+					const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px tolerance
+
+					if (isScrolledToBottom) {
+						timeSlotsContent.classList.add('scrolled-to-bottom');
+					} else {
+						timeSlotsContent.classList.remove('scrolled-to-bottom');
+					}
+				};
+
+				timeSlotsContent.addEventListener('scroll', handleScroll, { passive: true });
+
+				// Initial check
+				handleScroll();
+			} else {
+				timeSlotsContent.classList.remove('has-scroll', 'scrolled-to-bottom');
 			}
 		}
 
@@ -2081,13 +2120,17 @@ import Layout from '../layouts/Layout.astro';
 		function setupCalendarEventListeners() {
 			if (calendarEventListenersSetup) return;
 
-			// Event listeners for always-visible calendar
+			// Event listeners for always-visible calendar with animations
 			prevMonthBtn.addEventListener('click', () => {
-				navigateToMonth(-1);
+				if (!prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
+					animateMonthChange(-1, 'right');
+				}
 			});
 
 			nextMonthBtn.addEventListener('click', () => {
-				navigateToMonth(1);
+				if (!nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
+					animateMonthChange(1, 'left');
+				}
 			});
 
 			// Set up swipe navigation for mobile
@@ -2140,68 +2183,70 @@ import Layout from '../layouts/Layout.astro';
 				// Determine swipe direction and navigate with animation
 				if (horizontalDistance > 0) {
 					// Swipe right - go to previous month (if not disabled)
-					if (!prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
+					if (prevMonthBtn && !prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
 						animateMonthChange(-1, 'right');
 					}
 				} else {
 					// Swipe left - go to next month (if not disabled)
-					if (!nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
+					if (nextMonthBtn && !nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
 						animateMonthChange(1, 'left');
 					}
 				}
 			}
 
-			// Animate month change with slide effect
-			function animateMonthChange(direction: number, swipeDirection: string) {
+		}
+
+		// Animate month change with slide effect (shared function)
+		function animateMonthChange(direction: number, swipeDirection: string) {
+			const calendarGrid = document.getElementById('calendarGrid');
+			if (!calendarGrid) return;
+
+			const currentMonthEl = document.getElementById('currentMonth');
+			const calendarContainer = calendarGrid.closest('.bg-white');
+
+			// Add pulse feedback to calendar container
+			if (calendarContainer) {
+				calendarContainer.classList.add('swipe-feedback');
+				setTimeout(() => {
+					calendarContainer.classList.remove('swipe-feedback');
+				}, 100);
+			}
+
+			// Add changing class to month header
+			if (currentMonthEl) {
+				currentMonthEl.classList.add('changing');
+			}
+
+			// Add slide out animation
+			const slideOutClass = swipeDirection === 'left' ? 'slide-left' : 'slide-right';
+			calendarGrid.classList.add(slideOutClass);
+
+			// After slide out animation, change month and slide in
+			setTimeout(() => {
 				if (!calendarGrid) return;
 
-				const currentMonthEl = document.getElementById('currentMonth');
-				const calendarContainer = calendarGrid.closest('.bg-white');
+				// Remove slide out class
+				calendarGrid.classList.remove(slideOutClass);
 
-				// Add pulse feedback to calendar container
-				if (calendarContainer) {
-					calendarContainer.classList.add('swipe-feedback');
-					setTimeout(() => {
-						calendarContainer.classList.remove('swipe-feedback');
-					}, 100);
-				}
+				// Navigate to new month
+				navigateToMonth(direction);
 
-				// Add changing class to month header
+				// Add slide in animation
+				const slideInClass = swipeDirection === 'left' ? 'slide-in-left' : 'slide-in-right';
+				calendarGrid.classList.add(slideInClass);
+
+				// Remove month header changing class
 				if (currentMonthEl) {
-					currentMonthEl.classList.add('changing');
+					currentMonthEl.classList.remove('changing');
 				}
 
-				// Add slide out animation
-				const slideOutClass = swipeDirection === 'left' ? 'slide-left' : 'slide-right';
-				calendarGrid.classList.add(slideOutClass);
-
-				// After slide out animation, change month and slide in
+				// Clean up slide in animation
 				setTimeout(() => {
-					if (!calendarGrid) return;
-
-					// Remove slide out class
-					calendarGrid.classList.remove(slideOutClass);
-
-					// Navigate to new month
-					navigateToMonth(direction);
-
-					// Add slide in animation
-					const slideInClass = swipeDirection === 'left' ? 'slide-in-left' : 'slide-in-right';
-					calendarGrid.classList.add(slideInClass);
-
-					// Remove month header changing class
-					if (currentMonthEl) {
-						currentMonthEl.classList.remove('changing');
+					if (calendarGrid) {
+						calendarGrid.classList.remove(slideInClass);
 					}
-
-					// Clean up slide in animation
-					setTimeout(() => {
-						if (calendarGrid) {
-							calendarGrid.classList.remove(slideInClass);
-						}
-					}, 300);
 				}, 300);
-			}
+			}, 300);
 		}
 
 		// Render calendar for current month

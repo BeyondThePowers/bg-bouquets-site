@@ -1174,11 +1174,19 @@
 		// Set up calendar event listeners
 		function setupCalendarEventListeners(): void {
 			if (prevMonthBtn) {
-				prevMonthBtn.addEventListener('click', () => navigateToMonth(-1));
+				prevMonthBtn.addEventListener('click', () => {
+					if (!prevMonthBtn.disabled && !prevMonthBtn.classList.contains('cursor-not-allowed')) {
+						animateMonthChange(-1, 'right');
+					}
+				});
 			}
 
 			if (nextMonthBtn) {
-				nextMonthBtn.addEventListener('click', () => navigateToMonth(1));
+				nextMonthBtn.addEventListener('click', () => {
+					if (!nextMonthBtn.disabled && !nextMonthBtn.classList.contains('cursor-not-allowed')) {
+						animateMonthChange(1, 'left');
+					}
+				});
 			}
 
 			// Set up swipe navigation for mobile
@@ -1240,57 +1248,59 @@
 				}
 			}
 
-			// Animate month change with slide effect
-			function animateMonthChange(direction: number, swipeDirection: string): void {
+		}
+
+		// Animate month change with slide effect (shared function)
+		function animateMonthChange(direction: number, swipeDirection: string): void {
+			const calendarGrid = document.getElementById('calendar-days');
+			if (!calendarGrid) return;
+
+			const currentMonthEl = document.getElementById('currentMonth');
+			const calendarContainer = calendarGrid.closest('.bg-white');
+
+			// Add pulse feedback to calendar container
+			if (calendarContainer) {
+				calendarContainer.classList.add('swipe-feedback');
+				setTimeout(() => {
+					calendarContainer.classList.remove('swipe-feedback');
+				}, 100);
+			}
+
+			// Add changing class to month header
+			if (currentMonthEl) {
+				currentMonthEl.classList.add('changing');
+			}
+
+			// Add slide out animation
+			const slideOutClass = swipeDirection === 'left' ? 'slide-left' : 'slide-right';
+			calendarGrid.classList.add(slideOutClass);
+
+			// After slide out animation, change month and slide in
+			setTimeout(() => {
 				if (!calendarGrid) return;
 
-				const currentMonthEl = document.getElementById('currentMonth');
-				const calendarContainer = calendarGrid.closest('.bg-white');
+				// Remove slide out class
+				calendarGrid.classList.remove(slideOutClass);
 
-				// Add pulse feedback to calendar container
-				if (calendarContainer) {
-					calendarContainer.classList.add('swipe-feedback');
-					setTimeout(() => {
-						calendarContainer.classList.remove('swipe-feedback');
-					}, 100);
-				}
+				// Navigate to new month
+				navigateToMonth(direction);
 
-				// Add changing class to month header
+				// Add slide in animation
+				const slideInClass = swipeDirection === 'left' ? 'slide-in-left' : 'slide-in-right';
+				calendarGrid.classList.add(slideInClass);
+
+				// Remove month header changing class
 				if (currentMonthEl) {
-					currentMonthEl.classList.add('changing');
+					currentMonthEl.classList.remove('changing');
 				}
 
-				// Add slide out animation
-				const slideOutClass = swipeDirection === 'left' ? 'slide-left' : 'slide-right';
-				calendarGrid.classList.add(slideOutClass);
-
-				// After slide out animation, change month and slide in
+				// Clean up slide in animation
 				setTimeout(() => {
-					if (!calendarGrid) return;
-
-					// Remove slide out class
-					calendarGrid.classList.remove(slideOutClass);
-
-					// Navigate to new month
-					navigateToMonth(direction);
-
-					// Add slide in animation
-					const slideInClass = swipeDirection === 'left' ? 'slide-in-left' : 'slide-in-right';
-					calendarGrid.classList.add(slideInClass);
-
-					// Remove month header changing class
-					if (currentMonthEl) {
-						currentMonthEl.classList.remove('changing');
+					if (calendarGrid) {
+						calendarGrid.classList.remove(slideInClass);
 					}
-
-					// Clean up slide in animation
-					setTimeout(() => {
-						if (calendarGrid) {
-							calendarGrid.classList.remove(slideInClass);
-						}
-					}, 300);
 				}, 300);
-			}
+			}, 300);
 		}
 
 		// Render calendar for current month
