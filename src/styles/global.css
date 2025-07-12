@@ -1291,10 +1291,10 @@ input[type="number"] {
 
 @media (max-width: 767px) {
   .calendar-grid {
-    grid-template-columns: repeat(7, 1fr); /* Equal columns, use full width */
-    gap: 2px; /* Minimal gap for mobile like Calendly */
+    grid-template-columns: repeat(7, minmax(0, 1fr)); /* Prevent column overflow */
+    gap: 1px; /* Minimal gap for mobile like Calendly */
     width: 100%; /* Use full available width */
-    padding: 0 4px; /* Minimal side padding */
+    padding: 0 2px; /* Reduced side padding */
   }
 }
 
@@ -1313,6 +1313,8 @@ input[type="number"] {
   min-height: 42px; /* Minimum height for mobile */
   position: relative; /* Enable z-index stacking */
   margin: 1px; /* Small margin to accommodate border width changes */
+  justify-self: center; /* Center in grid cell */
+  box-sizing: border-box; /* Include borders in size calculations */
 }
 
 /* Desktop (768px+) - Larger calendar days */
@@ -1326,15 +1328,16 @@ input[type="number"] {
 /* Mobile (<768px) - Optimized calendar days following Calendly/HubSpot patterns */
 @media (max-width: 767px) {
   .calendar-day {
-    min-height: 36px; /* Reduced for better mobile fit on phones like Galaxy S25 */
-    height: 36px; /* Fixed height for consistency */
-    font-size: 0.8rem; /* Slightly smaller font for compact layout */
+    min-height: 32px; /* Reduced for better mobile fit */
+    height: 32px; /* Fixed height for consistency */
+    max-width: 32px; /* Prevent horizontal overflow */
+    font-size: 0.75rem; /* Smaller font for compact layout */
     border-width: 1px; /* Thinner borders on mobile */
   }
 
   /* Ensure calendar uses optimal mobile width */
   .calendar-column .bg-white {
-    padding: 0.75rem; /* More compact padding on mobile */
+    padding: 0.5rem; /* More compact padding on mobile */
     margin: 0; /* Remove any margins */
   }
 
@@ -1346,8 +1349,8 @@ input[type="number"] {
 
   /* Weekday headers - more compact on mobile */
   .weekday-header {
-    padding: 6px 2px; /* Reduced padding for compact layout */
-    font-size: 0.7rem; /* Smaller font size */
+    padding: 4px 1px; /* Reduced padding for compact layout */
+    font-size: 0.65rem; /* Smaller font size */
   }
 }
 
@@ -1625,10 +1628,21 @@ input[type="number"] {
     padding: 0.75rem 1.5rem;
   }
 
-  /* Extra compact calendar for very small screens */
+  /* Extra compact calendar for small screens */
   .calendar-day {
-    min-height: 32px; /* Slightly larger than before for better usability */
-    font-size: 0.75rem; /* Readable font size */
+    min-height: 28px; /* Compact for small screens */
+    height: 28px;
+    max-width: 28px; /* Prevent overflow */
+    font-size: 0.7rem; /* Readable font size */
+  }
+
+  .calendar-grid {
+    gap: 0px; /* No gap for maximum space efficiency */
+    padding: 0 1px; /* Minimal padding */
+  }
+
+  .calendar-column .bg-white {
+    padding: 0.25rem; /* Very compact padding */
   }
 
   /* Stack navigation buttons on very small screens */
@@ -1647,27 +1661,60 @@ input[type="number"] {
 /* Galaxy S25 and similar phone optimizations */
 @media (max-width: 430px) {
   .calendar-day {
-    min-height: 30px; /* Even more compact for very small phones */
-    height: 30px;
-    font-size: 0.7rem;
+    min-height: 26px; /* Ultra-compact for very small phones */
+    height: 26px;
+    max-width: 26px; /* Strict width limit */
+    font-size: 0.65rem; /* Smaller but still readable */
+    border-width: 0.5px; /* Thinner borders to save space */
   }
 
   .weekday-header {
-    padding: 4px 1px;
-    font-size: 0.65rem;
+    padding: 2px 0px; /* Minimal padding */
+    font-size: 0.6rem; /* Very small headers */
   }
 
   .calendar-column .bg-white {
-    padding: 0.5rem; /* Very compact padding */
+    padding: 0.25rem; /* Minimal padding */
+  }
+
+  .calendar-grid {
+    gap: 0px; /* No gaps at all */
+    padding: 0; /* No side padding */
   }
 
   .booking-columns {
-    min-height: 400px; /* Reduced for small screens */
+    min-height: 380px; /* Reduced for small screens */
   }
 
   /* Ensure continue button has proper spacing */
   .booking-step .flex.justify-end button {
     margin-top: 1rem; /* Add some top margin for better spacing */
+  }
+}
+
+/* Ultra-small phones (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  .calendar-day {
+    min-height: 24px; /* Maximum compactness */
+    height: 24px;
+    max-width: 24px;
+    font-size: 0.6rem;
+    border-radius: 0.25rem; /* Smaller border radius */
+  }
+
+  .weekday-header {
+    font-size: 0.55rem;
+    padding: 1px 0;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 320px) {
+  .calendar-day {
+    min-height: 22px; /* Absolute minimum */
+    height: 22px;
+    max-width: 22px;
+    font-size: 0.55rem;
   }
 }
 
