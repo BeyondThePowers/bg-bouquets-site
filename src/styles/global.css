@@ -1515,8 +1515,6 @@ input[type="number"] {
     justify-content: center;
   }
 
-
-
   .calendar-column .bg-white {
     padding: 1rem;
   }
@@ -1683,4 +1681,8 @@ input[type="number"] {
     padding-left: 0;
     padding-right: 0;
   }
+}
+
+.base-price {
+  font-size: 6rem;
 }
