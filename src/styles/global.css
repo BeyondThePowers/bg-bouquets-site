@@ -1144,6 +1144,17 @@ input[type="number"] {
   min-height: 380px;
 }
 
+/* Mobile: Remove height restrictions for time slots column */
+@media (max-width: 767px) {
+  .time-slots-column {
+    min-height: auto; /* Allow natural height expansion */
+  }
+
+  .calendar-column {
+    min-height: auto; /* Also allow calendar to be more compact */
+  }
+}
+
 /* Time slots content area should fill available space */
 #time-slots-content {
   flex: 1;
@@ -1152,12 +1163,25 @@ input[type="number"] {
   justify-content: flex-start;
 }
 
+/* Mobile: Allow time slots content to expand naturally */
+@media (max-width: 767px) {
+  #time-slots-content {
+    flex: none; /* Don't constrain height on mobile */
+    min-height: auto; /* Allow natural height */
+  }
+
+  #time-slots-container {
+    height: auto; /* Remove any height constraints */
+    min-height: auto; /* Allow natural height */
+  }
+}
+
 /* Mobile Slide Transition System - Following Calendly/HubSpot UX */
 @media (max-width: 767px) {
   .booking-columns {
     position: relative;
     overflow: hidden;
-    min-height: 500px; /* Ensure space for both views */
+    min-height: 450px; /* Reduced for more compact mobile layout */
   }
 
   .calendar-column,
@@ -1172,6 +1196,7 @@ input[type="number"] {
     top: 0;
     left: 100%;
     transform: translateX(0);
+    min-height: auto; /* Allow natural height */
   }
 
   /* When showing time slots, slide calendar left and time slots into view */
@@ -1182,8 +1207,10 @@ input[type="number"] {
   .booking-columns.show-time-slots .time-slots-column {
     transform: translateX(-100%);
   }
+}
 
-  /* Back button for mobile time slots view */
+/* Back button for mobile time slots view */
+@media (max-width: 767px) {
   .mobile-back-button {
     display: flex;
     align-items: center;
@@ -1299,21 +1326,28 @@ input[type="number"] {
 /* Mobile (<768px) - Optimized calendar days following Calendly/HubSpot patterns */
 @media (max-width: 767px) {
   .calendar-day {
-    min-height: 44px; /* Increased from 42px for better touch targets */
-    height: 44px; /* Fixed height for consistency */
-    font-size: 0.875rem;
+    min-height: 36px; /* Reduced for better mobile fit on phones like Galaxy S25 */
+    height: 36px; /* Fixed height for consistency */
+    font-size: 0.8rem; /* Slightly smaller font for compact layout */
     border-width: 1px; /* Thinner borders on mobile */
   }
 
   /* Ensure calendar uses optimal mobile width */
   .calendar-column .bg-white {
-    padding: 1rem; /* Reduced padding on mobile */
+    padding: 0.75rem; /* More compact padding on mobile */
     margin: 0; /* Remove any margins */
   }
 
   /* Mobile calendar container optimization */
   .calendar-grid {
     margin: 0; /* Remove any margins */
+    gap: 1px; /* Minimal gap for very compact layout */
+  }
+
+  /* Weekday headers - more compact on mobile */
+  .weekday-header {
+    padding: 6px 2px; /* Reduced padding for compact layout */
+    font-size: 0.7rem; /* Smaller font size */
   }
 }
 
@@ -1520,7 +1554,7 @@ input[type="number"] {
   }
 
   .calendar-column .bg-white {
-    padding: 1rem;
+    padding: 0.75rem; /* More compact padding */
   }
 
   #currentMonth {
@@ -1535,6 +1569,17 @@ input[type="number"] {
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  /* Continue button - full width and centered on mobile */
+  .booking-step .flex.justify-end {
+    justify-content: center; /* Center the button container */
+  }
+
+  .booking-step .flex.justify-end button {
+    width: 100%; /* Make button full width */
+    max-width: none; /* Remove any max-width restrictions */
+    text-align: center; /* Center text */
   }
 }
 
@@ -1580,10 +1625,10 @@ input[type="number"] {
     padding: 0.75rem 1.5rem;
   }
 
-  /* Extra compact calendar for small screens */
+  /* Extra compact calendar for very small screens */
   .calendar-day {
-    min-height: 28px;
-    font-size: 0.7rem;
+    min-height: 32px; /* Slightly larger than before for better usability */
+    font-size: 0.75rem; /* Readable font size */
   }
 
   /* Stack navigation buttons on very small screens */
@@ -1596,6 +1641,33 @@ input[type="number"] {
     .booking-step .flex.justify-between button {
       width: 100%;
     }
+  }
+}
+
+/* Galaxy S25 and similar phone optimizations */
+@media (max-width: 430px) {
+  .calendar-day {
+    min-height: 30px; /* Even more compact for very small phones */
+    height: 30px;
+    font-size: 0.7rem;
+  }
+
+  .weekday-header {
+    padding: 4px 1px;
+    font-size: 0.65rem;
+  }
+
+  .calendar-column .bg-white {
+    padding: 0.5rem; /* Very compact padding */
+  }
+
+  .booking-columns {
+    min-height: 400px; /* Reduced for small screens */
+  }
+
+  /* Ensure continue button has proper spacing */
+  .booking-step .flex.justify-end button {
+    margin-top: 1rem; /* Add some top margin for better spacing */
   }
 }
 
