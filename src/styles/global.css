@@ -2047,7 +2047,7 @@ input[type="number"] {
   #flowers,
   #about,
   #pricing {
-    padding-bottom: 6rem!important;
+    padding-bottom: 6rem;
   }
 
 }
