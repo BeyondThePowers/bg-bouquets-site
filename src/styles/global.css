@@ -1886,6 +1886,10 @@ input[type="number"] {
     padding-top:0;
   }
 
+  #pricing {
+    padding-bottom: 0;
+  }
+
   #mobile-reverse-column {
    display: flex;
    flex-direction: column-reverse;
