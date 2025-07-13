@@ -193,18 +193,26 @@ function formatTime(timeString: string): string {
 
             <!-- Action Buttons -->
             <div class="mt-8 flex flex-col sm:flex-row gap-4">
-              <a 
-                href="/" 
+              <a
+                href="/"
                 class="flex-1 bg-pink-500 text-white text-center px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors font-roboto"
               >
                 Return to Home
               </a>
-              <a 
+              <a
                 href={`/cancel?token=${booking.cancellation_token}`}
                 class="flex-1 bg-gray-200 text-charcoal text-center px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-roboto"
               >
                 Cancel or Reschedule
               </a>
+            </div>
+
+            <!-- Policy Information -->
+            <div class="mt-6 text-center text-sm text-gray-600">
+              <p>
+                View our <a href="/refund-policy" class="text-pink-600 hover:underline">refund policy</a>
+                for cancellation terms and refund information.
+              </p>
             </div>
           </div>
         </div>
