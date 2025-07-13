@@ -1954,6 +1954,11 @@ import Layout from '../layouts/Layout.astro';
 				announcement.textContent = 'Time slots view loaded';
 				document.body.appendChild(announcement);
 				setTimeout(() => document.body.removeChild(announcement), 1000);
+
+				// Ensure consistent column heights after transition
+				setTimeout(() => {
+					ensureConsistentColumnHeight();
+				}, 350); // After slide transition completes
 			}
 		}
 
@@ -1968,7 +1973,8 @@ import Layout from '../layouts/Layout.astro';
 			if (window.innerWidth > 767) return; // Only on mobile
 
 			const timeSlotsContent = document.getElementById('time-slots-content');
-			if (!timeSlotsContent) return;
+			const timeSlotsContainer = document.getElementById('time-slots-container');
+			if (!timeSlotsContent || !timeSlotsContainer) return;
 
 			// Check if content is scrollable
 			const isScrollable = timeSlotsContent.scrollHeight > timeSlotsContent.clientHeight;
@@ -1995,6 +2001,27 @@ import Layout from '../layouts/Layout.astro';
 			} else {
 				timeSlotsContent.classList.remove('has-scroll', 'scrolled-to-bottom');
 			}
+
+			// Ensure consistent height regardless of content
+			ensureConsistentColumnHeight();
+		}
+
+		// Ensure time slots column maintains same height as calendar column
+		function ensureConsistentColumnHeight() {
+			if (window.innerWidth > 767) return; // Only on mobile
+
+			const calendarColumn = document.querySelector('.calendar-column') as HTMLElement;
+			const timeSlotsColumn = document.querySelector('.time-slots-column') as HTMLElement;
+			const timeSlotsContainer = document.getElementById('time-slots-container') as HTMLElement;
+
+			if (!calendarColumn || !timeSlotsColumn || !timeSlotsContainer) return;
+
+			// Get the calendar column height
+			const calendarHeight = calendarColumn.offsetHeight;
+
+			// Ensure time slots column matches exactly
+			timeSlotsColumn.style.height = `${calendarHeight}px`;
+			timeSlotsContainer.style.height = `${calendarHeight}px`;
 		}
 
 		// Mobile back button handler
@@ -2325,6 +2352,11 @@ import Layout from '../layouts/Layout.astro';
 				dayEl.textContent = day.toString();
 				calendarDaysContainer.appendChild(dayEl);
 			}
+
+			// Ensure consistent column heights on mobile
+			setTimeout(() => {
+				ensureConsistentColumnHeight();
+			}, 50);
 		}
 
 		// Navigate to next/previous month with available dates

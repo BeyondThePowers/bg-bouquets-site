@@ -1181,7 +1181,7 @@ input[type="number"] {
   .booking-columns {
     position: relative;
     overflow: hidden;
-    min-height: 450px; /* Fixed height for consistent mobile layout */
+    height: 450px; /* Fixed height for consistent mobile layout */
     max-height: 80vh; /* Prevent taking up entire viewport */
   }
 
@@ -1189,7 +1189,8 @@ input[type="number"] {
   .time-slots-column {
     transition: transform 0.3s ease-in-out;
     width: 100%;
-    height: 100%; /* Fill the container height */
+    height: 450px; /* Exact same height as booking-columns */
+    max-height: 80vh; /* Match parent constraint */
   }
 
   /* Time slots initially positioned off-screen to the right */
@@ -1215,19 +1216,18 @@ input[type="number"] {
   .time-slots-column #time-slots-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    max-height: 450px; /* Match the booking-columns height */
+    height: 100%; /* Fill the entire time-slots-column height */
     overflow: hidden; /* Prevent container from scrolling */
   }
 
-  /* Make time slots content area scrollable */
+  /* Make time slots content area scrollable with consistent height */
   .time-slots-column #time-slots-content {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 0.5rem; /* Space for scrollbar */
     margin-right: -0.5rem; /* Hide scrollbar from layout */
-    min-height: 0; /* Allow flex item to shrink below content size */
+    min-height: 200px; /* Ensure minimum height to maintain visual balance */
   }
 
   /* Ensure fieldset doesn't interfere with flex layout */
@@ -1244,6 +1244,11 @@ input[type="number"] {
   /* Make legend not interfere with flex layout */
   .time-slots-column fieldset legend {
     flex-shrink: 0;
+  }
+
+  /* Ensure time slots grid doesn't overflow */
+  .time-slots-column #time-slots {
+    padding-bottom: 1rem; /* Extra space at bottom for better UX */
   }
 
   /* Custom scrollbar styling for time slots */
@@ -1289,6 +1294,16 @@ input[type="number"] {
   /* Hide scroll indicator when scrolled to bottom */
   .time-slots-column #time-slots-content.scrolled-to-bottom::after {
     display: none;
+  }
+
+  /* Ensure continue button stays close to time slots on mobile */
+  .booking-columns + div {
+    margin-top: 1rem; /* Consistent spacing after booking columns */
+  }
+
+  /* When time slots are showing, reduce gap to continue button */
+  .booking-columns.show-time-slots + div {
+    margin-top: 1rem; /* Keep consistent spacing */
   }
 }
 
