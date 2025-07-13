@@ -1374,6 +1374,8 @@ input[type="number"] {
   width: 100%; /* Ensure full width usage */
   touch-action: pan-x; /* Enable horizontal swipe gestures */
   user-select: none; /* Prevent text selection during swipes */
+  position: relative; /* Ensure proper stacking context */
+  z-index: 1; /* Ensure calendar grid is above other elements */
 }
 
 /* Weekday headers styling */

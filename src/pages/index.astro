@@ -2169,8 +2169,12 @@ import Layout from '../layouts/Layout.astro';
 		// Swipe navigation setup
 		function setupSwipeNavigation() {
 			const calendarGrid = document.getElementById('calendarGrid');
-			const calendarDaysContainer = document.getElementById('calendarDaysContainer');
-			if (!calendarGrid || !calendarDaysContainer) return;
+			// Try to get the calendar container (the white box containing the calendar)
+			const calendarContainer = calendarGrid?.closest('.bg-white') as HTMLElement;
+			if (!calendarGrid || !calendarContainer) return;
+
+			// Use the calendar container as the touch target for better coverage
+			const touchTarget = calendarContainer;
 
 			let touchStartX = 0;
 			let touchStartY = 0;
@@ -2182,28 +2186,24 @@ import Layout from '../layouts/Layout.astro';
 			// Maximum vertical movement allowed for horizontal swipe
 			const maxVerticalMovement = 150;
 
-			// Attach touch events to both the calendar grid AND the days container
-			// This ensures touch events work across the entire calendar area
-			const touchElements = [calendarGrid, calendarDaysContainer];
 
-			touchElements.forEach(element => {
-				element.addEventListener('touchstart', (e) => {
-					touchStartX = e.changedTouches[0].clientX;
-					touchStartY = e.changedTouches[0].clientY;
-					calendarGrid.classList.add('swiping');
-				}, { passive: true });
 
-				element.addEventListener('touchend', (e) => {
-					touchEndX = e.changedTouches[0].clientX;
-					touchEndY = e.changedTouches[0].clientY;
-					calendarGrid.classList.remove('swiping');
-					handleSwipeGesture();
-				}, { passive: true });
+			touchTarget.addEventListener('touchstart', (e) => {
+				touchStartX = e.changedTouches[0].clientX;
+				touchStartY = e.changedTouches[0].clientY;
+				calendarGrid.classList.add('swiping');
+			}, { passive: true });
 
-				element.addEventListener('touchcancel', () => {
-					calendarGrid.classList.remove('swiping');
-				}, { passive: true });
-			});
+			touchTarget.addEventListener('touchend', (e) => {
+				touchEndX = e.changedTouches[0].clientX;
+				touchEndY = e.changedTouches[0].clientY;
+				calendarGrid.classList.remove('swiping');
+				handleSwipeGesture();
+			}, { passive: true });
+
+			touchTarget.addEventListener('touchcancel', () => {
+				calendarGrid.classList.remove('swiping');
+			}, { passive: true });
 
 			function handleSwipeGesture() {
 				const horizontalDistance = touchEndX - touchStartX;
