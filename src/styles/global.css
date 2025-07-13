@@ -1880,6 +1880,12 @@ input[type="number"] {
 }
 
 @media (max-width: 640px) {
+
+  #contact,
+  #location {
+    padding-top:0;
+  }
+
   .step-indicator {
     width: 32px;
     height: 32px;
@@ -1934,6 +1940,12 @@ input[type="number"] {
 
   /* Stack navigation buttons on very small screens */
   @media (max-width: 480px) {
+
+    #location {
+      display: flex;
+      flex-direction: row-reverse;
+    }
+
     .booking-step .flex.justify-between {
       flex-direction: row;
       gap: 1rem;
