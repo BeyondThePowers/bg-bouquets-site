@@ -2895,6 +2895,10 @@ import Layout from '../layouts/Layout.astro';
 		let filteredFlowers = [...flowers];
 		let currentCardIndex = 0;
 
+		// Animation and scroll sync state
+		let isAnimating = false;
+		let scrollSyncTimeout: NodeJS.Timeout;
+
 		// Store original classes for restoration
 		let originalClasses = {
 			mobileCarousel: '',
@@ -2997,10 +3001,39 @@ import Layout from '../layouts/Layout.astro';
 
 			const carouselContainer = mobileCarousel?.querySelector('.overflow-x-auto');
 
+			// Add scroll event listener to sync indicator with actual scroll position
+			carouselContainer?.addEventListener('scroll', () => {
+				// Clear any pending sync timeout
+				clearTimeout(scrollSyncTimeout);
+
+				// Debounce the sync to avoid excessive updates during smooth scrolling
+				scrollSyncTimeout = setTimeout(() => {
+					syncIndicatorWithScroll();
+				}, 100);
+			}, { passive: true });
+
+			function syncIndicatorWithScroll() {
+				if (!carouselContainer || isAnimating || filteredFlowers.length === 0) return;
+
+				const cardWidth = 336; // w-80 (320px) + gap-4 (16px) = 336px
+				const scrollLeft = carouselContainer.scrollLeft;
+				const calculatedIndex = Math.round(scrollLeft / cardWidth);
+
+				// Only update if the calculated index is different and valid
+				if (calculatedIndex !== currentCardIndex &&
+					calculatedIndex >= 0 &&
+					calculatedIndex < filteredFlowers.length) {
+					currentCardIndex = calculatedIndex;
+					updateFlowerNavigation();
+				}
+			}
+
 			carouselContainer?.addEventListener('touchstart', (e: any) => {
 				startX = e.touches[0].clientX;
 				startTime = Date.now();
 				isDragging = true;
+				// Clear any pending scroll sync to prevent conflicts
+				clearTimeout(scrollSyncTimeout);
 			}, { passive: true });
 
 			carouselContainer?.addEventListener('touchmove', (e: any) => {
@@ -3018,6 +3051,7 @@ import Layout from '../layouts/Layout.astro';
 				const threshold = velocity > 0.5 ? 30 : 80;
 
 				if (Math.abs(diff) > threshold) {
+					// Navigate in the appropriate direction
 					if (diff > 0) {
 						navigateCarousel(1); // Swipe left = next flower
 					} else {
@@ -3192,6 +3226,9 @@ import Layout from '../layouts/Layout.astro';
 		function navigateCarousel(direction: number) {
 			if (filteredFlowers.length === 0) return;
 
+			// Prevent rapid navigation during animation to avoid jarring resets
+			if (isAnimating) return;
+
 			// Circular navigation - wrap around when reaching ends
 			currentCardIndex += direction;
 			if (currentCardIndex >= filteredFlowers.length) {
@@ -3363,10 +3400,19 @@ import Layout from '../layouts/Layout.astro';
 			if (carouselContainer && filteredFlowers.length > 0) {
 				const cardWidth = 336; // w-80 (320px) + gap-4 (16px) = 336px
 				const scrollPosition = currentCardIndex * cardWidth;
+
+				// Set animation flag to prevent scroll sync conflicts
+				isAnimating = true;
+
 				carouselContainer.scrollTo({
 					left: scrollPosition,
 					behavior: 'smooth'
 				});
+
+				// Clear animation flag after scroll completes (smooth scroll typically takes ~300ms)
+				setTimeout(() => {
+					isAnimating = false;
+				}, 350);
 			}
 
 			updateCarouselControls();
