@@ -1372,6 +1372,8 @@ input[type="number"] {
   justify-content: center;
   max-width: 100%;
   width: 100%; /* Ensure full width usage */
+  touch-action: pan-x; /* Enable horizontal swipe gestures */
+  user-select: none; /* Prevent text selection during swipes */
 }
 
 /* Weekday headers styling */
@@ -1384,6 +1386,7 @@ input[type="number"] {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: var(--font-roboto);
+  pointer-events: none; /* Allow touch events to pass through to parent */
 }
 
 /* Calendar days container - no additional grid, inherits from parent */

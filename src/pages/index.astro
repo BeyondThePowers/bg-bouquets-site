@@ -2169,7 +2169,8 @@ import Layout from '../layouts/Layout.astro';
 		// Swipe navigation setup
 		function setupSwipeNavigation() {
 			const calendarGrid = document.getElementById('calendarGrid');
-			if (!calendarGrid) return;
+			const calendarDaysContainer = document.getElementById('calendarDaysContainer');
+			if (!calendarGrid || !calendarDaysContainer) return;
 
 			let touchStartX = 0;
 			let touchStartY = 0;
@@ -2181,22 +2182,28 @@ import Layout from '../layouts/Layout.astro';
 			// Maximum vertical movement allowed for horizontal swipe
 			const maxVerticalMovement = 150;
 
-			calendarGrid.addEventListener('touchstart', (e) => {
-				touchStartX = e.changedTouches[0].clientX;
-				touchStartY = e.changedTouches[0].clientY;
-				calendarGrid.classList.add('swiping');
-			}, { passive: true });
+			// Attach touch events to both the calendar grid AND the days container
+			// This ensures touch events work across the entire calendar area
+			const touchElements = [calendarGrid, calendarDaysContainer];
 
-			calendarGrid.addEventListener('touchend', (e) => {
-				touchEndX = e.changedTouches[0].clientX;
-				touchEndY = e.changedTouches[0].clientY;
-				calendarGrid.classList.remove('swiping');
-				handleSwipeGesture();
-			}, { passive: true });
+			touchElements.forEach(element => {
+				element.addEventListener('touchstart', (e) => {
+					touchStartX = e.changedTouches[0].clientX;
+					touchStartY = e.changedTouches[0].clientY;
+					calendarGrid.classList.add('swiping');
+				}, { passive: true });
 
-			calendarGrid.addEventListener('touchcancel', () => {
-				calendarGrid.classList.remove('swiping');
-			}, { passive: true });
+				element.addEventListener('touchend', (e) => {
+					touchEndX = e.changedTouches[0].clientX;
+					touchEndY = e.changedTouches[0].clientY;
+					calendarGrid.classList.remove('swiping');
+					handleSwipeGesture();
+				}, { passive: true });
+
+				element.addEventListener('touchcancel', () => {
+					calendarGrid.classList.remove('swiping');
+				}, { passive: true });
+			});
 
 			function handleSwipeGesture() {
 				const horizontalDistance = touchEndX - touchStartX;
