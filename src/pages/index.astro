@@ -2019,8 +2019,8 @@ import Layout from '../layouts/Layout.astro';
 			// Get the calendar column height
 			const calendarHeight = calendarColumn.offsetHeight;
 
-			// Ensure time slots column matches exactly
-			timeSlotsColumn.style.height = `${calendarHeight}px`;
+			// Only adjust time slots column height, leave calendar column alone
+			// This prevents interference with calendar touch events
 			timeSlotsContainer.style.height = `${calendarHeight}px`;
 		}
 
