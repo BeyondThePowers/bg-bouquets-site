@@ -1881,8 +1881,7 @@ input[type="number"] {
 
 @media (max-width: 640px) {
 
-  #contact,
-  #location {
+  #mobile-reverse-column {
     padding-top:0;
   }
 
