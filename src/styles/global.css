@@ -1879,6 +1879,32 @@ input[type="number"] {
   }
 }
 
+@media screen and (max-width: 767px) {
+  
+  #wood-background-container,
+  #pink-background-container,
+  #white-background-container,
+  .white-background-container {
+      margin-top: -1rem;
+  }
+
+  #what-to-expect::before,
+  #home::before {
+    display: none;
+    background-image: none;
+    background-blend-mode: unset;
+  }
+
+  #home,
+  #what-to-expect,
+  #flowers,
+  #about,
+  #pricing {
+    padding-bottom: 6rem;
+  }
+
+}
+
 @media (max-width: 640px) {
 
   #contact,
@@ -2024,32 +2050,6 @@ input[type="number"] {
     max-width: 22px;
     font-size: 0.55rem;
   }
-}
-
-@media screen and (max-width: 767px) {
-  
-  #wood-background-container,
-  #pink-background-container,
-  #white-background-container,
-  .white-background-container {
-      margin-top: -1rem;
-  }
-
-  #what-to-expect::before,
-  #home::before {
-    display: none;
-    background-image: none;
-    background-blend-mode: unset;
-  }
-
-  #home,
-  #what-to-expect,
-  #flowers,
-  #about,
-  #pricing {
-    padding-bottom: 6rem;
-  }
-
 }
 
 /* Modern Booking Form Transitions - Following Calendly/HubSpot UX patterns */
