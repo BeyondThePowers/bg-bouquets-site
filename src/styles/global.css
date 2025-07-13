@@ -1881,8 +1881,14 @@ input[type="number"] {
 
 @media (max-width: 640px) {
 
-  #mobile-reverse-column {
+  #contact,
+  #location {
     padding-top:0;
+  }
+
+  #mobile-reverse-column {
+   display: flex;
+   flex-direction: column-reverse;
   }
 
   .step-indicator {
