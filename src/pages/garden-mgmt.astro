@@ -8,225 +8,41 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Garden Management - Bouquet Garden</title>
-	<link rel="stylesheet" href="/src/styles/global.css">
-	<style>
-		.admin-container {
-			max-width: 1200px;
-			margin: 0 auto;
-			padding: 2rem;
-			font-family: 'Roboto', sans-serif;
-		}
-		
-		.admin-header {
-			text-align: center;
-			margin-bottom: 3rem;
-			padding-bottom: 2rem;
-			border-bottom: 2px solid var(--color-dusty-rose);
-		}
-		
-		.admin-header h1 {
-			font-family: 'Allura', cursive;
-			font-size: 3rem;
-			color: var(--color-charcoal);
-			margin-bottom: 0.5rem;
-		}
-		
-		.login-section {
-			max-width: 400px;
-			margin: 0 auto;
-			padding: 2rem;
-			background: rgba(248, 231, 232, 0.1);
-			border-radius: 8px;
-			border: 1px solid var(--color-dusty-rose);
-		}
-		
-		.admin-sections {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 2rem;
-			margin-top: 2rem;
-		}
-		
-		.admin-section {
-			background: rgba(248, 231, 232, 0.05);
-			border: 1px solid var(--color-dusty-rose);
-			border-radius: 8px;
-			padding: 1.5rem;
-		}
-		
-		.admin-section h2 {
-			font-family: 'Playfair Display', serif;
-			color: var(--color-charcoal);
-			margin-bottom: 1rem;
-			font-size: 1.5rem;
-		}
-		
-		.form-group {
-			margin-bottom: 1rem;
-		}
-		
-		.form-group label {
-			display: block;
-			margin-bottom: 0.5rem;
-			font-weight: 500;
-			color: var(--color-charcoal);
-		}
-		
-		.form-group input, .form-group select, .form-group textarea {
-			width: 100%;
-			padding: 0.75rem;
-			border: 1px solid var(--color-dusty-rose);
-			border-radius: 4px;
-			font-size: 1rem;
-		}
-		
-		.btn {
-			background: var(--color-dusty-rose);
-			color: var(--color-charcoal);
-			border: none;
-			padding: 0.75rem 1.5rem;
-			border-radius: 4px;
-			cursor: pointer;
-			font-size: 1rem;
-			font-weight: 500;
-			transition: all 0.2s ease;
-		}
-		
-		.btn:hover {
-			background: #d49ca0;
-			transform: translateY(-1px);
-		}
-		
-		.btn-secondary {
-			background: transparent;
-			border: 1px solid var(--color-dusty-rose);
-		}
-		
-		.btn-danger {
-			background: #dc3545;
-			color: white;
-		}
-		
-		.btn-danger:hover {
-			background: #c82333;
-		}
-		
-		.holiday-list, .settings-list {
-			max-height: 300px;
-			overflow-y: auto;
-			border: 1px solid var(--color-dusty-rose);
-			border-radius: 4px;
-			padding: 1rem;
-			margin-top: 1rem;
-		}
-		
-		.holiday-item, .setting-item {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0.5rem 0;
-			border-bottom: 1px solid rgba(232, 180, 184, 0.3);
-		}
-		
-		.holiday-item:last-child, .setting-item:last-child {
-			border-bottom: none;
-		}
-		
-		.holiday-info {
-			flex: 1;
-		}
-		
-		.holiday-date {
-			font-weight: 500;
-			color: var(--color-charcoal);
-		}
-		
-		.holiday-name {
-			font-size: 0.9rem;
-			color: #666;
-		}
-		
-		.holiday-badge {
-			font-size: 0.8rem;
-			padding: 0.2rem 0.5rem;
-			border-radius: 12px;
-			background: rgba(232, 180, 184, 0.2);
-			color: var(--color-charcoal);
-			margin-left: 0.5rem;
-		}
-		
-		.error-message {
-			background: #f8d7da;
-			color: #721c24;
-			padding: 0.75rem;
-			border-radius: 4px;
-			margin-bottom: 1rem;
-			border: 1px solid #f5c6cb;
-		}
-		
-		.success-message {
-			background: #d4edda;
-			color: #155724;
-			padding: 0.75rem;
-			border-radius: 4px;
-			margin-bottom: 1rem;
-			border: 1px solid #c3e6cb;
-		}
-		
-		.hidden {
-			display: none;
-		}
-		
-		.checkbox-group {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-			gap: 0.5rem;
-			margin-top: 0.5rem;
-		}
-		
-		.checkbox-item {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-		}
-		
-		.checkbox-item input[type="checkbox"] {
-			width: auto;
-		}
-		
-		@media (max-width: 768px) {
-			.admin-sections {
-				grid-template-columns: 1fr;
-			}
-			
-			.admin-container {
-				padding: 1rem;
-			}
-		}
-	</style>
+	<title>Garden Management - BG Bouquet</title>
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+	<link rel="stylesheet" href="/styles/admin-garden-mgmt.css">
+
 </head>
 <body>
-	<div class="admin-container">
-		<div class="admin-header">
+	<!-- Clean Header (hidden until login) -->
+	<header class="header" id="admin-header" style="display: none;">
+		<div class="header-content">
 			<h1>Garden Management</h1>
-			<p>Manage booking schedule, holidays, and settings</p>
-		</div>
-
-		<!-- Login Section -->
-		<div id="loginSection" class="login-section">
-			<h2>Management Login</h2>
-			<div class="form-group">
-				<label for="adminPassword">Password:</label>
-				<input type="password" id="adminPassword" placeholder="Enter management password">
+			<div class="header-actions">
+				<a href="/garden-mgmt/bookings" class="btn btn-secondary">View Bookings</a>
+				<button id="logoutBtn" class="btn btn-secondary" onclick="logout()">Logout</button>
 			</div>
-			<button class="btn" onclick="login()">Login</button>
-			<div id="loginError" class="error-message hidden">Invalid password</div>
 		</div>
+	</header>
 
-		<!-- Admin Interface (hidden until login) -->
-		<div id="adminInterface" class="hidden">
-			<div class="admin-sections">
+	<!-- Login Form (shown initially) -->
+	<div id="login-container" class="login-container">
+		<div class="login-form">
+			<h2>Admin Access</h2>
+			<div id="login-error" class="error" style="display: none;"></div>
+			<form id="login-form">
+				<div class="form-group">
+					<label for="admin-password">Password:</label>
+					<input type="password" id="admin-password" required>
+				</div>
+				<button type="submit" class="btn btn-primary">Login</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Main Admin Container -->
+	<div id="adminContent" class="admin-container hidden">
+		<div class="admin-sections">
 				<!-- Holiday Management -->
 				<div class="admin-section">
 					<h2>Holiday Management</h2>
@@ -238,15 +54,49 @@
 					
 					<div class="form-group">
 						<label for="holidayName">Holiday Name:</label>
-						<input type="text" id="holidayName" placeholder="e.g., Custom Closure">
+						<input type="text" id="holidayName" placeholder="e.g., Day Off">
 					</div>
 					
-					<button class="btn" onclick="addHoliday()">Add Holiday</button>
+					<div class="holiday-actions mb-4">
+						<button class="btn btn-primary" id="addHolidayBtn" onclick="addHoliday()">
+							<span class="btn-text">Add Holiday</span>
+							<span class="btn-spinner" style="display: none;">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M21 12a9 9 0 11-6.219-8.56"/>
+								</svg>
+								Adding...
+							</span>
+						</button>
+						<button class="btn btn-secondary" id="generateHolidaysBtn" onclick="generateFutureHolidays()">
+							<span class="btn-text">Generate Future Holidays</span>
+							<span class="btn-spinner" style="display: none;">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M21 12a9 9 0 11-6.219-8.56"/>
+								</svg>
+								Generating...
+							</span>
+						</button>
+					</div>
 					
 					<div id="holidayMessage" class="hidden"></div>
 					
-					<div class="holiday-list" id="holidayList">
-						<p>Loading holidays...</p>
+					<div class="holiday-table-container">
+						<table class="holiday-table" id="holidayTable">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Holiday Name</th>
+									<th>Type</th>
+									<th>Status</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody id="holidayTableBody">
+								<tr>
+									<td colspan="5" class="loading-cell">Loading holidays...</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				</div>
 
@@ -255,80 +105,171 @@
 					<h2>Schedule Settings</h2>
 					
 					<div class="form-group">
-						<label>Operating Days:</label>
-						<div class="checkbox-group" id="operatingDays">
-							<div class="checkbox-item">
-								<input type="checkbox" id="monday" value="monday">
-								<label for="monday">Monday</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="tuesday" value="tuesday">
-								<label for="tuesday">Tuesday</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="wednesday" value="wednesday">
-								<label for="wednesday">Wednesday</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="thursday" value="thursday">
-								<label for="thursday">Thursday</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="friday" value="friday">
-								<label for="friday">Friday</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="saturday" value="saturday">
-								<label for="saturday">Saturday</label>
-							</div>
-							<div class="checkbox-item">
-								<input type="checkbox" id="sunday" value="sunday">
-								<label for="sunday">Sunday</label>
-							</div>
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label for="timeSlots">Time Slots (one per line):</label>
-						<textarea id="timeSlots" rows="8" placeholder="10:00 AM&#10;11:00 AM&#10;12:00 PM&#10;1:00 PM&#10;6:00 PM&#10;7:00 PM&#10;8:00 PM"></textarea>
-					</div>
-					
-					<div class="form-group">
 						<label for="maxBookings">Max Bookings per Slot:</label>
 						<input type="number" id="maxBookings" min="1" max="20" value="3">
 					</div>
-					
+
 					<div class="form-group">
 						<label for="maxVisitors">Max Visitors per Slot:</label>
 						<input type="number" id="maxVisitors" min="1" max="50" value="10">
 					</div>
+
+					<div class="form-group">
+						<label>Season Range:</label>
+						<div class="season-range-group">
+							<div class="season-date">
+								<label for="seasonStartMonth">Start:</label>
+								<select id="seasonStartMonth" name="seasonStartMonth">
+									<option value="1">January</option>
+									<option value="2">February</option>
+									<option value="3">March</option>
+									<option value="4">April</option>
+									<option value="5">May</option>
+									<option value="6">June</option>
+									<option value="7">July</option>
+									<option value="8">August</option>
+									<option value="9">September</option>
+									<option value="10">October</option>
+									<option value="11">November</option>
+									<option value="12">December</option>
+								</select>
+								<input type="number" id="seasonStartDay" name="seasonStartDay" min="1" max="31" placeholder="Day">
+							</div>
+							<div class="season-date">
+								<label for="seasonEndMonth">End:</label>
+								<select id="seasonEndMonth" name="seasonEndMonth">
+									<option value="1">January</option>
+									<option value="2">February</option>
+									<option value="3">March</option>
+									<option value="4">April</option>
+									<option value="5">May</option>
+									<option value="6">June</option>
+									<option value="7">July</option>
+									<option value="8">August</option>
+									<option value="9">September</option>
+									<option value="10">October</option>
+									<option value="11">November</option>
+									<option value="12">December</option>
+								</select>
+								<input type="number" id="seasonEndDay" name="seasonEndDay" min="1" max="31" placeholder="Day">
+							</div>
+						</div>
+						<p class="help-text">Define when your garden is open for the season (e.g., May 15 - September 30)</p>
+					</div>
+
+					<div class="form-group">
+						<label>Operating Days:</label>
+						<div class="toggle-chips-group" id="operatingDays">
+							<button type="button" class="toggle-chip" data-day="monday">Monday</button>
+							<button type="button" class="toggle-chip" data-day="tuesday">Tuesday</button>
+							<button type="button" class="toggle-chip" data-day="wednesday">Wednesday</button>
+							<button type="button" class="toggle-chip" data-day="thursday">Thursday</button>
+							<button type="button" class="toggle-chip" data-day="friday">Friday</button>
+							<button type="button" class="toggle-chip" data-day="saturday">Saturday</button>
+							<button type="button" class="toggle-chip" data-day="sunday">Sunday</button>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label>Active Time Slots:</label>
+						<div class="time-slots-grid" id="timeSlotsGrid">
+							<!-- Time slots will be generated by JavaScript -->
+						</div>
+					</div>
 					
-					<button class="btn" onclick="updateScheduleSettings()">Update Schedule</button>
+					<button class="btn btn-primary" id="saveScheduleBtn" onclick="updateScheduleSettings()">
+						<span class="btn-text">Save Schedule</span>
+						<span class="btn-spinner" style="display: none;">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M21 12a9 9 0 11-6.219-8.56"/>
+							</svg>
+							Saving...
+						</span>
+					</button>
 					
 					<div id="scheduleMessage" class="hidden"></div>
 				</div>
-			</div>
-			
-			<div style="text-align: center; margin-top: 2rem;">
-				<button class="btn btn-secondary" id="logoutButton">Logout</button>
-				<a href="/" class="btn btn-secondary" style="margin-left: 1rem; text-decoration: none;">Back to Booking</a>
+
+				<!-- Booking Range Monitoring -->
+				<div class="admin-section">
+					<h2>Booking Range Status</h2>
+
+					<div class="booking-range-status">
+						<div class="status-grid">
+							<div class="status-item">
+								<label>Current Date:</label>
+								<span id="currentDate">Loading...</span>
+							</div>
+							<div class="status-item">
+								<label>Bookings Available Until:</label>
+								<span id="maxFutureDate">Loading...</span>
+							</div>
+							<div class="status-item">
+								<label>Days Remaining:</label>
+								<span id="daysRemaining" class="days-remaining">Loading...</span>
+							</div>
+							<div class="status-item">
+								<label>Total Open Days:</label>
+								<span id="totalOpenDays">Loading...</span>
+							</div>
+							<div class="status-item">
+								<label>Total Time Slots:</label>
+								<span id="totalTimeSlots">Loading...</span>
+							</div>
+							<div class="status-item">
+								<label>Extension Status:</label>
+								<span id="extensionStatus" class="extension-status">Loading...</span>
+							</div>
+						</div>
+
+						<div class="range-actions">
+							<button id="refreshRangeStatus" class="btn btn-secondary">
+								<span class="btn-text">Refresh Status</span>
+								<span class="btn-spinner hidden">⟳</span>
+							</button>
+							<button id="extendRange" class="btn btn-primary">
+								<span class="btn-text">Extend Range</span>
+								<span class="btn-spinner hidden">⟳</span>
+							</button>
+						</div>
+
+						<div id="rangeMessage" class="hidden"></div>
+					</div>
+				</div>
 			</div>
 		</div>
+
+		<div class="admin-actions">
+			<a href="/" class="btn btn-secondary">Back to Booking</a>
+		</div>
+	</div>
 	</div>
 
 	<script>
 		let isLoggedIn = false;
 
-		async function login(): Promise<void> {
-			const passwordElement = document.getElementById('adminPassword') as HTMLInputElement;
-			const errorDiv = document.getElementById('loginError') as HTMLElement;
+		// DOM elements
+		const loginContainer = document.getElementById('login-container') as HTMLElement;
+		const adminContent = document.getElementById('adminContent') as HTMLElement;
+		const adminHeader = document.getElementById('admin-header') as HTMLElement;
+		const loginForm = document.getElementById('login-form') as HTMLFormElement;
+		const loginError = document.getElementById('login-error') as HTMLElement;
+		const adminPassword = document.getElementById('admin-password') as HTMLInputElement;
+		// const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
 
-			if (!passwordElement || !errorDiv) {
+		// Event listeners
+		if (loginForm) loginForm.addEventListener('submit', handleLogin);
+
+		// Login handler
+		async function handleLogin(event: Event): Promise<void> {
+			event.preventDefault();
+
+			if (!adminPassword || !loginError) {
 				console.error('Required elements not found');
 				return;
 			}
 
-			const password = passwordElement.value;
+			const password = adminPassword.value;
 
 			try {
 				// Get admin password from settings
@@ -342,106 +283,119 @@
 
 				if (result.success) {
 					isLoggedIn = true;
-					const loginSection = document.getElementById('loginSection');
-					const adminInterface = document.getElementById('adminInterface');
 
-					if (loginSection && adminInterface) {
-						loginSection.classList.add('hidden');
-						adminInterface.classList.remove('hidden');
+					if (loginContainer) loginContainer.style.display = 'none';
+					if (adminContent) {
+						adminContent.classList.remove('hidden');
+						adminContent.style.display = 'block';
 					}
+					if (adminHeader) adminHeader.style.display = 'block';
 
 					loadHolidays();
-					loadScheduleSettings();
+					loadBookingRangeStatus();
+					// Add a small delay to ensure DOM is ready
+					setTimeout(() => {
+						// Test: Manually activate Thursday chip to test CSS
+						const thursdayChip = document.querySelector('[data-day="thursday"]') as HTMLElement;
+						if (thursdayChip) {
+							thursdayChip.classList.add('active');
+							console.log('Test: Manually activated Thursday chip for CSS testing');
+						}
+
+						loadScheduleSettings();
+						setupOperatingDaysHandlers();
+					}, 100);
 				} else {
-					errorDiv.classList.remove('hidden');
+					showLoginError('Invalid password');
 				}
 			} catch (error) {
 				console.error('Login error:', error);
-				errorDiv.textContent = 'Login failed. Please try again.';
-				errorDiv.classList.remove('hidden');
+				showLoginError('Login failed. Please try again.');
+			}
+		}
+
+		// Show login error
+		function showLoginError(message: string): void {
+			if (loginError) {
+				loginError.textContent = message;
+				loginError.style.display = 'block';
 			}
 		}
 
 		function logout(): void {
-			console.log('Logout function called');
 			isLoggedIn = false;
 
-			try {
-				// Show login section, hide admin interface
-				const loginSection = document.getElementById('loginSection');
-				const adminInterface = document.getElementById('adminInterface');
-
-				if (loginSection && adminInterface) {
-					loginSection.classList.remove('hidden');
-					adminInterface.classList.add('hidden');
-					console.log('Sections toggled successfully');
-				} else {
-					console.error('Could not find login or admin sections');
-				}
-
-				// Clear password field
-				const passwordField = document.getElementById('adminPassword') as HTMLInputElement;
-				if (passwordField) {
-					passwordField.value = '';
-				}
-
-				// Hide any error messages
-				const loginError = document.getElementById('loginError');
-				if (loginError) {
-					loginError.classList.add('hidden');
-				}
-
-				// Clear any success/error messages in admin sections
-				const messageElements = document.querySelectorAll('#holidayMessage, #scheduleMessage');
-				messageElements.forEach((el: Element) => el.classList.add('hidden'));
-
-				// Reset form fields to defaults
-				const holidayDate = document.getElementById('holidayDate') as HTMLInputElement;
-				const holidayName = document.getElementById('holidayName') as HTMLInputElement;
-				if (holidayDate) holidayDate.value = '';
-				if (holidayName) holidayName.value = '';
-
-				console.log('Logged out successfully');
-
-				// Visual confirmation
-				alert('Logged out successfully!');
-
-			} catch (error: unknown) {
-				console.error('Error during logout:', error);
-				const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-				alert('Error during logout: ' + errorMessage);
+			if (adminContent) {
+				adminContent.classList.add('hidden');
+				adminContent.style.display = 'none';
 			}
+			if (adminHeader) adminHeader.style.display = 'none';
+			if (loginContainer) loginContainer.style.display = 'flex';
+			if (adminPassword) adminPassword.value = '';
+			if (loginError) loginError.style.display = 'none';
 		}
+
+
 
 		async function loadHolidays(): Promise<void> {
 			try {
 				const response = await fetch('/api/admin/holidays');
 				const holidays = await response.json();
 
-				const holidayList = document.getElementById('holidayList');
+				const holidayTableBody = document.getElementById('holidayTableBody');
 
-				if (!holidayList) {
-					console.error('Holiday list element not found');
+				if (!holidayTableBody) {
+					console.error('Holiday table body element not found');
 					return;
 				}
 
 				if (holidays.length === 0) {
-					holidayList.innerHTML = '<p>No holidays configured.</p>';
+					holidayTableBody.innerHTML = '<tr><td colspan="5" class="no-data-cell">No holidays configured.</td></tr>';
 					return;
 				}
 
-				holidayList.innerHTML = holidays.map((holiday: any) => `
-					<div class="holiday-item">
-						<div class="holiday-info">
-							<div class="holiday-date">${new Date(holiday.date).toLocaleDateString()}</div>
-							<div class="holiday-name">${holiday.name}
-								${holiday.is_auto_generated ? '<span class="holiday-badge">Auto</span>' : '<span class="holiday-badge">Manual</span>'}
-								${holiday.is_override_allowed ? '<span class="holiday-badge">Override</span>' : ''}
-							</div>
-						</div>
-						<button class="btn btn-danger" onclick="removeHoliday('${holiday.id}')">Remove</button>
-					</div>
-				`).join('');
+				holidayTableBody.innerHTML = holidays.map((holiday: any) => {
+					const isDisabled = holiday.is_disabled || false;
+					const isAutoGenerated = holiday.is_auto_generated || false;
+					// Fix timezone issue by parsing date as local date
+					const dateParts = holiday.date.split('-');
+					const localDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+					const formattedDate = localDate.toLocaleDateString('en-US', {
+						weekday: 'short',
+						month: 'short',
+						day: 'numeric',
+						year: 'numeric'
+					});
+
+					return `
+						<tr class="${isDisabled ? 'holiday-disabled' : ''}">
+							<td class="date-cell">${formattedDate}</td>
+							<td class="name-cell">
+								${isDisabled ? '<span class="disabled-indicator">🚫</span>' : ''}
+								${holiday.name}
+							</td>
+							<td class="type-cell">
+								<span class="badge ${isAutoGenerated ? 'badge-auto' : 'badge-manual'}">
+									${isAutoGenerated ? 'Auto' : 'Manual'}
+								</span>
+							</td>
+							<td class="status-cell">
+								<span class="badge ${isDisabled ? 'badge-disabled' : 'badge-active'}">
+									${isDisabled ? 'Disabled' : 'Active'}
+								</span>
+							</td>
+							<td class="actions-cell">
+								${isAutoGenerated ?
+									(isDisabled ?
+										`<button class="btn btn-sm btn-success" onclick="enableHoliday('${holiday.id}')">Enable</button>` :
+										`<button class="btn btn-sm btn-warning" onclick="disableHoliday('${holiday.id}')">Disable</button>`
+									) :
+									`<button class="btn btn-sm btn-danger" onclick="removeHoliday('${holiday.id}')">Remove</button>`
+								}
+							</td>
+						</tr>
+					`;
+				}).join('');
 			} catch (error) {
 				console.error('Error loading holidays:', error);
 				const holidayList = document.getElementById('holidayList');
@@ -469,6 +423,9 @@
 				return;
 			}
 
+			// Show loading state
+			setButtonLoading('addHolidayBtn', true);
+
 			try {
 				const response = await fetch('/api/admin/holidays', {
 					method: 'POST',
@@ -489,11 +446,50 @@
 			} catch (error) {
 				console.error('Error adding holiday:', error);
 				showMessage(messageDiv, 'Error adding holiday.', 'error');
+			} finally {
+				// Hide loading state
+				setButtonLoading('addHolidayBtn', false);
+			}
+		}
+
+		async function generateFutureHolidays(): Promise<void> {
+			const messageDiv = document.getElementById('holidayMessage');
+			if (!messageDiv) return;
+
+			if (!confirm('This will generate automatic holidays for the next 3 years. Continue?')) {
+				return;
+			}
+
+			// Show loading state
+			setButtonLoading('generateHolidaysBtn', true);
+
+			try {
+				showMessage(messageDiv, 'Generating holidays...', 'success');
+
+				const response = await fetch('/api/admin/holidays/generate', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' }
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					showMessage(messageDiv, `Successfully generated holidays for ${result.years_generated} years!`, 'success');
+					loadHolidays(); // Refresh the list
+				} else {
+					showMessage(messageDiv, result.error || 'Failed to generate holidays.', 'error');
+				}
+			} catch (error) {
+				console.error('Error generating holidays:', error);
+				showMessage(messageDiv, 'An error occurred while generating holidays.', 'error');
+			} finally {
+				// Hide loading state
+				setButtonLoading('generateHolidaysBtn', false);
 			}
 		}
 
 		async function removeHoliday(holidayId: string): Promise<void> {
-			if (!confirm('Are you sure you want to remove this holiday?')) return;
+			if (!confirm('Are you sure you want to remove this holiday? This action cannot be undone.')) return;
 
 			try {
 				const response = await fetch(`/api/admin/holidays/${holidayId}`, {
@@ -513,40 +509,262 @@
 			}
 		}
 
+		async function disableHoliday(holidayId: string): Promise<void> {
+			if (!confirm('Are you sure you want to disable this automatic holiday? It can be re-enabled later.')) return;
+
+			// Find the button that was clicked and show loading state
+			const button = document.querySelector(`button[onclick="disableHoliday('${holidayId}')"]`) as HTMLButtonElement;
+			if (button) {
+				button.disabled = true;
+				button.innerHTML = '<span class="btn-spinner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg></span> Disabling...';
+			}
+
+			try {
+				const response = await fetch(`/api/admin/holidays/${holidayId}`, {
+					method: 'DELETE'
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					loadHolidays();
+				} else {
+					alert('Failed to disable holiday: ' + (result.error || 'Unknown error'));
+				}
+			} catch (error) {
+				console.error('Error disabling holiday:', error);
+				alert('Error disabling holiday.');
+			} finally {
+				// Reset button state (will be replaced by loadHolidays anyway)
+				if (button) {
+					button.disabled = false;
+					button.innerHTML = 'Disable';
+				}
+			}
+		}
+
+		async function enableHoliday(holidayId: string): Promise<void> {
+			// Find the button that was clicked and show loading state
+			const button = document.querySelector(`button[onclick="enableHoliday('${holidayId}')"]`) as HTMLButtonElement;
+			if (button) {
+				button.disabled = true;
+				button.innerHTML = '<span class="btn-spinner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg></span> Enabling...';
+			}
+
+			try {
+				const response = await fetch(`/api/admin/holidays/${holidayId}/enable`, {
+					method: 'POST'
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					loadHolidays();
+				} else {
+					alert('Failed to enable holiday: ' + (result.error || 'Unknown error'));
+				}
+			} catch (error) {
+				console.error('Error enabling holiday:', error);
+				alert('Error enabling holiday.');
+			} finally {
+				// Reset button state (will be replaced by loadHolidays anyway)
+				if (button) {
+					button.disabled = false;
+					button.innerHTML = 'Enable';
+				}
+			}
+		}
+
+		// Generate 24-hour time slots grid
+		function generateTimeSlotsGrid(): void {
+			console.log('generateTimeSlotsGrid called'); // Debug log
+			const timeSlotsGrid = document.getElementById('timeSlotsGrid');
+			if (!timeSlotsGrid) {
+				console.error('timeSlotsGrid element not found!'); // Debug log
+				return;
+			}
+			console.log('timeSlotsGrid element found:', timeSlotsGrid); // Debug log
+
+			const hours: Array<{ value: string; hour24: number }> = [];
+			for (let i = 0; i < 24; i++) {
+				const hour12 = i === 0 ? 12 : i > 12 ? i - 12 : i;
+				const ampm = i < 12 ? 'AM' : 'PM';
+				const timeString = `${hour12}:00 ${ampm}`;
+				hours.push({ value: timeString, hour24: i });
+			}
+
+			timeSlotsGrid.innerHTML = hours.map(time => `
+				<button type="button" class="time-slot-chip" data-time="${time.value}">
+					${time.value}
+				</button>
+			`).join('');
+
+			console.log('Generated', hours.length, 'time slot chips'); // Debug log
+
+			// Test: Manually activate a few chips to test CSS
+			const testChips = timeSlotsGrid.querySelectorAll('.time-slot-chip');
+			if (testChips.length > 0) {
+				testChips[0].classList.add('active'); // 12:00 AM
+				testChips[10].classList.add('active'); // 10:00 AM
+				console.log('Test: Manually activated first two chips for CSS testing');
+			}
+
+			// Add click handlers for time slots
+			timeSlotsGrid.addEventListener('click', handleTimeSlotToggle);
+		}
+
+		async function handleTimeSlotToggle(event: Event): Promise<void> {
+			const target = event.target as HTMLElement;
+			if (!target.classList.contains('time-slot-chip')) return;
+
+			const timeValue = target.dataset.time;
+			const isActive = target.classList.contains('active');
+			const action = isActive ? 'remove' : 'add';
+
+			if (!confirm(`Are you sure you want to ${action} ${timeValue} ${isActive ? 'from' : 'to'} the available time slots?`)) {
+				return;
+			}
+
+			target.classList.toggle('active');
+		}
+
 		async function loadScheduleSettings(): Promise<void> {
 			try {
 				const response = await fetch('/api/admin/settings');
 				const settings = await response.json();
 
+				console.log('Loaded settings:', settings); // Debug log
+
+				// Generate time slots grid first
+				generateTimeSlotsGrid();
+
 				// Load operating days
-				const operatingDays = JSON.parse(settings.operating_days || '[]');
-				const dayCheckboxes = document.querySelectorAll('#operatingDays input[type="checkbox"]');
-				dayCheckboxes.forEach((checkbox: Element) => {
-					const checkboxElement = checkbox as HTMLInputElement;
-					checkboxElement.checked = operatingDays.includes(checkboxElement.value);
+				console.log('Raw operating_days from DB:', settings.operating_days, 'Type:', typeof settings.operating_days); // Debug log
+				let operatingDays = [];
+
+				if (Array.isArray(settings.operating_days)) {
+					// Data is already an array
+					operatingDays = settings.operating_days;
+					console.log('Operating days already an array:', operatingDays); // Debug log
+				} else if (typeof settings.operating_days === 'string') {
+					// Data is a JSON string, parse it
+					try {
+						operatingDays = JSON.parse(settings.operating_days || '[]');
+						console.log('Parsed operating days from JSON:', operatingDays); // Debug log
+					} catch (error) {
+						console.error('Error parsing operating_days JSON:', error);
+						operatingDays = [];
+					}
+				} else {
+					console.log('Operating days is neither array nor string, using empty array');
+					operatingDays = [];
+				}
+
+				const dayChips = document.querySelectorAll('#operatingDays .toggle-chip');
+				console.log('Found', dayChips.length, 'day chips'); // Debug log
+				dayChips.forEach((chip: Element) => {
+					const chipElement = chip as HTMLElement;
+					const dayValue = chipElement.dataset.day;
+					chipElement.classList.remove('active'); // Clear existing state
+					if (operatingDays.includes(dayValue)) {
+						chipElement.classList.add('active');
+						console.log('Activated day:', dayValue, 'Classes:', chipElement.className); // Debug log
+					} else {
+						console.log('Day not active:', dayValue); // Debug log
+					}
 				});
 
-				// Load time slots
-				const timeSlots = JSON.parse(settings.time_slots || '[]');
-				const timeSlotsElement = document.getElementById('timeSlots') as HTMLTextAreaElement;
-				if (timeSlotsElement) {
-					timeSlotsElement.value = timeSlots.join('\n');
+				// Load and set active time slots
+				console.log('Raw time_slots from DB:', settings.time_slots, 'Type:', typeof settings.time_slots); // Debug log
+				let timeSlots = [];
+
+				if (Array.isArray(settings.time_slots)) {
+					// Data is already an array
+					timeSlots = settings.time_slots;
+					console.log('Time slots already an array:', timeSlots); // Debug log
+				} else if (typeof settings.time_slots === 'string') {
+					// Data is a JSON string, parse it
+					try {
+						timeSlots = JSON.parse(settings.time_slots || '[]');
+						console.log('Parsed time slots from JSON:', timeSlots); // Debug log
+					} catch (error) {
+						console.error('Error parsing time_slots JSON:', error);
+						timeSlots = [];
+					}
+				} else {
+					console.log('Time slots is neither array nor string, using empty array');
+					timeSlots = [];
 				}
+
+				const timeSlotChips = document.querySelectorAll('#timeSlotsGrid .time-slot-chip');
+				console.log('Found', timeSlotChips.length, 'time slot chips'); // Debug log
+				timeSlotChips.forEach((chip: Element) => {
+					const chipElement = chip as HTMLElement;
+					const timeValue = chipElement.dataset.time;
+					chipElement.classList.remove('active'); // Clear existing state
+					if (timeSlots.includes(timeValue)) {
+						chipElement.classList.add('active');
+						console.log('Activated time slot:', timeValue, 'Classes:', chipElement.className); // Debug log
+					} else {
+						console.log('Time slot not active:', timeValue); // Debug log
+					}
+				});
 
 				// Load capacity settings
 				const maxBookingsElement = document.getElementById('maxBookings') as HTMLInputElement;
 				const maxVisitorsElement = document.getElementById('maxVisitors') as HTMLInputElement;
 
-				if (maxBookingsElement) {
-					maxBookingsElement.value = settings.max_bookings_per_slot || '3';
+				if (maxBookingsElement && settings.max_bookings_per_slot) {
+					maxBookingsElement.value = settings.max_bookings_per_slot;
 				}
-				if (maxVisitorsElement) {
-					maxVisitorsElement.value = settings.max_visitors_per_slot || '10';
+
+				if (maxVisitorsElement && settings.max_visitors_per_slot) {
+					maxVisitorsElement.value = settings.max_visitors_per_slot;
+				}
+
+				// Load seasonal settings
+				const seasonStartMonthElement = document.getElementById('seasonStartMonth') as HTMLSelectElement;
+				const seasonStartDayElement = document.getElementById('seasonStartDay') as HTMLInputElement;
+				const seasonEndMonthElement = document.getElementById('seasonEndMonth') as HTMLSelectElement;
+				const seasonEndDayElement = document.getElementById('seasonEndDay') as HTMLInputElement;
+
+				if (seasonStartMonthElement && settings.season_start_month) {
+					seasonStartMonthElement.value = settings.season_start_month;
+				}
+				if (seasonStartDayElement && settings.season_start_day) {
+					seasonStartDayElement.value = settings.season_start_day;
+				}
+				if (seasonEndMonthElement && settings.season_end_month) {
+					seasonEndMonthElement.value = settings.season_end_month;
+				}
+				if (seasonEndDayElement && settings.season_end_day) {
+					seasonEndDayElement.value = settings.season_end_day;
 				}
 
 			} catch (error) {
 				console.error('Error loading settings:', error);
 			}
+		}
+
+		// Add click handlers for operating days
+		function setupOperatingDaysHandlers(): void {
+			const operatingDaysContainer = document.getElementById('operatingDays');
+			if (!operatingDaysContainer) return;
+
+			operatingDaysContainer.addEventListener('click', async (event: Event) => {
+				const target = event.target as HTMLElement;
+				if (!target.classList.contains('toggle-chip')) return;
+
+				const dayValue = target.dataset.day;
+				const isActive = target.classList.contains('active');
+				const action = isActive ? 'close' : 'open';
+
+				if (!confirm(`Are you sure you want to ${action} the business on ${dayValue}s?`)) {
+					return;
+				}
+
+				target.classList.toggle('active');
+			});
 		}
 
 		async function updateScheduleSettings(): Promise<void> {
@@ -557,33 +775,51 @@
 				return;
 			}
 
+			// Show loading state
+			setButtonLoading('saveScheduleBtn', true);
+
 			try {
-				// Get operating days
-				const operatingDays = Array.from(document.querySelectorAll('#operatingDays input[type="checkbox"]:checked'))
-					.map((cb: Element) => (cb as HTMLInputElement).value);
+				// Get operating days from active chips
+				const operatingDays: string[] = [];
+				const activeDayChips = document.querySelectorAll('#operatingDays .toggle-chip.active');
+				activeDayChips.forEach((chip: Element) => {
+					const chipElement = chip as HTMLElement;
+					const dayValue = chipElement.dataset.day;
+					if (dayValue) operatingDays.push(dayValue);
+				});
 
-				// Get time slots
-				const timeSlotsElement = document.getElementById('timeSlots') as HTMLTextAreaElement;
-				if (!timeSlotsElement) {
-					showMessage(messageDiv, 'Time slots element not found.', 'error');
-					return;
-				}
+				// Get time slots from active chips
+				const timeSlots: string[] = [];
+				const activeTimeChips = document.querySelectorAll('#timeSlotsGrid .time-slot-chip.active');
+				activeTimeChips.forEach((chip: Element) => {
+					const chipElement = chip as HTMLElement;
+					const timeValue = chipElement.dataset.time;
+					if (timeValue) timeSlots.push(timeValue);
+				});
 
-				const timeSlots = timeSlotsElement.value
-					.split('\n')
-					.map((slot: string) => slot.trim())
-					.filter((slot: string) => slot.length > 0);
+				const maxBookingsInput = document.getElementById('maxBookings') as HTMLInputElement;
+				const maxVisitorsInput = document.getElementById('maxVisitors') as HTMLInputElement;
+				const seasonStartMonthInput = document.getElementById('seasonStartMonth') as HTMLSelectElement;
+				const seasonStartDayInput = document.getElementById('seasonStartDay') as HTMLInputElement;
+				const seasonEndMonthInput = document.getElementById('seasonEndMonth') as HTMLSelectElement;
+				const seasonEndDayInput = document.getElementById('seasonEndDay') as HTMLInputElement;
 
-				const maxBookingsElement = document.getElementById('maxBookings') as HTMLInputElement;
-				const maxVisitorsElement = document.getElementById('maxVisitors') as HTMLInputElement;
-
-				if (!maxBookingsElement || !maxVisitorsElement) {
+				if (!maxBookingsInput || !maxVisitorsInput) {
 					showMessage(messageDiv, 'Capacity elements not found.', 'error');
 					return;
 				}
 
-				const maxBookings = maxBookingsElement.value;
-				const maxVisitors = maxVisitorsElement.value;
+				if (!seasonStartMonthInput || !seasonStartDayInput || !seasonEndMonthInput || !seasonEndDayInput) {
+					showMessage(messageDiv, 'Season range elements not found.', 'error');
+					return;
+				}
+
+				const maxBookings = maxBookingsInput.value;
+				const maxVisitors = maxVisitorsInput.value;
+				const seasonStartMonth = seasonStartMonthInput.value;
+				const seasonStartDay = seasonStartDayInput.value;
+				const seasonEndMonth = seasonEndMonthInput.value;
+				const seasonEndDay = seasonEndDayInput.value;
 
 				if (operatingDays.length === 0) {
 					showMessage(messageDiv, 'Please select at least one operating day.', 'error');
@@ -595,6 +831,15 @@
 					return;
 				}
 
+				// Debug logging
+				console.log('Submitting schedule settings:');
+				console.log('Operating days:', operatingDays);
+				console.log('Time slots:', timeSlots);
+				console.log('Max bookings:', maxBookings);
+				console.log('Max visitors:', maxVisitors);
+				console.log('Season start:', seasonStartMonth, seasonStartDay);
+				console.log('Season end:', seasonEndMonth, seasonEndDay);
+
 				const response = await fetch('/api/admin/settings', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -602,7 +847,11 @@
 						operating_days: operatingDays,
 						time_slots: timeSlots,
 						max_bookings_per_slot: parseInt(maxBookings),
-						max_visitors_per_slot: parseInt(maxVisitors)
+						max_visitors_per_slot: parseInt(maxVisitors),
+						season_start_month: parseInt(seasonStartMonth),
+						season_start_day: parseInt(seasonStartDay),
+						season_end_month: parseInt(seasonEndMonth),
+						season_end_day: parseInt(seasonEndDay)
 					})
 				});
 
@@ -616,6 +865,9 @@
 			} catch (error) {
 				console.error('Error updating settings:', error);
 				showMessage(messageDiv, 'Error updating settings.', 'error');
+			} finally {
+				// Hide loading state
+				setButtonLoading('saveScheduleBtn', false);
 			}
 		}
 
@@ -629,33 +881,149 @@
 			}, 5000);
 		}
 
-		// Allow Enter key to login
-		const adminPasswordElement = document.getElementById('adminPassword');
-		if (adminPasswordElement) {
-			adminPasswordElement.addEventListener('keypress', function(e: KeyboardEvent) {
-				if (e.key === 'Enter') {
-					login();
-				}
-			});
+		// Button loading state helpers
+		function setButtonLoading(buttonId: string, loading: boolean): void {
+			const button = document.getElementById(buttonId) as HTMLButtonElement;
+			if (!button) return;
+
+			const textSpan = button.querySelector('.btn-text') as HTMLElement;
+			const spinnerSpan = button.querySelector('.btn-spinner') as HTMLElement;
+
+			if (loading) {
+				button.disabled = true;
+				if (textSpan) textSpan.style.display = 'none';
+				if (spinnerSpan) spinnerSpan.style.display = 'flex';
+			} else {
+				button.disabled = false;
+				if (textSpan) textSpan.style.display = 'inline';
+				if (spinnerSpan) spinnerSpan.style.display = 'none';
+			}
 		}
 
-		// Add logout button event listener
-		const logoutBtn = document.getElementById('logoutButton');
-		if (logoutBtn) {
-			logoutBtn.addEventListener('click', function() {
-				console.log('Logout button clicked');
-				logout();
-			});
-			console.log('Logout button event listener attached');
-		} else {
-			console.error('Logout button not found!');
+		// Booking Range Status Functions
+		async function loadBookingRangeStatus(): Promise<void> {
+			try {
+				const response = await fetch('/api/admin/extend-booking-range');
+				const result = await response.json();
+
+				if (result.success) {
+					updateBookingRangeDisplay(result.status);
+				} else {
+					console.error('Failed to load booking range status:', result.error);
+					showRangeMessage('Failed to load booking range status.', 'error');
+				}
+			} catch (error) {
+				console.error('Error loading booking range status:', error);
+				showRangeMessage('Error loading booking range status.', 'error');
+			}
 		}
+
+		function updateBookingRangeDisplay(status: any): void {
+			// Update display elements
+			const currentDate = document.getElementById('currentDate');
+			const maxFutureDate = document.getElementById('maxFutureDate');
+			const daysRemaining = document.getElementById('daysRemaining');
+			const totalOpenDays = document.getElementById('totalOpenDays');
+			const totalTimeSlots = document.getElementById('totalTimeSlots');
+			const extensionStatus = document.getElementById('extensionStatus');
+
+			if (currentDate) currentDate.textContent = status.current_date;
+			if (maxFutureDate) maxFutureDate.textContent = status.max_future_date;
+			if (totalOpenDays) totalOpenDays.textContent = status.total_open_days.toString();
+			if (totalTimeSlots) totalTimeSlots.textContent = status.total_time_slots.toString();
+
+			// Update days remaining with color coding
+			if (daysRemaining) {
+				daysRemaining.textContent = `${status.days_remaining} days`;
+				daysRemaining.className = 'days-remaining';
+
+				if (status.days_remaining < 180) {
+					daysRemaining.classList.add('danger');
+				} else if (status.days_remaining < 300) {
+					daysRemaining.classList.add('warning');
+				}
+			}
+
+			// Update extension status
+			if (extensionStatus) {
+				if (status.needs_extension) {
+					extensionStatus.textContent = 'Extension Needed';
+					extensionStatus.className = 'extension-status danger';
+				} else if (status.days_remaining < 300) {
+					extensionStatus.textContent = 'Monitor Closely';
+					extensionStatus.className = 'extension-status warning';
+				} else {
+					extensionStatus.textContent = 'Healthy Range';
+					extensionStatus.className = 'extension-status good';
+				}
+			}
+		}
+
+		async function refreshRangeStatus(): Promise<void> {
+			setButtonLoading('refreshRangeStatus', true);
+			await loadBookingRangeStatus();
+			setButtonLoading('refreshRangeStatus', false);
+		}
+
+		async function extendBookingRange(): Promise<void> {
+			const messageDiv = document.getElementById('rangeMessage');
+			if (!messageDiv) return;
+
+			setButtonLoading('extendRange', true);
+
+			try {
+				const response = await fetch('/api/admin/extend-booking-range', {
+					method: 'POST'
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					showRangeMessage(result.message, 'success');
+					// Refresh the status display
+					await loadBookingRangeStatus();
+				} else {
+					showRangeMessage(result.error || 'Failed to extend booking range.', 'error');
+				}
+			} catch (error) {
+				console.error('Error extending booking range:', error);
+				showRangeMessage('Error extending booking range.', 'error');
+			} finally {
+				setButtonLoading('extendRange', false);
+			}
+		}
+
+		function showRangeMessage(message: string, type: 'error' | 'success'): void {
+			const messageDiv = document.getElementById('rangeMessage');
+			if (!messageDiv) return;
+
+			messageDiv.textContent = message;
+			messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+			messageDiv.classList.remove('hidden');
+
+			setTimeout(() => {
+				messageDiv.classList.add('hidden');
+			}, 5000);
+		}
+
+
+
+		// Add event listeners for booking range buttons
+		const refreshRangeBtn = document.getElementById('refreshRangeStatus');
+		const extendRangeBtn = document.getElementById('extendRange');
+
+		if (refreshRangeBtn) refreshRangeBtn.addEventListener('click', refreshRangeStatus);
+		if (extendRangeBtn) extendRangeBtn.addEventListener('click', extendBookingRange);
 
 		// Make functions globally available for onclick handlers
-		(window as any).login = login;
+		(window as any).logout = logout;
 		(window as any).addHoliday = addHoliday;
 		(window as any).removeHoliday = removeHoliday;
+		(window as any).disableHoliday = disableHoliday;
+		(window as any).enableHoliday = enableHoliday;
 		(window as any).updateScheduleSettings = updateScheduleSettings;
+		(window as any).refreshRangeStatus = refreshRangeStatus;
+		(window as any).extendBookingRange = extendBookingRange;
 
 		console.log('Garden management page JavaScript loaded');
 	</script>

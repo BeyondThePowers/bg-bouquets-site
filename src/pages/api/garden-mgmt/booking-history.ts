@@ -90,6 +90,31 @@ export const GET: APIRoute = async ({ request, url }) => {
       });
     }
 
+    // Always include booking creation as the first history entry
+    const allActions = [];
+
+    // Add creation event as first entry
+    allActions.push({
+      id: 'creation',
+      booking_id: booking.id,
+      action_type: 'booking_created',
+      action_timestamp: booking.created_at,
+      reason: 'Booking created',
+      performed_by_customer: true,
+      performed_by_admin: null,
+      original_booking_data: {
+        customer_name: booking.full_name,
+        email: booking.email,
+        date: booking.date,
+        time: booking.time
+      }
+    });
+
+    // Add any additional actions
+    if (actions && actions.length > 0) {
+      allActions.push(...actions);
+    }
+
     return new Response(JSON.stringify({
       booking: {
         id: booking.id,
@@ -100,7 +125,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         status: booking.status,
         createdAt: booking.created_at
       },
-      actions: actions || []
+      actions: allActions
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

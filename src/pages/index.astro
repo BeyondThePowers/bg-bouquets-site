@@ -109,7 +109,7 @@ import Layout from '../layouts/Layout.astro';
 								</svg>
 							</div>
 							<h3 class="font-playfair font-semibold mb-2" style="color: #333333;">Bouquet Vessels</h3>
-							<p class="text-sm font-roboto text-center" style="color: #333333;">We have wrapping paper but you can also bring your own vessel or buy for a small fee.</p>
+							<p class="text-sm font-roboto text-center" style="color: #333333;">Free wrapping paper, or bring your own vessel or buy one for a small fee.</p>
 						</div>
 
 						<div class="flex flex-col items-center">
@@ -758,11 +758,48 @@ import Layout from '../layouts/Layout.astro';
 
 		<div class="max-w-7xl mx-auto px-4" style="z-index:2; position: relative;">
 			<!-- Header -->
-			<div class="text-center mb-12">
+			<div class="text-center mb-8">
 				<h2 class="text-4xl md:text-5xl font-playfair font-bold mb-6" style="color: #333333;">Our Beautiful Flowers</h2>
 				<p class="text-xl font-roboto max-w-3xl mx-auto" style="color: #333333;">
 					Discover our carefully curated collection of seasonal blooms, perfect for creating your dream bouquet.
 				</p>
+			</div>
+
+			<!-- Seasonal Information -->
+			<div class="max-w-4xl mx-auto mb-12">
+				<div class="shabby-card p-6 text-center">
+					<div class="flex items-center justify-center gap-2 mb-4">
+						<svg class="w-5 h-5" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+						</svg>
+						<h3 class="text-lg font-playfair font-semibold" style="color: #333333;">Southern Alberta Growing Season</h3>
+					</div>
+					<p class="text-sm font-roboto mb-4" style="color: #666;">
+						Our flowers bloom naturally with Alberta's climate. Each flower has its own peak season when it's at its most beautiful and abundant.
+					</p>
+					<div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-roboto">
+						<div class="flex flex-col items-center p-2 rounded" style="background-color: #F0F9FF;">
+							<span class="font-semibold" style="color: #0369A1;">June</span>
+							<span style="color: #666;">Peonies, Lupins</span>
+						</div>
+						<div class="flex flex-col items-center p-2 rounded" style="background-color: #F0FDF4;">
+							<span class="font-semibold" style="color: #166534;">July</span>
+							<span style="color: #666;">Peak Season</span>
+						</div>
+						<div class="flex flex-col items-center p-2 rounded" style="background-color: #FFFBEB;">
+							<span class="font-semibold" style="color: #92400E;">August</span>
+							<span style="color: #666;">Sunflowers, Zinnias</span>
+						</div>
+						<div class="flex flex-col items-center p-2 rounded" style="background-color: #FEF3F2;">
+							<span class="font-semibold" style="color: #B91C1C;">September</span>
+							<span style="color: #666;">Fall Blooms</span>
+						</div>
+						<div class="flex flex-col items-center p-2 rounded" style="background-color: #F5F3FF;">
+							<span class="font-semibold" style="color: #7C3AED;">October</span>
+							<span style="color: #666;">Asters, Marigolds</span>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<!-- Search and Controls -->
@@ -847,6 +884,28 @@ import Layout from '../layouts/Layout.astro';
 											<option value="anniversary">Anniversary</option>
 											<option value="sympathy">Sympathy</option>
 											<option value="everyday">Everyday</option>
+										</select>
+										<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+											<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+											</svg>
+										</div>
+									</div>
+								</div>
+
+								<div>
+									<div class="mb-2">
+										<label for="seasonFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Season</label>
+									</div>
+									<div class="relative">
+										<select id="seasonFilter" name="seasonFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by season">
+											<option value="">All Year</option>
+											<option value="current">Available Now</option>
+											<option value="6">June</option>
+											<option value="7">July</option>
+											<option value="8">August</option>
+											<option value="9">September</option>
+											<option value="10">October</option>
 										</select>
 										<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
 											<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
@@ -2821,7 +2880,7 @@ import Layout from '../layouts/Layout.astro';
 
 	// Flower Section Implementation
 	function initializeFlowerSection() {
-		// Flower data
+		// Flower data with seasonal availability for Southern Alberta
 		const flowers = [
 			{
 				id: 1,
@@ -2829,7 +2888,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Star-shaped blooms in purple, pink, and white that add texture to arrangements",
 				colors: ["purple", "pink", "white"],
 				occasions: ["wedding", "birthday", "everyday"],
-				image: "aster_thumbnail.webp"
+				image: "aster_thumbnail.webp",
+				seasons: ["late-summer", "fall"], // August-October
+				months: [8, 9, 10],
+				peakMonths: [9, 10]
 			},
 			{
 				id: 2,
@@ -2837,7 +2899,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Delicate white clouds that create airy, romantic arrangements",
 				colors: ["white"],
 				occasions: ["wedding", "anniversary", "everyday"],
-				image: "babys-breath_thumbnail.webp"
+				image: "babys-breath_thumbnail.webp",
+				seasons: ["summer", "fall"], // June-September
+				months: [6, 7, 8, 9],
+				peakMonths: [7, 8]
 			},
 			{
 				id: 3,
@@ -2845,7 +2910,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Charming cornflower blooms in brilliant blue and mixed colors",
 				colors: ["blue", "pink", "white", "purple"],
 				occasions: ["wedding", "birthday", "everyday"],
-				image: "bachelor-buttons_thumbnail.webp"
+				image: "bachelor-buttons_thumbnail.webp",
+				seasons: ["summer"], // June-August
+				months: [6, 7, 8],
+				peakMonths: [7, 8]
 			},
 			{
 				id: 4,
@@ -2853,7 +2921,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Classic white petals with sunny yellow centers, perfect for cheerful bouquets",
 				colors: ["white", "yellow"],
 				occasions: ["birthday", "everyday"],
-				image: "daisies_thumbnail.webp"
+				image: "daisies_thumbnail.webp",
+				seasons: ["summer", "fall"], // June-September
+				months: [6, 7, 8, 9],
+				peakMonths: [7, 8]
 			},
 			{
 				id: 5,
@@ -2861,7 +2932,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Silvery-green foliage that adds fragrance and texture to any arrangement",
 				colors: ["green"],
 				occasions: ["wedding", "anniversary", "everyday"],
-				image: "eucalyptus_thumbnail.webp"
+				image: "eucalyptus_thumbnail.webp",
+				seasons: ["summer", "fall"], // Available all season as foliage
+				months: [6, 7, 8, 9, 10],
+				peakMonths: [7, 8, 9]
 			},
 			{
 				id: 6,
@@ -2869,7 +2943,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Tall spikes of tubular blooms in purple, pink, and white",
 				colors: ["purple", "pink", "white"],
 				occasions: ["wedding", "everyday"],
-				image: "foxgloves_thumbnail.webp"
+				image: "foxgloves_thumbnail.webp",
+				seasons: ["summer"], // June-July (early summer)
+				months: [6, 7],
+				peakMonths: [6, 7]
 			},
 			{
 				id: 7,
@@ -2877,7 +2954,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Aromatic purple spikes perfect for rustic, fragrant arrangements",
 				colors: ["purple"],
 				occasions: ["wedding", "everyday"],
-				image: "lavender_thumbnail.webp"
+				image: "lavender_thumbnail.webp",
+				seasons: ["summer"], // July-August
+				months: [7, 8],
+				peakMonths: [7, 8]
 			},
 			{
 				id: 8,
@@ -2885,7 +2965,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Dramatic tall spikes in vibrant blues, purples, and mixed colors",
 				colors: ["blue", "purple", "pink", "white"],
 				occasions: ["wedding", "birthday", "everyday"],
-				image: "lupin_thumbnail.webp"
+				image: "lupin_thumbnail.webp",
+				seasons: ["summer"], // June-July (early summer)
+				months: [6, 7],
+				peakMonths: [6, 7]
 			},
 			{
 				id: 9,
@@ -2893,7 +2976,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Bright, cheerful blooms in warm oranges and yellows",
 				colors: ["orange", "yellow"],
 				occasions: ["birthday", "everyday"],
-				image: "marigolds_thumbnail.webp"
+				image: "marigolds_thumbnail.webp",
+				seasons: ["summer", "fall"], // June-October (frost tolerant)
+				months: [6, 7, 8, 9, 10],
+				peakMonths: [7, 8, 9]
 			},
 			{
 				id: 10,
@@ -2901,7 +2987,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Luxurious, full-bodied blooms with incredible fragrance",
 				colors: ["pink", "white", "red"],
 				occasions: ["wedding", "anniversary"],
-				image: "peonies_thumbnail.webp"
+				image: "peonies_thumbnail.webp",
+				seasons: ["early-summer"], // June only (short season)
+				months: [6],
+				peakMonths: [6]
 			},
 			{
 				id: 11,
@@ -2909,7 +2998,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Classic and hybrid roses in various colors and fragrances",
 				colors: ["red", "pink", "white", "yellow"],
 				occasions: ["wedding", "anniversary", "everyday"],
-				image: "roses_thumbnail.webp"
+				image: "roses_thumbnail.webp",
+				seasons: ["summer", "fall"], // June-September
+				months: [6, 7, 8, 9],
+				peakMonths: [7, 8]
 			},
 			{
 				id: 12,
@@ -2917,7 +3009,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Tall spikes of colorful blooms that add height and drama",
 				colors: ["red", "pink", "white", "yellow", "purple"],
 				occasions: ["wedding", "birthday", "everyday"],
-				image: "snapdragons_thumbnail.webp"
+				image: "snapdragons_thumbnail.webp",
+				seasons: ["summer", "fall"], // June-September
+				months: [6, 7, 8, 9],
+				peakMonths: [7, 8]
 			},
 			{
 				id: 13,
@@ -2925,7 +3020,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Bright, cheerful sunflowers that bring joy to any bouquet",
 				colors: ["yellow", "orange"],
 				occasions: ["birthday", "everyday"],
-				image: "sunflower_thumbnail.webp"
+				image: "sunflower_thumbnail.webp",
+				seasons: ["late-summer", "fall"], // August-September
+				months: [8, 9],
+				peakMonths: [8, 9]
 			},
 			{
 				id: 14,
@@ -2933,7 +3031,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Delicate, fragrant climbers in soft pastel shades",
 				colors: ["pink", "purple", "white"],
 				occasions: ["wedding", "birthday"],
-				image: "sweatpea_thumbnail.webp"
+				image: "sweatpea_thumbnail.webp",
+				seasons: ["early-summer"], // June-July (cool weather)
+				months: [6, 7],
+				peakMonths: [6, 7]
 			},
 			{
 				id: 15,
@@ -2941,7 +3042,10 @@ import Layout from '../layouts/Layout.astro';
 				description: "Vibrant, long-lasting blooms in every color imaginable",
 				colors: ["red", "orange", "yellow", "pink", "purple"],
 				occasions: ["birthday", "everyday"],
-				image: "zinnia_thumbnail.webp"
+				image: "zinnia_thumbnail.webp",
+				seasons: ["summer", "fall"], // July-October
+				months: [7, 8, 9, 10],
+				peakMonths: [8, 9]
 			}
 		];
 
@@ -2978,6 +3082,7 @@ import Layout from '../layouts/Layout.astro';
 		const searchSuggestions = document.getElementById('searchSuggestions') as HTMLElement;
 		const colorFilter = document.getElementById('colorFilter') as HTMLSelectElement;
 		const occasionFilter = document.getElementById('occasionFilter') as HTMLSelectElement;
+		const seasonFilter = document.getElementById('seasonFilter') as HTMLSelectElement;
 		const mobileCarousel = document.getElementById('mobileCarousel') as HTMLElement;
 		const desktopGrid = document.getElementById('desktopGrid') as HTMLElement;
 		const carouselTrack = document.getElementById('carouselTrack') as HTMLElement;
@@ -3016,6 +3121,7 @@ import Layout from '../layouts/Layout.astro';
 			// Filter functionality
 			colorFilter?.addEventListener('change', applyFilters);
 			occasionFilter?.addEventListener('change', applyFilters);
+			seasonFilter?.addEventListener('change', applyFilters);
 
 
 
@@ -3166,6 +3272,10 @@ import Layout from '../layouts/Layout.astro';
 			const query = searchInput?.value.toLowerCase() || '';
 			const color = colorFilter?.value || '';
 			const occasion = occasionFilter?.value || '';
+			const season = seasonFilter?.value || '';
+
+			// Get current month for "Available Now" filter
+			const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-indexed
 
 			if (query.length > 0) {
 				// Search mode: filter by flower name only
@@ -3178,7 +3288,10 @@ import Layout from '../layouts/Layout.astro';
 					filteredFlowers = filteredFlowers.filter(flower => {
 						const matchesColor = !color || flower.colors.includes(color);
 						const matchesOccasion = !occasion || flower.occasions.includes(occasion);
-						return matchesColor && matchesOccasion;
+						const matchesSeason = !season ||
+							(season === 'current' ? flower.months.includes(currentMonth) :
+							 flower.months.includes(parseInt(season)));
+						return matchesColor && matchesOccasion && matchesSeason;
 					});
 				}
 			} else {
@@ -3186,7 +3299,10 @@ import Layout from '../layouts/Layout.astro';
 				filteredFlowers = flowers.filter(flower => {
 					const matchesColor = !color || flower.colors.includes(color);
 					const matchesOccasion = !occasion || flower.occasions.includes(occasion);
-					return matchesColor && matchesOccasion;
+					const matchesSeason = !season ||
+						(season === 'current' ? flower.months.includes(currentMonth) :
+						 flower.months.includes(parseInt(season)));
+					return matchesColor && matchesOccasion && matchesSeason;
 				});
 			}
 
@@ -3261,6 +3377,7 @@ import Layout from '../layouts/Layout.astro';
 			// Reset all filters
 			if (colorFilter) colorFilter.value = '';
 			if (occasionFilter) occasionFilter.value = '';
+			if (seasonFilter) seasonFilter.value = '';
 
 			applyFilters();
 		}
@@ -3368,6 +3485,11 @@ import Layout from '../layouts/Layout.astro';
 				occasionFilter.style.opacity = '0.5';
 				occasionFilter.style.cursor = 'not-allowed';
 			}
+			if (seasonFilter) {
+				seasonFilter.disabled = true;
+				seasonFilter.style.opacity = '0.5';
+				seasonFilter.style.cursor = 'not-allowed';
+			}
 		}
 
 		function enableFiltersAndControls() {
@@ -3381,6 +3503,11 @@ import Layout from '../layouts/Layout.astro';
 				occasionFilter.disabled = false;
 				occasionFilter.style.opacity = '1';
 				occasionFilter.style.cursor = 'pointer';
+			}
+			if (seasonFilter) {
+				seasonFilter.disabled = false;
+				seasonFilter.style.opacity = '1';
+				seasonFilter.style.cursor = 'pointer';
 			}
 		}
 
@@ -3418,6 +3545,19 @@ import Layout from '../layouts/Layout.astro';
 								</span>
 							`).join('')}
 						</div>
+
+						<!-- Seasonal availability -->
+						<div class="pt-2 border-t border-shabby-pink">
+							<div class="flex items-center gap-2 mb-1">
+								<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+								</svg>
+								<span class="text-xs font-roboto font-medium" style="color: #666;">Available:</span>
+							</div>
+							<div class="text-xs font-roboto" style="color: #666;">
+								${getSeasonalDisplay(flower)}
+							</div>
+						</div>
 					</div>
 				</div>
 			`;
@@ -3438,6 +3578,51 @@ import Layout from '../layouts/Layout.astro';
 				'coral': '#FF7F7F'
 			};
 			return colorMap[colorName.toLowerCase()] || '#E8B4B8';
+		}
+
+		// Helper function to display seasonal availability
+		function getSeasonalDisplay(flower: any): string {
+			const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+			const currentMonth = new Date().getMonth() + 1;
+
+			if (!flower.months || flower.months.length === 0) {
+				return 'Season varies';
+			}
+
+			// Check if currently in season
+			const isCurrentlyAvailable = flower.months.includes(currentMonth);
+			const availabilityStatus = isCurrentlyAvailable ?
+				'<span style="color: #22C55E; font-weight: 600;">● Available now</span>' :
+				'<span style="color: #F97316;">○ Out of season</span>';
+
+			// Format month range
+			const sortedMonths = [...flower.months].sort((a, b) => a - b);
+			const monthRanges = [];
+			let rangeStart = sortedMonths[0];
+			let rangeEnd = sortedMonths[0];
+
+			for (let i = 1; i < sortedMonths.length; i++) {
+				if (sortedMonths[i] === rangeEnd + 1) {
+					rangeEnd = sortedMonths[i];
+				} else {
+					// End current range and start new one
+					if (rangeStart === rangeEnd) {
+						monthRanges.push(monthNames[rangeStart]);
+					} else {
+						monthRanges.push(`${monthNames[rangeStart]}-${monthNames[rangeEnd]}`);
+					}
+					rangeStart = rangeEnd = sortedMonths[i];
+				}
+			}
+
+			// Add final range
+			if (rangeStart === rangeEnd) {
+				monthRanges.push(monthNames[rangeStart]);
+			} else {
+				monthRanges.push(`${monthNames[rangeStart]}-${monthNames[rangeEnd]}`);
+			}
+
+			return `${availabilityStatus}<br><span style="color: #999;">${monthRanges.join(', ')}</span>`;
 		}
 
 

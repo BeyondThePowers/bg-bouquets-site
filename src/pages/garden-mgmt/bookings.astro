@@ -9,7 +9,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Booking Management - BG Bouquet</title>
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-	<link rel="stylesheet" href="/fonts/fonts.css">
 	<link rel="stylesheet" href="/styles/admin-bookings.css">
 </head>
 <body>
@@ -33,21 +32,96 @@
 		<div class="header">
 			<div class="header-content">
 				<h1>BG Bouquet Admin</h1>
-				<button id="logout-btn" class="logout-btn">Logout</button>
+				<div class="header-actions">
+					<a href="/garden-mgmt" class="btn btn-secondary">Schedule Settings</a>
+					<button id="logout-btn" class="logout-btn">Logout</button>
+				</div>
 			</div>
 		</div>
 
 		<div class="container">
+			<!-- Dashboard Navigation -->
+			<div class="dashboard-nav">
+				<div class="time-filters">
+					<button class="time-filter active" data-period="today">Today</button>
+					<button class="time-filter" data-period="week">This Week</button>
+					<button class="time-filter" data-period="month">This Month</button>
+					<button class="time-filter" data-period="all">All Bookings</button>
+				</div>
+				<div class="payment-filters">
+					<span class="filter-label">Payment:</span>
+					<button class="payment-filter active" data-payment="all">All</button>
+					<button class="payment-filter" data-payment="pay_on_arrival">Pay on Arrival</button>
+					<button class="payment-filter" data-payment="online">Paid Online</button>
+				</div>
+			</div>
+
+			<!-- Summary Cards -->
+			<div class="summary-cards">
+				<div class="summary-card">
+					<div class="summary-value" id="total-bookings">-</div>
+					<div class="summary-label">Total Bookings</div>
+				</div>
+				<div class="summary-card">
+					<div class="summary-value" id="pending-payment">-</div>
+					<div class="summary-label">Pending Payment</div>
+				</div>
+				<div class="summary-card">
+					<div class="summary-value" id="paid-bookings">-</div>
+					<div class="summary-label">Paid</div>
+				</div>
+				<div class="summary-card">
+					<div class="summary-value" id="total-revenue">-</div>
+					<div class="summary-label">Revenue</div>
+				</div>
+			</div>
+
+			<!-- Advanced Date Range Filter (shown only for "All Bookings" view) -->
+			<div class="date-range-filter" id="date-range-filter" style="display: none;">
+				<div class="date-range-header">
+					<span class="date-range-label">Date Range:</span>
+					<button class="date-range-display" id="date-range-display">
+						<span id="date-range-text">All Time</span>
+						<span class="date-range-icon">📅</span>
+					</button>
+				</div>
+
+				<!-- Date Range Picker Dropdown -->
+				<div class="date-picker-dropdown" id="date-picker-dropdown">
+					<div class="date-picker-content">
+						<div class="preset-ranges">
+							<h4>Quick Ranges</h4>
+							<button class="preset-range" data-range="last7">Last 7 days</button>
+							<button class="preset-range" data-range="last30">Last 30 days</button>
+							<button class="preset-range" data-range="last90">Last 3 months</button>
+							<button class="preset-range" data-range="last365">Last year</button>
+							<button class="preset-range" data-range="ytd">Year to date</button>
+							<button class="preset-range active" data-range="all">All time</button>
+						</div>
+						<div class="custom-range">
+							<h4>Custom Range</h4>
+							<div class="date-inputs">
+								<div class="date-input-group">
+									<label for="start-date">From:</label>
+									<input type="date" id="start-date" class="date-input">
+								</div>
+								<div class="date-input-group">
+									<label for="end-date">To:</label>
+									<input type="date" id="end-date" class="date-input">
+								</div>
+							</div>
+						</div>
+						<div class="date-picker-actions">
+							<button class="btn btn-secondary" id="cancel-date-range">Cancel</button>
+							<button class="btn btn-primary" id="apply-date-range">Apply</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Search and Controls -->
 			<div class="controls">
 				<div class="controls-row">
-					<div class="form-group">
-						<label for="status-filter">Status:</label>
-						<select id="status-filter">
-							<option value="all">All Bookings</option>
-							<option value="confirmed">Active</option>
-							<option value="cancelled">Cancelled</option>
-						</select>
-					</div>
 					<div class="form-group">
 						<label for="search-input">Search:</label>
 						<input type="text" id="search-input" placeholder="Name, email, or phone...">
@@ -59,6 +133,9 @@
 					<div class="form-group">
 						<label>&nbsp;</label>
 						<button id="refresh-btn" class="btn btn-secondary">Refresh</button>
+					</div>
+					<div class="bulk-actions" id="bulk-actions" style="display: none;">
+						<button id="bulk-mark-paid" class="btn btn-success btn-small">Mark Selected as Paid</button>
 					</div>
 				</div>
 			</div>
@@ -98,7 +175,13 @@
 		// Global variables
 		let adminToken: string | null = null;
 		let currentPage = 0;
-		let currentFilters = { status: 'all', search: '' };
+		let currentFilters = {
+			status: 'confirmed', // Default to active bookings
+			search: '',
+			period: 'today', // Default to today view
+			payment: 'all', // Default to all payment types
+			dateRange: null as { start: string; end: string } | null // Custom date range for "all" view
+		};
 		const pageSize = 20;
 
 		// DOM elements
@@ -108,10 +191,28 @@
 		const loginError = document.getElementById('login-error') as HTMLElement;
 		const adminPassword = document.getElementById('admin-password') as HTMLInputElement;
 		const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
-		const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
 		const searchInput = document.getElementById('search-input') as HTMLInputElement;
 		const searchBtn = document.getElementById('search-btn') as HTMLButtonElement;
 		const refreshBtn = document.getElementById('refresh-btn') as HTMLButtonElement;
+
+		// Dashboard elements
+		const timeFilters = document.querySelectorAll('.time-filter');
+		const paymentFilters = document.querySelectorAll('.payment-filter');
+		const totalBookingsEl = document.getElementById('total-bookings') as HTMLElement;
+		const pendingPaymentEl = document.getElementById('pending-payment') as HTMLElement;
+		const paidBookingsEl = document.getElementById('paid-bookings') as HTMLElement;
+		const totalRevenueEl = document.getElementById('total-revenue') as HTMLElement;
+
+		// Date range elements
+		const dateRangeFilter = document.getElementById('date-range-filter') as HTMLElement;
+		const dateRangeDisplay = document.getElementById('date-range-display') as HTMLButtonElement;
+		const dateRangeText = document.getElementById('date-range-text') as HTMLElement;
+		const datePickerDropdown = document.getElementById('date-picker-dropdown') as HTMLElement;
+		const presetRanges = document.querySelectorAll('.preset-range');
+		const startDateInput = document.getElementById('start-date') as HTMLInputElement;
+		const endDateInput = document.getElementById('end-date') as HTMLInputElement;
+		const applyDateRangeBtn = document.getElementById('apply-date-range') as HTMLButtonElement;
+		const cancelDateRangeBtn = document.getElementById('cancel-date-range') as HTMLButtonElement;
 		const loading = document.getElementById('loading') as HTMLElement;
 		const errorContainer = document.getElementById('error-container') as HTMLElement;
 		const bookingsContainer = document.getElementById('bookings-container') as HTMLElement;
@@ -123,12 +224,29 @@
 		if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 		if (searchBtn) searchBtn.addEventListener('click', handleSearch);
 		if (refreshBtn) refreshBtn.addEventListener('click', () => loadBookings());
-		if (statusFilter) statusFilter.addEventListener('change', handleSearch);
 		if (searchInput) {
 			searchInput.addEventListener('keypress', (e: KeyboardEvent) => {
 				if (e.key === 'Enter') handleSearch();
 			});
 		}
+
+		// Dashboard filter listeners
+		timeFilters.forEach(filter => {
+			filter.addEventListener('click', handleTimeFilter);
+		});
+
+		paymentFilters.forEach(filter => {
+			filter.addEventListener('click', handlePaymentFilter);
+		});
+
+		// Date range listeners
+		if (dateRangeDisplay) dateRangeDisplay.addEventListener('click', toggleDatePicker);
+		if (applyDateRangeBtn) applyDateRangeBtn.addEventListener('click', applyDateRange);
+		if (cancelDateRangeBtn) cancelDateRangeBtn.addEventListener('click', closeDatePicker);
+
+		presetRanges.forEach(range => {
+			range.addEventListener('click', handlePresetRange);
+		});
 
 		// Login handler
 		async function handleLogin(e: Event): Promise<void> {
@@ -179,10 +297,166 @@
 
 		// Search handler
 		function handleSearch(): void {
-			if (statusFilter) currentFilters.status = statusFilter.value;
 			if (searchInput) currentFilters.search = searchInput.value.trim();
 			currentPage = 0;
 			loadBookings();
+		}
+
+		// Time filter handler
+		function handleTimeFilter(event: Event): void {
+			const target = event.target as HTMLButtonElement;
+			const period = target.dataset.period;
+			if (!period) return;
+
+			// Update active state
+			timeFilters.forEach(f => f.classList.remove('active'));
+			target.classList.add('active');
+
+			// Show/hide date range filter based on selection
+			if (dateRangeFilter) {
+				if (period === 'all') {
+					dateRangeFilter.style.display = 'block';
+				} else {
+					dateRangeFilter.style.display = 'none';
+					closeDatePicker(); // Close picker if open
+					currentFilters.dateRange = null; // Reset custom range
+				}
+			}
+
+			// Update filter and reload
+			currentFilters.period = period;
+			currentPage = 0;
+			loadBookings();
+		}
+
+		// Payment filter handler
+		function handlePaymentFilter(event: Event): void {
+			const target = event.target as HTMLButtonElement;
+			const payment = target.dataset.payment;
+			if (!payment) return;
+
+			// Update active state
+			paymentFilters.forEach(f => f.classList.remove('active'));
+			target.classList.add('active');
+
+			// Update filter and reload
+			currentFilters.payment = payment;
+			currentPage = 0;
+			loadBookings();
+		}
+
+		// Date range functions
+		function toggleDatePicker(): void {
+			if (datePickerDropdown) {
+				datePickerDropdown.classList.toggle('show');
+			}
+		}
+
+		function closeDatePicker(): void {
+			if (datePickerDropdown) {
+				datePickerDropdown.classList.remove('show');
+			}
+		}
+
+		function handlePresetRange(event: Event): void {
+			const target = event.target as HTMLButtonElement;
+			const range = target.dataset.range;
+			if (!range) return;
+
+			// Update active state
+			presetRanges.forEach(r => r.classList.remove('active'));
+			target.classList.add('active');
+
+			// Calculate date range
+			const now = new Date();
+			const mtOffset = now.getTimezoneOffset() + (7 * 60); // Mountain Time
+			const mtNow = new Date(now.getTime() - (mtOffset * 60 * 1000));
+
+			let startDate: Date;
+			let endDate = new Date(mtNow);
+
+			switch (range) {
+				case 'last7':
+					startDate = new Date(mtNow);
+					startDate.setDate(mtNow.getDate() - 7);
+					break;
+				case 'last30':
+					startDate = new Date(mtNow);
+					startDate.setDate(mtNow.getDate() - 30);
+					break;
+				case 'last90':
+					startDate = new Date(mtNow);
+					startDate.setDate(mtNow.getDate() - 90);
+					break;
+				case 'last365':
+					startDate = new Date(mtNow);
+					startDate.setFullYear(mtNow.getFullYear() - 1);
+					break;
+				case 'ytd':
+					startDate = new Date(mtNow.getFullYear(), 0, 1);
+					break;
+				default: // 'all'
+					currentFilters.dateRange = null;
+					updateDateRangeDisplay('All Time');
+					closeDatePicker();
+					currentPage = 0;
+					loadBookings();
+					return;
+			}
+
+			// Set the date range
+			currentFilters.dateRange = {
+				start: startDate.toISOString().split('T')[0],
+				end: endDate.toISOString().split('T')[0]
+			};
+
+			// Update inputs
+			if (startDateInput) startDateInput.value = currentFilters.dateRange.start;
+			if (endDateInput) endDateInput.value = currentFilters.dateRange.end;
+
+			// Update display and reload
+			updateDateRangeDisplay(target.textContent || 'Custom Range');
+			closeDatePicker();
+			currentPage = 0;
+			loadBookings();
+		}
+
+		function applyDateRange(): void {
+			if (!startDateInput || !endDateInput) return;
+
+			const startDate = startDateInput.value;
+			const endDate = endDateInput.value;
+
+			if (!startDate || !endDate) {
+				alert('Please select both start and end dates');
+				return;
+			}
+
+			if (startDate > endDate) {
+				alert('Start date must be before end date');
+				return;
+			}
+
+			// Set custom date range
+			currentFilters.dateRange = { start: startDate, end: endDate };
+
+			// Update preset selection
+			presetRanges.forEach(r => r.classList.remove('active'));
+
+			// Update display
+			const startFormatted = new Date(startDate).toLocaleDateString();
+			const endFormatted = new Date(endDate).toLocaleDateString();
+			updateDateRangeDisplay(`${startFormatted} - ${endFormatted}`);
+
+			closeDatePicker();
+			currentPage = 0;
+			loadBookings();
+		}
+
+		function updateDateRangeDisplay(text: string): void {
+			if (dateRangeText) {
+				dateRangeText.textContent = text;
+			}
 		}
 
 		// Load bookings
@@ -197,11 +471,19 @@
 				const params = new URLSearchParams({
 					limit: pageSize.toString(),
 					offset: (currentPage * pageSize).toString(),
-					status: currentFilters.status
+					status: currentFilters.status,
+					period: currentFilters.period,
+					payment: currentFilters.payment
 				});
 
 				if (currentFilters.search) {
 					params.append('search', currentFilters.search);
+				}
+
+				// Add custom date range if set
+				if (currentFilters.dateRange) {
+					params.append('startDate', currentFilters.dateRange.start);
+					params.append('endDate', currentFilters.dateRange.end);
 				}
 
 				const response = await fetch(`/api/garden-mgmt/bookings?${params}`, {
@@ -217,6 +499,7 @@
 				const data = await response.json();
 				renderBookings(data.bookings);
 				renderPagination(data.total);
+				updateSummaryCards(data.summary || {});
 
 			} catch (error) {
 				console.error('Error loading bookings:', error);
@@ -224,6 +507,14 @@
 			} finally {
 				if (loading) loading.style.display = 'none';
 			}
+		}
+
+		// Update summary cards
+		function updateSummaryCards(summary: any): void {
+			if (totalBookingsEl) totalBookingsEl.textContent = summary.total || '0';
+			if (pendingPaymentEl) pendingPaymentEl.textContent = summary.pending || '0';
+			if (paidBookingsEl) paidBookingsEl.textContent = summary.paid || '0';
+			if (totalRevenueEl) totalRevenueEl.textContent = summary.revenue ? `$${summary.revenue}` : '$0';
 		}
 
 		// Render bookings cards
@@ -316,27 +607,28 @@
 						<span class="status-badge ${statusClass}">${statusText}</span>
 					</div>
 
-					<!-- Actions -->
+					<!-- Actions Menu -->
 					<div class="booking-actions">
-						${booking.status === 'confirmed' ? `<button class="btn btn-small btn-danger" onclick="cancelBooking('${booking.id}')">Cancel</button>` : ''}
-						${booking.status === 'confirmed' ? `<button class="btn btn-small btn-info" onclick="rescheduleBooking('${booking.id}')">Reschedule</button>` : ''}
-						${booking.status === 'confirmed' && booking.payment_method === 'pay_on_arrival' ?
-							`<button class="btn btn-small ${booking.payment_status === 'paid' ? 'btn-warning' : 'btn-success'}"
-								onclick="showPaymentToggleModal('${booking.id}', '${booking.payment_status}', '${booking.full_name}')">
-								${booking.payment_status === 'paid' ? 'Mark Unpaid' : 'Mark Paid'}
-							</button>`
-							: ''
-						}
-						${booking.status === 'confirmed' && booking.payment_status === 'paid' ?
-							`<button class="btn btn-small btn-primary" onclick="documentRefund('${booking.id}')">Document Refund</button>`
-							: ''
-						}
-						${booking.total_actions > 0 ?
-							`<button class="btn btn-small btn-secondary" onclick="viewBookingHistory('${booking.id}')">
-								History (${booking.total_actions})
-							</button>`
-							: ''
-						}
+						<div class="actions-menu">
+							<button class="actions-trigger" onclick="toggleActionsMenu('${booking.id}')"></button>
+							<div class="actions-dropdown" id="actions-${booking.id}">
+								${booking.status === 'confirmed' && booking.payment_method === 'pay_on_arrival' ?
+									`<button class="${booking.payment_status === 'paid' ? 'warning' : 'success'}" onclick="showPaymentToggleModal('${booking.id}', '${booking.payment_status}', '${booking.full_name}'); hideActionsMenu('${booking.id}')">
+										${booking.payment_status === 'paid' ? 'Mark Unpaid' : 'Mark Paid'}
+									</button>`
+									: ''
+								}
+								${booking.status === 'confirmed' ? `<button onclick="rescheduleBooking('${booking.id}'); hideActionsMenu('${booking.id}')">Reschedule</button>` : ''}
+								${booking.status === 'confirmed' && booking.payment_status === 'paid' ?
+									`<button onclick="documentRefund('${booking.id}'); hideActionsMenu('${booking.id}')">Document Refund</button>`
+									: ''
+								}
+								<button onclick="viewBookingHistory('${booking.id}'); hideActionsMenu('${booking.id}')">
+									View History
+								</button>
+								${booking.status === 'confirmed' ? `<button class="danger" onclick="cancelBooking('${booking.id}'); hideActionsMenu('${booking.id}')">Cancel Booking</button>` : ''}
+							</div>
+						</div>
 					</div>
 				</div>
 			`;
@@ -778,7 +1070,17 @@
 				const bookingDetailsEl = document.getElementById('historyBookingDetails');
 
 				if (customerNameEl) customerNameEl.textContent = data.booking.customerName;
-				if (bookingDetailsEl) bookingDetailsEl.textContent = `${data.booking.date} at ${data.booking.time}`;
+
+				// Format the booking date and time in a more readable format
+				if (bookingDetailsEl) {
+					const bookingDate = new Date(data.booking.currentDate + 'T00:00:00');
+					const formattedDate = bookingDate.toLocaleDateString('en-US', {
+						weekday: 'short',
+						month: 'short',
+						day: 'numeric'
+					});
+					bookingDetailsEl.textContent = `${formattedDate}  ${data.booking.currentTime}`;
+				}
 
 				const historyContent = document.getElementById('historyContent');
 
@@ -799,45 +1101,81 @@
 							hour12: true
 						});
 
-						// Format action type, with special handling for payment and refund actions
+						// Format action type, with special handling for different action types
 						let actionType: string;
-						if (action.reason && action.reason.includes('Payment marked as')) {
+						let actionIcon: string = '';
+						let actionClass: string = '';
+
+						if (action.action_type === 'booking_created') {
+							actionType = 'Booking Created';
+							actionIcon = '📅';
+							actionClass = 'history-creation';
+						} else if (action.reason && action.reason.includes('Payment marked as')) {
 							// Extract the payment action from the reason
 							if (action.reason.includes('Payment marked as PAID')) {
 								actionType = 'Payment Marked Paid';
+								actionIcon = '💳';
+								actionClass = 'history-payment-paid';
 							} else if (action.reason.includes('Payment marked as UNPAID')) {
 								actionType = 'Payment Marked Unpaid';
+								actionIcon = '💳';
+								actionClass = 'history-payment-unpaid';
 							} else {
 								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+								actionIcon = '💳';
+								actionClass = 'history-payment';
 							}
 						} else if (action.reason && action.reason.includes('Refund document')) {
 							// Extract the refund action from the reason
 							if (action.reason.includes('Refund documented -')) {
 								actionType = 'Refund Documented';
+								actionIcon = '💰';
+								actionClass = 'history-refund';
 							} else if (action.reason.includes('Refund document updated')) {
 								actionType = 'Refund Updated';
+								actionIcon = '💰';
+								actionClass = 'history-refund';
 							} else {
 								actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+								actionIcon = '💰';
+								actionClass = 'history-refund';
 							}
+						} else if (action.action_type === 'cancellation') {
+							actionType = 'Booking Cancelled';
+							actionIcon = '❌';
+							actionClass = 'history-cancellation';
+						} else if (action.action_type === 'admin_cancellation') {
+							actionType = 'Booking Cancelled by Admin';
+							actionIcon = '🛑';
+							actionClass = 'history-admin-cancellation';
+						} else if (action.action_type.includes('reschedule')) {
+							actionType = 'Booking Rescheduled';
+							actionIcon = '🔄';
+							actionClass = 'history-reschedule';
 						} else {
 							actionType = action.action_type.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+							actionIcon = '📝';
+							actionClass = 'history-other';
 						}
 
 						historyHTML += `
-							<div class="history-item">
+							<div class="history-item ${actionClass}">
 								<div class="history-header">
-									<span class="history-action">${actionType}</span>
-									<span class="history-date">${date} at ${time}</span>
+									<span class="history-icon">${actionIcon}</span>
+									<div class="history-main">
+										<span class="history-action">${actionType}</span>
+										<span class="history-date">${date} at ${time}</span>
+									</div>
 								</div>
 								<div class="history-details">
-									${action.reason ? `<div class="history-reason"><strong>Reason:</strong> ${action.reason}</div>` : ''}
+									${action.reason && action.action_type !== 'booking_created' ? `<div class="history-reason">${action.reason.replace('Reason: ', '')}</div>` : ''}
 									<div class="history-performer">
-										<strong>Performed by:</strong> ${action.performed_by_admin ? `Admin: ${action.performed_by_admin}` : 'Customer'}
+										${action.performed_by_admin ? `Admin: ${action.performed_by_admin}` : 'Customer'}
 									</div>
 									${action.action_type.includes('reschedule') ? `
 										<div class="history-reschedule">
-											<strong>Changed from:</strong> ${action.original_date} at ${action.original_time}<br>
-											<strong>Changed to:</strong> ${action.new_date} at ${action.new_time}
+											<strong>From:</strong> ${action.original_date} at ${action.original_time}<br>
+											<strong>To:</strong> ${action.new_date} at ${action.new_time}
 										</div>
 									` : ''}
 								</div>
@@ -845,13 +1183,25 @@
 						`;
 					});
 
+					// Check if we only have the creation event
+					const hasNonCreationActions = data.actions.some((action: any) => action.action_type !== 'booking_created');
+
+					if (!hasNonCreationActions) {
+						historyHTML += `
+							<div class="history-no-activity">
+								<p><em>No additional activity on this booking.</em></p>
+							</div>
+						`;
+					}
+
 					if (historyContent) historyContent.innerHTML = historyHTML;
 				} else {
+					// This case should not happen anymore since we always include creation event
 					if (historyContent) {
 						historyContent.innerHTML = `
 							<div class="no-history">
-								<p>No history found for this booking.</p>
-								<p><small>Booking ID: ${bookingId}</small></p>
+								<p>Unable to load booking history.</p>
+								<p><small>Please try again or contact support.</small></p>
 							</div>
 						`;
 					}
@@ -871,6 +1221,56 @@
 			const modalEl = document.getElementById('historyModal');
 			if (modalEl) modalEl.style.display = 'none';
 		};
+
+		// Actions menu functions
+		(window as any).toggleActionsMenu = function(bookingId: string): void {
+			const dropdown = document.getElementById(`actions-${bookingId}`);
+			if (!dropdown) return;
+
+			// Close all other dropdowns first and remove active class from cards
+			document.querySelectorAll('.actions-dropdown.show').forEach(el => {
+				if (el.id !== `actions-${bookingId}`) {
+					el.classList.remove('show');
+					const card = el.closest('.booking-card');
+					if (card) card.classList.remove('dropdown-active');
+				}
+			});
+
+			// Toggle current dropdown
+			dropdown.classList.toggle('show');
+			const card = dropdown.closest('.booking-card');
+			if (card) {
+				card.classList.toggle('dropdown-active', dropdown.classList.contains('show'));
+			}
+		};
+
+		(window as any).hideActionsMenu = function(bookingId: string): void {
+			const dropdown = document.getElementById(`actions-${bookingId}`);
+			if (dropdown) {
+				dropdown.classList.remove('show');
+				const card = dropdown.closest('.booking-card');
+				if (card) card.classList.remove('dropdown-active');
+			}
+		};
+
+		// Close dropdowns when clicking outside
+		document.addEventListener('click', function(event: Event): void {
+			const target = event.target as HTMLElement;
+
+			// Close action menus
+			if (!target.closest('.actions-menu')) {
+				document.querySelectorAll('.actions-dropdown.show').forEach(el => {
+					el.classList.remove('show');
+					const card = el.closest('.booking-card');
+					if (card) card.classList.remove('dropdown-active');
+				});
+			}
+
+			// Close date picker
+			if (!target.closest('.date-range-filter')) {
+				closeDatePicker();
+			}
+		});
 
 		// Close history modal when clicking outside of it
 		window.addEventListener('click', function(event: Event): void {

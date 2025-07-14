@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { supabaseAdmin } from '../../../../../lib/supabase-admin';
+import { supabaseAdmin } from '../../../../../../lib/supabase-admin';
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const POST: APIRoute = async ({ params }) => {
   try {
     const { id } = params;
 
@@ -12,10 +12,10 @@ export const DELETE: APIRoute = async ({ params }) => {
       });
     }
 
-    // Check if holiday exists and if it has existing bookings
+    // Check if holiday exists and is auto-generated
     const { data: holiday } = await supabaseAdmin
       .from('holidays')
-      .select('date, name, is_auto_generated')
+      .select('date, name, is_auto_generated, is_disabled')
       .eq('id', id)
       .single();
 
@@ -26,50 +26,41 @@ export const DELETE: APIRoute = async ({ params }) => {
       });
     }
 
-    // Check if there are existing bookings for this date
-    const { data: bookings } = await supabaseAdmin
-      .from('bookings')
-      .select('id')
-      .eq('date', holiday.date);
-
-    if (bookings && bookings.length > 0) {
+    if (!holiday.is_auto_generated) {
       return new Response(JSON.stringify({ 
         success: false, 
-        error: `Cannot remove holiday - there are ${bookings.length} existing bookings for ${holiday.date}` 
+        error: 'Only automatic holidays can be enabled/disabled' 
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // For automatic holidays, disable instead of delete
-    // For manual holidays, delete completely
-    let error;
-    if (holiday.is_auto_generated) {
-      // Disable automatic holiday
-      const result = await supabaseAdmin
-        .from('holidays')
-        .update({ is_disabled: true })
-        .eq('id', id);
-      error = result.error;
-    } else {
-      // Delete manual holiday completely
-      const result = await supabaseAdmin
-        .from('holidays')
-        .delete()
-        .eq('id', id);
-      error = result.error;
+    if (!holiday.is_disabled) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Holiday is already enabled' 
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
+    // Enable the holiday
+    const { error } = await supabaseAdmin
+      .from('holidays')
+      .update({ is_disabled: false })
+      .eq('id', id);
+
     if (error) {
-      console.error('Error deleting holiday:', error);
+      console.error('Error enabling holiday:', error);
       return new Response(JSON.stringify({ success: false, error: error.message }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Refresh future schedule to account for removed holiday
+    // Refresh future schedule to account for enabled holiday
     const { error: refreshError } = await supabaseAdmin.rpc('refresh_future_schedule');
     if (refreshError) {
       console.warn('Warning: Could not refresh schedule:', refreshError);
@@ -81,7 +72,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     });
 
   } catch (error) {
-    console.error('Delete holiday error:', error);
+    console.error('Enable holiday error:', error);
     return new Response(JSON.stringify({ success: false, error: 'Server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

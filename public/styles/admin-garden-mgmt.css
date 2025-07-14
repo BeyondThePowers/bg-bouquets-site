@@ -1,0 +1,918 @@
+/* Clean Minimalist Garden Management Interface */
+:root {
+	/* Monochrome color system */
+	--admin-black: #000000;
+	--admin-white: #ffffff;
+	--admin-gray-50: #fafafa;
+	--admin-gray-100: #f5f5f5;
+	--admin-gray-200: #e5e5e5;
+	--admin-gray-300: #d4d4d4;
+	--admin-gray-400: #a3a3a3;
+	--admin-gray-500: #737373;
+	--admin-gray-600: #525252;
+	--admin-gray-700: #404040;
+	--admin-gray-800: #262626;
+	--admin-gray-900: #171717;
+	
+	/* Minimal status colors - only for information */
+	--status-success: #16a34a;
+	--status-warning: #ca8a04;
+	--status-danger: #dc2626;
+	
+	/* Subtle effects */
+	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+	
+	/* Minimal border radius */
+	--radius: 4px;
+	
+	/* Fast transitions */
+	--transition: 0.15s ease;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+	background-color: var(--admin-white);
+	color: var(--admin-black);
+	line-height: 1.5;
+	font-size: 14px;
+	font-weight: 400;
+}
+
+/* Clean Header Design */
+.header {
+	background: var(--admin-white);
+	border-bottom: 1px solid var(--admin-gray-200);
+	padding: 16px 0;
+}
+
+.header-content {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 24px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.header h1 {
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--admin-black);
+	margin: 0;
+}
+
+.header-actions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+/* Clean Container */
+.admin-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 24px;
+}
+
+/* Clean Login Form */
+.login-container {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	background: var(--admin-gray-50);
+}
+
+.login-form {
+	background: var(--admin-white);
+	padding: 32px;
+	border: 1px solid var(--admin-gray-200);
+	border-radius: var(--radius);
+	max-width: 400px;
+	width: 100%;
+	box-shadow: var(--shadow-md);
+}
+
+.login-form h2 {
+	text-align: center;
+	margin-bottom: 24px;
+	color: var(--admin-black);
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.login-form input {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid var(--admin-gray-300);
+	border-radius: var(--radius);
+	font-size: 14px;
+	transition: border-color var(--transition);
+}
+
+.login-form input:focus {
+	border-color: var(--admin-black);
+	outline: none;
+}
+
+.login-form .btn {
+	width: 100%;
+	padding: 12px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+/* Clean Button System */
+.btn {
+	padding: 8px 16px;
+	border: 1px solid var(--admin-gray-300);
+	border-radius: var(--radius);
+	cursor: pointer;
+	font-family: inherit;
+	font-weight: 500;
+	font-size: 14px;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	transition: all var(--transition);
+	background: var(--admin-white);
+	color: var(--admin-black);
+	position: relative;
+}
+
+.btn:hover {
+	background: var(--admin-gray-50);
+	border-color: var(--admin-gray-400);
+}
+
+.btn-primary {
+	background: var(--admin-black);
+	color: var(--admin-white);
+	border-color: var(--admin-black);
+}
+
+.btn-primary:hover {
+	background: var(--admin-gray-800);
+	border-color: var(--admin-gray-800);
+}
+
+.btn-secondary {
+	background: var(--admin-white);
+	color: var(--admin-gray-600);
+	border-color: var(--admin-gray-300);
+}
+
+.btn-secondary:hover {
+	background: var(--admin-gray-50);
+	color: var(--admin-black);
+	border-color: var(--admin-gray-400);
+}
+
+.btn-danger {
+	background: var(--status-danger);
+	color: var(--admin-white);
+	border-color: var(--status-danger);
+}
+
+.btn-danger:hover {
+	background: #dc2626;
+	border-color: #dc2626;
+}
+
+/* Button Loading States */
+.btn-spinner {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.btn-spinner svg {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* Admin Sections Grid */
+.admin-sections {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	margin-bottom: 24px;
+}
+
+.admin-section {
+	background: var(--admin-white);
+	border: 1px solid var(--admin-gray-200);
+	border-radius: var(--radius);
+	padding: 24px;
+	box-shadow: var(--shadow-sm);
+}
+
+.admin-section h2 {
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--admin-black);
+	margin-bottom: 20px;
+}
+
+/* Form Elements */
+.form-group {
+	margin-bottom: 16px;
+}
+
+/* Login form specific overrides */
+.login-form .form-group {
+	margin-bottom: 20px;
+}
+
+.login-form input {
+	padding: 12px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: 600;
+	color: var(--admin-gray-700);
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+	width: 100%;
+	padding: 8px 12px;
+	border: 1px solid var(--admin-gray-300);
+	border-radius: var(--radius);
+	font-size: 14px;
+	background: var(--admin-white);
+	color: var(--admin-black);
+	transition: border-color var(--transition);
+	font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+	outline: none;
+	border-color: var(--admin-black);
+}
+
+.form-group textarea {
+	resize: vertical;
+	min-height: 80px;
+}
+
+/* Season Range Group */
+.season-range-group {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+}
+
+.season-date {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.season-date label {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--admin-gray-600);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 4px;
+}
+
+.season-date select,
+.season-date input {
+	width: 100%;
+	padding: 6px 8px;
+	border: 1px solid var(--admin-gray-300);
+	border-radius: var(--radius);
+	font-size: 13px;
+	background: var(--admin-white);
+}
+
+.season-date input[type="number"] {
+	max-width: 60px;
+	margin-top: 4px;
+}
+
+.help-text {
+	font-size: 11px;
+	color: var(--admin-gray-500);
+	margin-top: 6px;
+	font-style: italic;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: 8px;
+}
+
+.checkbox-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.checkbox-item input[type="checkbox"] {
+	width: auto;
+	margin: 0;
+}
+
+.checkbox-item label {
+	margin: 0;
+	font-weight: 400;
+	cursor: pointer;
+}
+
+/* Lists */
+.holiday-list,
+.settings-list {
+	max-height: 300px;
+	overflow-y: auto;
+	border: 1px solid var(--admin-gray-200);
+	border-radius: var(--radius);
+	background: var(--admin-white);
+}
+
+.holiday-item,
+.setting-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--admin-gray-200);
+}
+
+.holiday-item:last-child,
+.setting-item:last-child {
+	border-bottom: none;
+}
+
+.holiday-item.holiday-disabled {
+	opacity: 0.6;
+	background: var(--admin-gray-50);
+	border-left: 3px dashed var(--admin-gray-400);
+}
+
+.holiday-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.disabled-indicator {
+	margin-right: 4px;
+}
+
+/* Holiday Table Styles */
+.holiday-table-container {
+	overflow-x: auto;
+	border-radius: var(--radius);
+	border: 1px solid var(--admin-gray-200);
+}
+
+.holiday-table {
+	width: 100%;
+	border-collapse: collapse;
+	background: var(--admin-white);
+}
+
+.holiday-table th {
+	background: var(--admin-gray-50);
+	padding: 12px;
+	text-align: left;
+	font-weight: 600;
+	font-size: 13px;
+	color: var(--admin-gray-700);
+	border-bottom: 1px solid var(--admin-gray-200);
+}
+
+.holiday-table td {
+	padding: 12px;
+	border-bottom: 1px solid var(--admin-gray-100);
+	font-size: 14px;
+}
+
+.holiday-table tr:last-child td {
+	border-bottom: none;
+}
+
+.holiday-table tr.holiday-disabled {
+	opacity: 0.6;
+	background: var(--admin-gray-25);
+}
+
+.loading-cell,
+.no-data-cell {
+	text-align: center;
+	color: var(--admin-gray-500);
+	font-style: italic;
+	padding: 24px;
+}
+
+.date-cell {
+	font-weight: 500;
+	color: var(--admin-gray-900);
+	white-space: nowrap;
+}
+
+.name-cell {
+	font-weight: 500;
+}
+
+.type-cell,
+.status-cell {
+	white-space: nowrap;
+}
+
+.actions-cell {
+	text-align: right;
+	white-space: nowrap;
+}
+
+/* Badge Styles */
+.badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.badge-auto {
+	background: rgba(59, 130, 246, 0.1);
+	color: #1d4ed8;
+}
+
+.badge-manual {
+	background: rgba(107, 114, 128, 0.1);
+	color: #374151;
+}
+
+.badge-active {
+	background: rgba(34, 197, 94, 0.1);
+	color: #15803d;
+}
+
+.badge-disabled {
+	background: rgba(239, 68, 68, 0.1);
+	color: #dc2626;
+}
+
+/* Toggle Chips for Operating Days */
+.toggle-chips-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.toggle-chip {
+	padding: 8px 16px;
+	border: 1px solid var(--admin-gray-300);
+	border-radius: 20px;
+	background: var(--admin-white);
+	color: var(--admin-gray-700);
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	min-width: 80px;
+	text-align: center;
+}
+
+.toggle-chip:hover {
+	border-color: var(--admin-gray-400);
+	background: var(--admin-gray-50);
+}
+
+.toggle-chip.active {
+	border-color: #15803d !important;
+	background: rgba(34, 197, 94, 0.1) !important;
+	color: #15803d !important;
+	font-weight: 600;
+	transform: scale(1.02);
+}
+
+.toggle-chip.active:hover {
+	background: rgba(34, 197, 94, 0.15);
+	border-color: #15803d;
+}
+
+/* Time Slots Grid */
+.time-slots-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+	gap: 8px;
+	margin-top: 8px;
+	max-height: 300px;
+	overflow-y: auto;
+	padding: 4px;
+	border: 1px solid var(--admin-gray-200);
+	border-radius: var(--radius);
+	background: var(--admin-gray-25);
+}
+
+.time-slot-chip {
+	padding: 8px 4px;
+	border: 1px solid var(--admin-gray-300);
+	border-radius: var(--radius);
+	background: var(--admin-white);
+	color: var(--admin-gray-700);
+	font-size: 12px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-align: center;
+}
+
+.time-slot-chip:hover {
+	border-color: var(--admin-gray-400);
+	background: var(--admin-gray-50);
+}
+
+.time-slot-chip.active {
+	border-color: #15803d !important;
+	background: rgba(34, 197, 94, 0.1) !important;
+	color: #15803d !important;
+	font-weight: 600;
+	transform: scale(1.05);
+}
+
+.time-slot-chip.active:hover {
+	background: rgba(34, 197, 94, 0.15);
+	border-color: #15803d;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+	/* Stack table vertically on mobile like Stripe */
+	.holiday-table-container {
+		border: none;
+	}
+
+	.holiday-table,
+	.holiday-table thead,
+	.holiday-table tbody,
+	.holiday-table th,
+	.holiday-table td,
+	.holiday-table tr {
+		display: block;
+	}
+
+	.holiday-table thead tr {
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+
+	.holiday-table tr {
+		border: 1px solid var(--admin-gray-200);
+		border-radius: var(--radius);
+		margin-bottom: 12px;
+		padding: 12px;
+		background: var(--admin-white);
+	}
+
+	.holiday-table td {
+		border: none;
+		padding: 8px 0;
+		position: relative;
+		padding-left: 30%;
+	}
+
+	.holiday-table td:before {
+		content: attr(data-label);
+		position: absolute;
+		left: 0;
+		width: 25%;
+		padding-right: 10px;
+		white-space: nowrap;
+		font-weight: 600;
+		color: var(--admin-gray-600);
+		font-size: 12px;
+	}
+
+	.date-cell:before { content: "Date:"; }
+	.name-cell:before { content: "Holiday:"; }
+	.type-cell:before { content: "Type:"; }
+	.status-cell:before { content: "Status:"; }
+	.actions-cell:before { content: "Actions:"; }
+
+	.actions-cell {
+		text-align: left;
+	}
+
+	/* Adjust chips for mobile */
+	.toggle-chips-group {
+		gap: 6px;
+	}
+
+	.toggle-chip {
+		min-width: 70px;
+		padding: 6px 12px;
+		font-size: 13px;
+	}
+
+	.time-slots-grid {
+		grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+		gap: 6px;
+	}
+
+	.time-slot-chip {
+		padding: 6px 2px;
+		font-size: 11px;
+	}
+}
+
+.holiday-info {
+	flex: 1;
+}
+
+.holiday-date {
+	font-weight: 500;
+	color: var(--admin-black);
+	margin-bottom: 2px;
+}
+
+.holiday-name {
+	font-size: 13px;
+	color: var(--admin-gray-600);
+}
+
+.holiday-badge {
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: var(--radius);
+	background: var(--admin-gray-100);
+	color: var(--admin-gray-700);
+	margin-left: 6px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Messages */
+.error-message {
+	background: #fef2f2;
+	color: var(--status-danger);
+	padding: 12px;
+	border-radius: var(--radius);
+	margin: 16px 0;
+	border: 1px solid #fecaca;
+	font-size: 13px;
+}
+
+.error {
+	background: #fef2f2;
+	color: var(--status-danger);
+	padding: 12px;
+	border-radius: var(--radius);
+	margin: 16px 0;
+	border: 1px solid #fecaca;
+	font-size: 13px;
+}
+
+.success-message {
+	background: #f0fdf4;
+	color: var(--status-success);
+	padding: 12px;
+	border-radius: var(--radius);
+	margin: 16px 0;
+	border: 1px solid #bbf7d0;
+	font-size: 13px;
+}
+
+/* Utility Classes */
+.hidden {
+	display: none !important;
+}
+
+.mb-4 {
+	margin-bottom: 20px;
+}
+
+.holiday-actions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.text-center {
+	text-align: center;
+}
+
+/* Actions Section */
+.admin-actions {
+	text-align: center;
+	padding: 24px 0;
+	border-top: 1px solid var(--admin-gray-200);
+	margin-top: 24px;
+}
+
+.admin-actions .btn {
+	margin: 0 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+	.admin-container {
+		padding: 20px 16px;
+	}
+
+	.header-content {
+		flex-direction: column;
+		gap: 16px;
+		padding: 0 16px;
+	}
+
+	.header h1 {
+		font-size: 18px;
+	}
+
+	.admin-sections {
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+
+	.admin-section {
+		padding: 20px 16px;
+	}
+
+	.checkbox-group {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.login-form {
+		padding: 24px 20px;
+		margin: 16px;
+	}
+
+	.admin-actions .btn {
+		display: block;
+		margin: 8px 0;
+		width: 100%;
+	}
+}
+
+@media (max-width: 480px) {
+	.admin-container {
+		padding: 16px 12px;
+	}
+
+	.header h1 {
+		font-size: 16px;
+	}
+
+	.admin-section {
+		padding: 16px 12px;
+	}
+
+	.checkbox-group {
+		grid-template-columns: 1fr;
+	}
+
+	.holiday-item,
+	.setting-item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.holiday-item .btn,
+	.setting-item .btn {
+		align-self: flex-end;
+	}
+
+	.login-form {
+		padding: 20px 16px;
+		margin: 12px;
+	}
+}
+
+/* Booking Range Status Styles */
+.booking-range-status {
+	background: var(--admin-gray-50);
+	border-radius: var(--radius);
+	padding: 20px;
+	margin-top: 16px;
+}
+
+.status-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.status-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.status-item label {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--admin-gray-600);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin: 0;
+}
+
+.status-item span {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--admin-black);
+	padding: 4px 0;
+}
+
+.days-remaining {
+	font-weight: 600;
+}
+
+.days-remaining.warning {
+	color: var(--status-warning);
+}
+
+.days-remaining.danger {
+	color: var(--status-danger);
+}
+
+.extension-status {
+	font-weight: 600;
+}
+
+.extension-status.good {
+	color: var(--status-success);
+}
+
+.extension-status.warning {
+	color: var(--status-warning);
+}
+
+.extension-status.danger {
+	color: var(--status-danger);
+}
+
+.range-actions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+	.status-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 12px;
+	}
+
+	.range-actions {
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.range-actions .btn {
+		width: 100%;
+	}
+}
+
+@media (max-width: 480px) {
+	.status-grid {
+		grid-template-columns: 1fr;
+	}
+}
