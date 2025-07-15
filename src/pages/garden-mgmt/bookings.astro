@@ -592,7 +592,10 @@
 					<!-- Amount & Bouquets -->
 					<div class="booking-amount">
 						<div class="amount-main">$${booking.total_amount}</div>
-						<div class="amount-details">${booking.number_of_bouquets} ${booking.number_of_bouquets === 1 ? 'bouquet' : 'bouquets'}</div>
+						<div class="amount-details">
+							${booking.number_of_bouquets} ${booking.number_of_bouquets === 1 ? 'bouquet' : 'bouquets'}
+							${booking.number_of_visitor_passes > 0 ? `, ${booking.number_of_visitor_passes} visitor ${booking.number_of_visitor_passes === 1 ? 'pass' : 'passes'}` : ''}
+						</div>
 						${booking.admin_refund_amount ? `<div class="refund-note">Refunded: $${booking.admin_refund_amount}</div>` : ''}
 					</div>
 

@@ -201,6 +201,20 @@
 						<p class="help-text">Price charged per bouquet (1.00 - 200.00 CAD)</p>
 					</div>
 
+					<div class="form-group">
+						<label for="pricePerVisitorPass">Visitor Pass Price (CAD):</label>
+						<input type="number" id="pricePerVisitorPass" min="0" max="100" step="0.01"
+							   placeholder="5.00" required>
+						<p class="help-text">Price for additional guests age 13+ not picking bouquets (0.00 - 100.00 CAD)</p>
+					</div>
+
+					<div class="form-group">
+						<label for="maxVisitorPassesPerBooking">Max Visitor Passes per Booking:</label>
+						<input type="number" id="maxVisitorPassesPerBooking" min="0" max="50" step="1"
+							   placeholder="20" required>
+						<p class="help-text">Maximum number of visitor passes allowed per booking (0 - 50)</p>
+					</div>
+
 					<button class="btn btn-primary" id="savePricingBtn" onclick="updatePricingSettings()">
 						<span class="btn-text">Save Pricing</span>
 						<span class="btn-spinner" style="display: none;">
@@ -1046,63 +1060,101 @@
 				const response = await fetch('/api/settings/pricing');
 				const data = await response.json();
 
-				const priceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
-				if (priceInput) {
-					priceInput.value = data.price_per_bouquet || '35.00';
+				const bouquetPriceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
+				const visitorPassPriceInput = document.getElementById('pricePerVisitorPass') as HTMLInputElement;
+				const maxVisitorPassesInput = document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement;
+
+				if (bouquetPriceInput) {
+					bouquetPriceInput.value = data.price_per_bouquet || '35.00';
+				}
+
+				if (visitorPassPriceInput) {
+					visitorPassPriceInput.value = data.price_per_visitor_pass || '5.00';
+				}
+
+				if (maxVisitorPassesInput) {
+					maxVisitorPassesInput.value = data.max_visitor_passes_per_booking || '20';
 				}
 
 				console.log('Loaded pricing settings:', data);
 			} catch (error) {
 				console.error('Error loading pricing settings:', error);
-				// Set fallback value
-				const priceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
-				if (priceInput) {
-					priceInput.value = '35.00';
+				// Set fallback values
+				const bouquetPriceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
+				const visitorPassPriceInput = document.getElementById('pricePerVisitorPass') as HTMLInputElement;
+				const maxVisitorPassesInput = document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement;
+
+				if (bouquetPriceInput) {
+					bouquetPriceInput.value = '35.00';
+				}
+				if (visitorPassPriceInput) {
+					visitorPassPriceInput.value = '5.00';
+				}
+				if (maxVisitorPassesInput) {
+					maxVisitorPassesInput.value = '20';
 				}
 			}
 		}
 
 		async function updatePricingSettings(): Promise<void> {
-			const priceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
+			const bouquetPriceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
+			const visitorPassPriceInput = document.getElementById('pricePerVisitorPass') as HTMLInputElement;
+			const maxVisitorPassesInput = document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement;
 			const messageDiv = document.getElementById('pricingMessage');
 
-			if (!priceInput || !messageDiv) return;
+			if (!bouquetPriceInput || !visitorPassPriceInput || !maxVisitorPassesInput || !messageDiv) return;
 
-			const price = parseFloat(priceInput.value);
+			const bouquetPrice = parseFloat(bouquetPriceInput.value);
+			const visitorPassPrice = parseFloat(visitorPassPriceInput.value);
+			const maxVisitorPasses = parseInt(maxVisitorPassesInput.value);
 
-			// Validate price
-			if (isNaN(price) || price < 1 || price > 200) {
-				showMessage(messageDiv, 'Price must be between $1.00 and $200.00', 'error');
+			// Validate bouquet price
+			if (isNaN(bouquetPrice) || bouquetPrice < 1 || bouquetPrice > 200) {
+				showMessage(messageDiv, 'Bouquet price must be between $1.00 and $200.00', 'error');
+				return;
+			}
+
+			// Validate visitor pass price
+			if (isNaN(visitorPassPrice) || visitorPassPrice < 0 || visitorPassPrice > 100) {
+				showMessage(messageDiv, 'Visitor pass price must be between $0.00 and $100.00', 'error');
+				return;
+			}
+
+			// Validate visitor pass limit
+			if (isNaN(maxVisitorPasses) || maxVisitorPasses < 0 || maxVisitorPasses > 50) {
+				showMessage(messageDiv, 'Visitor pass limit must be between 0 and 50', 'error');
 				return;
 			}
 
 			setButtonLoading('savePricingBtn', true);
 
 			try {
-				// Get admin password from session/storage (same pattern as other admin functions)
-				const adminPassword = (document.getElementById('admin-password') as HTMLInputElement)?.value;
-
 				const response = await fetch('/api/settings/pricing', {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${adminPassword}`
+						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						price_per_bouquet: price.toFixed(2)
+						price_per_bouquet: bouquetPrice.toFixed(2),
+						price_per_visitor_pass: visitorPassPrice.toFixed(2),
+						max_visitor_passes_per_booking: maxVisitorPasses
 					})
 				});
 
 				const result = await response.json();
 
 				if (result.success) {
-					showMessage(messageDiv, `Price updated to $${result.price_per_bouquet} CAD successfully!`, 'success');
+					const bouquetMsg = result.price_per_bouquet ? `Bouquet: $${result.price_per_bouquet}` : '';
+					const visitorMsg = result.price_per_visitor_pass ? `Visitor Pass: $${result.price_per_visitor_pass}` : '';
+					const limitMsg = result.max_visitor_passes_per_booking ? `Max Visitor Passes: ${result.max_visitor_passes_per_booking}` : '';
+					const messages = [bouquetMsg, visitorMsg, limitMsg].filter(Boolean).join(', ');
+					showMessage(messageDiv, `Pricing updated successfully! ${messages}`, 'success');
 				} else {
-					showMessage(messageDiv, result.error || 'Failed to update price.', 'error');
+					showMessage(messageDiv, result.error || 'Failed to update pricing.', 'error');
 				}
 			} catch (error) {
 				console.error('Error updating pricing:', error);
-				showMessage(messageDiv, 'Failed to update price. Please try again.', 'error');
+				showMessage(messageDiv, 'Failed to update pricing. Please try again.', 'error');
 			} finally {
 				setButtonLoading('savePricingBtn', false);
 			}

@@ -47,11 +47,12 @@ export const POST: APIRoute = async ({ request }) => {
       visitDate,
       preferredTime,
       numberOfVisitors, // Keep this name for API compatibility, maps to number_of_bouquets
+      numberOfVisitorPasses = 0, // New field for visitor passes
       totalAmount,
       paymentMethod = 'pay_on_arrival'
     } = body;
 
-    console.log('Extracted fields:', { fullName, email, phone, visitDate, preferredTime, numberOfVisitors, totalAmount, paymentMethod });
+    console.log('Extracted fields:', { fullName, email, phone, visitDate, preferredTime, numberOfVisitors, numberOfVisitorPasses, totalAmount, paymentMethod });
 
     // Basic server-side validation
     if (!fullName || !email || !phone || !visitDate || !preferredTime || !numberOfVisitors) {
@@ -88,6 +89,23 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Get visitor pass limit from settings
+    const { data: visitorLimitSetting, error: limitError } = await supabase
+      .from('schedule_settings')
+      .select('setting_value')
+      .eq('setting_key', 'max_visitor_passes_per_booking')
+      .single();
+
+    const maxVisitorPasses = limitError ? 20 : parseInt(visitorLimitSetting?.setting_value || '20');
+
+    // Validate number of visitor passes
+    if (numberOfVisitorPasses < 0 || numberOfVisitorPasses > maxVisitorPasses) {
+      return new Response(JSON.stringify({ error: `Number of visitor passes must be between 0 and ${maxVisitorPasses}.` }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Use database function to prevent race conditions and ensure atomic booking creation
     console.log('Creating booking with race condition protection:', {
       fullName,
@@ -96,6 +114,7 @@ export const POST: APIRoute = async ({ request }) => {
       visitDate,
       preferredTime,
       numberOfVisitors,
+      numberOfVisitorPasses,
       totalAmount,
       paymentMethod
     });
@@ -114,6 +133,7 @@ export const POST: APIRoute = async ({ request }) => {
       date: visitDate,
       time: preferredTime,
       number_of_bouquets: numberOfVisitors,
+      number_of_visitor_passes: numberOfVisitorPasses,
       total_amount: totalAmount,
       payment_method: paymentMethod,
       payment_status: paymentStatus,
@@ -138,6 +158,7 @@ export const POST: APIRoute = async ({ request }) => {
       visitDate,
       preferredTime,
       numberOfVisitors,
+      numberOfVisitorPasses,
       totalAmount,
       paymentMethod,
       createdAt: insertedBooking.created_at,

@@ -68,6 +68,7 @@ export function createStandardizedPayload(
         time: bookingData.preferredTime,
         bouquets: bookingData.numberOfVisitors || null, // Primary field using bouquet terminology
         visitors: bookingData.numberOfVisitors || null, // Deprecated: kept for backward compatibility
+        visitorPasses: bookingData.numberOfVisitorPasses || null, // New field for visitor passes
         amount: bookingData.totalAmount || null,
       },
       payment: {
@@ -91,6 +92,7 @@ export function createStandardizedPayload(
           time: bookingData.preferredTime,
           bouquets: bookingData.numberOfVisitors, // Primary field using bouquet terminology
           visitors: bookingData.numberOfVisitors, // Deprecated: kept for backward compatibility
+          visitorPasses: bookingData.numberOfVisitorPasses || null, // New field for visitor passes
           amount: bookingData.totalAmount,
         }
       }),
@@ -184,6 +186,7 @@ interface BookingData {
   visitDate: string;
   preferredTime: string;
   numberOfVisitors: number; // Keep for API compatibility, represents number of bouquets
+  numberOfVisitorPasses?: number; // New field for visitor passes
   totalAmount: number;
   paymentMethod: string;
   createdAt?: string;
@@ -294,6 +297,7 @@ interface StandardizedWebhookPayload {
       time: string;
       bouquets: number | null; // Primary field using bouquet terminology
       visitors: number | null; // Deprecated: kept for backward compatibility
+      visitorPasses: number | null; // New field for visitor passes
       amount: number | null;
     };
     payment: {
@@ -320,6 +324,7 @@ interface StandardizedWebhookPayload {
       time: string;
       bouquets: number; // Primary field using bouquet terminology
       visitors: number; // Deprecated: kept for backward compatibility
+      visitorPasses: number | null; // New field for visitor passes
       amount: number;
     } | null;
     // Cancellation details (only for cancellations)

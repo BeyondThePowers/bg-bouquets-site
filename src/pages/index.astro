@@ -90,7 +90,7 @@ import Layout from '../layouts/Layout.astro';
 					</h2>
 
 					<div class="mb-8">
-						<div class="font-allura mb-4 base-price" style="color: #E8B4B8;">
+						<div class="font-allura mb-4 base-price" style="color: #E8B4B8;" id="hero-price">
 							$35
 						</div>
 						<div class="text-xl font-playfair font-semibold mb-2" style="color: #333333;">
@@ -378,7 +378,45 @@ import Layout from '../layouts/Layout.astro';
 												<div class="counter-message hidden" id="counter-message">For 30+ bouquets, please call us to confirm availability</div>
 											</div>
 										</div>
+									</div>
 
+									<!-- Visitor Pass Selection -->
+									<div class="mb-6">
+										<label for="numberOfVisitorPasses" class="block text-sm font-playfair font-medium text-charcoal mb-3">Additional guests (age 13+) not picking a bouquet</label>
+										<div class="bouquet-counter">
+											<div class="counter-row">
+												<div class="counter-controls">
+													<button type="button" id="visitor-counter-minus" class="counter-btn minus" aria-label="Decrease visitor pass count">−</button>
+													<input
+														type="number"
+														id="numberOfVisitorPasses"
+														name="numberOfVisitorPasses"
+														value="0"
+														min="0"
+														max="20"
+														readonly
+														class="counter-input"
+														aria-label="Number of visitor passes"
+													>
+													<button type="button" id="visitor-counter-plus" class="counter-btn plus" aria-label="Increase visitor pass count">+</button>
+												</div>
+												<div class="counter-price" id="visitor-counter-price">$0 CAD</div>
+												<div class="counter-message hidden" id="visitor-counter-message">Maximum visitor passes reached for this booking</div>
+											</div>
+										</div>
+										<p class="text-xs text-charcoal mt-2 opacity-80 font-roboto">
+											Each bouquet includes admission for one couple or individual.
+										</p>
+									</div>
+
+									<!-- Total Price Display -->
+									<div class="booking-total-section mb-6">
+										<div class="total-price-display">
+											<div class="total-price-row">
+												<span class="total-label">Your Total:</span>
+												<span class="total-amount" id="booking-total-price">$40 CAD</span>
+											</div>
+										</div>
 									</div>
 
 									<!-- Payment Method Choice -->
@@ -423,14 +461,6 @@ import Layout from '../layouts/Layout.astro';
 										</div>
 									</div>
 
-									<!-- Policy Notice -->
-									<div class="text-center text-xs text-gray-500 mb-4">
-										<p class="font-roboto">
-											By booking, you agree to our
-											<a href="/refund-policy" class="text-dusty-rose hover:underline">refund policy</a>
-										</p>
-									</div>
-
 									<!-- Step 2 Navigation -->
 									<div class="flex justify-between">
 										<button
@@ -459,9 +489,17 @@ import Layout from '../layouts/Layout.astro';
 										</button>
 									</div>
 
+																		<!-- Policy Notice -->
+									<div class="text-center text-xs text-charcoal mb-4">
+										<p class="font-roboto">
+											By booking, you agree to our
+											<a href="/refund-policy" class="text-charcoal hover:underline">refund policy</a>
+										</p>
+									</div>
 									<p class="text-xs font-roboto text-charcoal text-center mt-4">
 										Secure payment powered by Square. Your information is protected.
 									</p>
+
 								</div>
 
 
@@ -1337,7 +1375,7 @@ import Layout from '../layouts/Layout.astro';
 								</button>
 								<div class="faq-answer hidden overflow-hidden">
 									<div class="pt-2 pb-4">
-										<p class="font-roboto" style="color: #333333;">Your $35 bouquet experience includes all cutting tools (professional shears), a collection vessel for gathering your flowers, expert guidance on flower selection and care, and detailed care instructions to keep your bouquet fresh longer. Free on-site parking is also included.</p>
+										<p class="font-roboto" style="color: #333333;">Your <span id="faq-price">$35</span> bouquet experience includes all cutting tools (professional shears), a collection vessel for gathering your flowers, expert guidance on flower selection and care, and detailed care instructions to keep your bouquet fresh longer. Free on-site parking is also included.</p>
 									</div>
 								</div>
 							</div>
@@ -1783,10 +1821,24 @@ import Layout from '../layouts/Layout.astro';
 		const counterPrice = document.getElementById('counter-price') as HTMLElement;
 		const counterMessage = document.getElementById('counter-message') as HTMLElement;
 
+		// Visitor pass counter elements
+		const visitorCounterMinusBtn = document.getElementById('visitor-counter-minus') as HTMLButtonElement;
+		const visitorCounterPlusBtn = document.getElementById('visitor-counter-plus') as HTMLButtonElement;
+		const visitorCounterPrice = document.getElementById('visitor-counter-price') as HTMLElement;
+		const visitorCounterMessage = document.getElementById('visitor-counter-message') as HTMLElement;
+		const visitorPassesSelect = document.getElementById('numberOfVisitorPasses') as HTMLInputElement;
 
+		// Total price display element
+		const bookingTotalPrice = document.getElementById('booking-total-price') as HTMLElement;
 
-		// Dynamic pricing - loaded from API
-		let currentPrice = 35.00; // Fallback price
+		// Static price display elements
+		const heroPrice = document.getElementById('hero-price') as HTMLElement;
+		const faqPrice = document.getElementById('faq-price') as HTMLElement;
+
+		// Dynamic pricing and limits - loaded from API
+		let currentBouquetPrice = 35.00; // Fallback bouquet price
+		let currentVisitorPassPrice = 5.00; // Fallback visitor pass price
+		let maxVisitorPassesPerBooking = 20; // Fallback visitor pass limit
 
 		// Global variables for multi-step form
 		let currentStep = 1;
@@ -1803,21 +1855,60 @@ import Layout from '../layouts/Layout.astro';
 			}); // Returns YYYY-MM-DD format
 		}
 
+		// Update all static price displays
+		function updateStaticPriceDisplays() {
+			const formattedPrice = `$${currentBouquetPrice.toFixed(0)}`;
+
+			// Update hero section price
+			if (heroPrice) {
+				heroPrice.textContent = formattedPrice;
+			}
+
+			// Update FAQ price
+			if (faqPrice) {
+				faqPrice.textContent = formattedPrice;
+			}
+
+			// Update initial counter price (before user interaction)
+			if (counterPrice && bouquetsSelect.value === '1') {
+				counterPrice.textContent = `${formattedPrice} CAD`;
+			}
+		}
+
 		// Load dynamic pricing from API
 		async function loadPricing(): Promise<void> {
 			try {
 				const response = await fetch('/api/settings/pricing');
 				const data = await response.json();
-				currentPrice = parseFloat(data.price_per_bouquet) || 35.00;
+				currentBouquetPrice = parseFloat(data.price_per_bouquet) || 35.00;
+				currentVisitorPassPrice = parseFloat(data.price_per_visitor_pass) || 5.00;
+				maxVisitorPassesPerBooking = parseInt(data.max_visitor_passes_per_booking) || 20;
 
-				console.log('Loaded dynamic pricing:', currentPrice);
+				console.log('Loaded dynamic pricing and limits:', {
+					bouquet: currentBouquetPrice,
+					visitorPass: currentVisitorPassPrice,
+					maxVisitorPasses: maxVisitorPassesPerBooking
+				});
+
+				// Update visitor pass input max attribute
+				if (visitorPassesSelect) {
+					visitorPassesSelect.max = maxVisitorPassesPerBooking.toString();
+				}
+
+				// Update all static price displays
+				updateStaticPriceDisplays();
 
 				// Update price display immediately
 				updateTotalPrice();
 			} catch (error) {
 				console.error('Failed to load pricing:', error);
-				// Keep fallback price
-				currentPrice = 35.00;
+				// Keep fallback prices and limits
+				currentBouquetPrice = 35.00;
+				currentVisitorPassPrice = 5.00;
+				maxVisitorPassesPerBooking = 20;
+
+				// Update displays with fallback prices
+				updateStaticPriceDisplays();
 			}
 		}
 
@@ -1937,27 +2028,55 @@ import Layout from '../layouts/Layout.astro';
 
 
 		function updateTotalPrice() {
-			const count = parseInt(bouquetsSelect.value) || 1;
-			const total = count * currentPrice;
+			const bouquetCount = parseInt(bouquetsSelect.value) || 1;
+			const visitorPassCount = parseInt(visitorPassesSelect.value) || 0;
 
-			// Update counter price with pulse animation
+			const bouquetTotal = bouquetCount * currentBouquetPrice;
+			const visitorPassTotal = visitorPassCount * currentVisitorPassPrice;
+			const grandTotal = bouquetTotal + visitorPassTotal;
+
+			// Update bouquet counter price with pulse animation
 			if (counterPrice) {
 				counterPrice.classList.add('updating');
-				counterPrice.textContent = `$${total} CAD`;
+				counterPrice.textContent = `$${bouquetTotal} CAD`;
 				setTimeout(() => counterPrice.classList.remove('updating'), 500);
+			}
+
+			// Update visitor pass counter price with pulse animation
+			if (visitorCounterPrice) {
+				visitorCounterPrice.classList.add('updating');
+				visitorCounterPrice.textContent = `$${visitorPassTotal} CAD`;
+				setTimeout(() => visitorCounterPrice.classList.remove('updating'), 500);
+			}
+
+			// Update total price with pulse animation
+			if (bookingTotalPrice) {
+				bookingTotalPrice.classList.add('updating');
+				bookingTotalPrice.textContent = `$${grandTotal.toFixed(2)} CAD`;
+				setTimeout(() => bookingTotalPrice.classList.remove('updating'), 500);
 			}
 
 			// Handle 30+ bouquet message
 			if (counterMessage) {
-				if (count >= 30) {
+				if (bouquetCount >= 30) {
 					counterMessage.classList.remove('hidden');
 				} else {
 					counterMessage.classList.add('hidden');
 				}
 			}
 
+			// Handle visitor pass limit message
+			if (visitorCounterMessage) {
+				if (visitorPassCount >= maxVisitorPassesPerBooking) {
+					visitorCounterMessage.classList.remove('hidden');
+				} else {
+					visitorCounterMessage.classList.add('hidden');
+				}
+			}
+
 			// Update button states
-			updateCounterButtons(count);
+			updateCounterButtons(bouquetCount);
+			updateVisitorCounterButtons(visitorPassCount);
 		}
 
 		// Update counter button states
@@ -1967,6 +2086,16 @@ import Layout from '../layouts/Layout.astro';
 			}
 			if (counterPlusBtn) {
 				counterPlusBtn.disabled = count >= 30;
+			}
+		}
+
+		// Update visitor counter button states
+		function updateVisitorCounterButtons(count: number) {
+			if (visitorCounterMinusBtn) {
+				visitorCounterMinusBtn.disabled = count <= 0;
+			}
+			if (visitorCounterPlusBtn) {
+				visitorCounterPlusBtn.disabled = count >= maxVisitorPassesPerBooking;
 			}
 		}
 
@@ -1983,6 +2112,22 @@ import Layout from '../layouts/Layout.astro';
 			const currentValue = parseInt(bouquetsSelect.value) || 1;
 			const newValue = Math.max(currentValue - 1, 1);
 			bouquetsSelect.value = newValue.toString();
+			updateTotalPrice();
+		}
+
+		// Visitor counter increment function
+		function incrementVisitorCounter() {
+			const currentValue = parseInt(visitorPassesSelect.value) || 0;
+			const newValue = Math.min(currentValue + 1, maxVisitorPassesPerBooking);
+			visitorPassesSelect.value = newValue.toString();
+			updateTotalPrice();
+		}
+
+		// Visitor counter decrement function
+		function decrementVisitorCounter() {
+			const currentValue = parseInt(visitorPassesSelect.value) || 0;
+			const newValue = Math.max(currentValue - 1, 0);
+			visitorPassesSelect.value = newValue.toString();
 			updateTotalPrice();
 		}
 
@@ -2218,6 +2363,31 @@ import Layout from '../layouts/Layout.astro';
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();
 					decrementCounter();
+				}
+			});
+		}
+
+		// Visitor counter button event listeners
+		if (visitorCounterPlusBtn) {
+			visitorCounterPlusBtn.addEventListener('click', incrementVisitorCounter);
+
+			// Keyboard support
+			visitorCounterPlusBtn.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					incrementVisitorCounter();
+				}
+			});
+		}
+
+		if (visitorCounterMinusBtn) {
+			visitorCounterMinusBtn.addEventListener('click', decrementVisitorCounter);
+
+			// Keyboard support
+			visitorCounterMinusBtn.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					decrementVisitorCounter();
 				}
 			});
 		}
@@ -2742,7 +2912,13 @@ import Layout from '../layouts/Layout.astro';
 
 			const formData = new FormData(bookingForm);
 			const numberOfBouquets = parseInt(formData.get('numberOfBouquets') as string) || 1;
+			const numberOfVisitorPasses = parseInt(formData.get('numberOfVisitorPasses') as string) || 0;
 			const paymentMethod = formData.get('paymentMethod') as string || 'pay_on_arrival';
+
+			// Calculate total amount
+			const bouquetTotal = numberOfBouquets * currentBouquetPrice;
+			const visitorPassTotal = numberOfVisitorPasses * currentVisitorPassPrice;
+			const totalAmount = bouquetTotal + visitorPassTotal;
 
 			const booking = {
 				fullName: formData.get('fullName'),
@@ -2751,7 +2927,8 @@ import Layout from '../layouts/Layout.astro';
 				visitDate: formData.get('visitDate'),
 				preferredTime: formData.get('preferredTime'),
 				numberOfVisitors: numberOfBouquets, // Keep API field name for compatibility
-				totalAmount: numberOfBouquets * currentPrice,
+				numberOfVisitorPasses: numberOfVisitorPasses,
+				totalAmount: totalAmount,
 				paymentMethod
 			};
 

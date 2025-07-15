@@ -912,6 +912,58 @@ input[type="number"] {
   }
 }
 
+/* Total Price Display - Matches counter styling but slightly more prominent */
+.booking-total-section {
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.total-price-display {
+  background: rgba(248, 231, 232, 0.15); /* More subtle background */
+  border-top: 1px solid rgba(232, 180, 184, 0.4); /* Subtle top border only */
+  border-bottom: 1px solid rgba(232, 180, 184, 0.4); /* Subtle bottom border only */
+  border-radius: 0;
+  padding: 1rem 0;
+  transition: all 0.2s ease-out;
+}
+
+.total-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.total-label {
+  font-size: 1.125rem; /* Slightly larger than body text */
+  font-weight: 500;
+  color: var(--color-charcoal);
+  font-family: var(--font-playfair);
+}
+
+.total-amount {
+  font-size: 1.5rem; /* Slightly larger than counter-price */
+  font-weight: 700; /* Bolder for emphasis */
+  color: var(--color-charcoal);
+  font-family: var(--font-playfair);
+  transition: transform 0.15s ease-out;
+}
+
+.total-amount.updating {
+  animation: pulse 0.5s ease-out;
+}
+
+/* Desktop adjustments for total */
+@media (min-width: 768px) {
+  .total-label {
+    font-size: 1.25rem;
+  }
+
+  .total-amount {
+    font-size: 1.75rem; /* Larger on desktop */
+  }
+}
+
 /* Mobile responsive adjustments */
 @media (max-width: 767px) {
   .counter-row {
