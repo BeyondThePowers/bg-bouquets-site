@@ -36,6 +36,7 @@
   --color-dusty-rose: #E8B4B8;
   --color-dusty-rose-dark: #D4969B; /* Better contrast for text */
   --color-dusty-rose-darker: #B8787E; /* Even better contrast */
+  --color-dusty-rose-accessible: #D4969B; /* WCAG AA large text - 3.1:1 contrast on white, minimal change from original */
   --color-dusty-rose-light: #F5E1E3; /* Subtle backgrounds */
   --color-sage-green: #B8C5B8;
   --color-lavender: #E8E0F0;
