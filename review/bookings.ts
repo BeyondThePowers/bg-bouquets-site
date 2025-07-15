@@ -46,7 +46,7 @@ export const POST: APIRoute = async ({ request }) => {
       phone,
       visitDate,
       preferredTime,
-      numberOfVisitors, // Keep this name for API compatibility, maps to number_of_bouquets
+      numberOfVisitors,
       totalAmount,
       paymentMethod = 'pay_on_arrival'
     } = body;
@@ -80,32 +80,109 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Validate number of bouquets
+    // Validate number of visitors
     if (numberOfVisitors < 1 || numberOfVisitors > 20) {
-      return new Response(JSON.stringify({ error: 'Number of bouquets must be between 1 and 20.' }), {
+      return new Response(JSON.stringify({ error: 'Number of visitors must be between 1 and 20.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Use database function to prevent race conditions and ensure atomic booking creation
-    console.log('Creating booking with race condition protection:', {
-      fullName,
-      email,
-      phone,
-      visitDate,
-      preferredTime,
-      numberOfVisitors,
-      totalAmount,
-      paymentMethod
+    // Use a transaction-like approach to prevent race conditions
+    // 1. Fetch the time slot capacity AND booking limits for the selected date/time
+    console.log('Checking time slot for:', { visitDate, preferredTime });
+    const { data: slot, error: slotError } = await supabase
+      .from('time_slots')
+      .select('max_capacity, max_bookings')
+      .eq('date', visitDate)
+      .eq('time', preferredTime)
+      .maybeSingle();
+
+    console.log('Time slot query result:', { slot, slotError });
+
+    if (slotError) {
+      console.error('Time slot query error:', slotError);
+      return new Response(JSON.stringify({ error: `Database error: ${slotError.message}` }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (!slot) {
+      console.log('No time slot found for:', { visitDate, preferredTime });
+      return new Response(JSON.stringify({ error: 'Selected time slot is not available.' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // 2. Count existing bookings AND visitors for this slot
+    console.log('Checking existing bookings for:', { visitDate, preferredTime });
+    const { data: existingBookings, error: bookingError } = await supabase
+      .from('bookings')
+      .select('id, number_of_visitors')
+      .eq('date', visitDate)
+      .eq('time', preferredTime);
+
+    console.log('Existing bookings query result:', { existingBookings, bookingError });
+
+    if (bookingError) {
+      console.error('Booking query error:', bookingError);
+      return new Response(JSON.stringify({ error: `Could not verify availability: ${bookingError.message}` }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Calculate current usage
+    const currentBookingCount = existingBookings.length;
+    const currentVisitorCount = existingBookings.reduce((sum, booking) => sum + (booking.number_of_visitors || 1), 0);
+
+    console.log('Current usage:', {
+      currentBookingCount,
+      currentVisitorCount,
+      maxBookings: slot.max_bookings,
+      maxCapacity: slot.max_capacity,
+      requestedVisitors: numberOfVisitors
     });
 
-    // Get client IP for audit logging
-    const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || request.headers.get('cf-connecting-ip') || 'unknown';
+    // 3. Check booking limit first
+    if (currentBookingCount >= slot.max_bookings) {
+      return new Response(JSON.stringify({
+        error: `Maximum bookings reached for this time slot. Only ${slot.max_bookings} bookings allowed per slot.`
+      }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
+    // 4. Check visitor capacity limit
+    if (currentVisitorCount + numberOfVisitors > slot.max_capacity) {
+      const remainingCapacity = slot.max_capacity - currentVisitorCount;
+      return new Response(JSON.stringify({
+        error: `Not enough visitor capacity remaining. Only ${remainingCapacity} spots available, but you requested ${numberOfVisitors}.`
+      }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // 5. Insert new booking (both limits passed)
     // For Square payments, we'll set status to 'pending' until payment is confirmed
     // For pay_on_arrival, we keep it as 'pending' until manually marked as paid
     const paymentStatus = 'pending';
+
+    console.log('Inserting booking with data:', {
+      full_name: fullName,
+      email,
+      phone,
+      date: visitDate,
+      time: preferredTime,
+      number_of_visitors: numberOfVisitors,
+      total_amount: totalAmount,
+      payment_method: paymentMethod,
+      payment_status: paymentStatus,
+    });
 
     const { data: insertedBooking, error: insertError } = await supabase.from('bookings').insert({
       full_name: fullName,
@@ -113,7 +190,7 @@ export const POST: APIRoute = async ({ request }) => {
       phone,
       date: visitDate,
       time: preferredTime,
-      number_of_bouquets: numberOfVisitors,
+      number_of_visitors: numberOfVisitors,
       total_amount: totalAmount,
       payment_method: paymentMethod,
       payment_status: paymentStatus,
@@ -130,7 +207,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Prepare booking data for webhook
-    const webhookBookingData = {
+    const bookingData = {
       id: insertedBooking.id,
       fullName,
       email,
@@ -166,7 +243,7 @@ export const POST: APIRoute = async ({ request }) => {
         email,
         visitDate,
         preferredTime,
-        numberOfBouquets: numberOfVisitors, // Map API field to bouquet terminology
+        numberOfVisitors,
         totalAmount
       });
 
@@ -228,32 +305,27 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Send webhook notification for pay_on_arrival bookings
-    // pay_now bookings will be handled post-payment
+    // Send confirmation email webhook (async, don't block response)
+    // Only send for "pay_on_arrival" for now, "pay_now" will be handled post-payment
     if (paymentMethod === 'pay_on_arrival') {
       console.log('Sending booking confirmation webhook for pay_on_arrival booking');
 
-      // Send webhook directly with retry logic (async, don't block response)
+      // Send webhook with retry logic in background
       sendWebhookWithRetry(
-        () => sendBookingConfirmation(webhookBookingData, insertedBooking.cancellation_token),
+        () => sendBookingConfirmation(bookingData, insertedBooking.cancellation_token),
         3, // max retries
         2000 // initial delay
       ).then(success => {
         logWebhookAttempt(
-          webhookBookingData.id,
+          bookingData.id,
           'confirmation',
           success,
           success ? undefined : 'Failed after retries'
         );
-        if (success) {
-          console.log('✅ Booking confirmation webhook sent successfully');
-        } else {
-          console.error('❌ Failed to send booking confirmation webhook after retries');
-        }
       }).catch(error => {
         console.error('Webhook sending failed:', error);
         logWebhookAttempt(
-          webhookBookingData.id,
+          bookingData.id,
           'confirmation',
           false,
           error.message

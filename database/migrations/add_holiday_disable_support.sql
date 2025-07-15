@@ -23,7 +23,7 @@ BEGIN
   -- Get current settings
   SELECT setting_value INTO operating_days FROM schedule_settings WHERE setting_key = 'operating_days';
   SELECT setting_value INTO time_slots FROM schedule_settings WHERE setting_key = 'time_slots';
-  SELECT (setting_value #>> '{}')::INTEGER INTO max_capacity FROM schedule_settings WHERE setting_key = 'max_visitors_per_slot';
+  SELECT (setting_value #>> '{}')::INTEGER INTO max_capacity FROM schedule_settings WHERE setting_key = 'max_bouquets_per_slot';
 
   -- Generate dates for the specified number of days ahead
   FOR i IN 0..days_ahead LOOP

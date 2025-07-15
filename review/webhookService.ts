@@ -27,7 +27,7 @@ function getWebhookUrl(eventType: keyof typeof WEBHOOK_CONFIG): string | undefin
  * Create standardized webhook payload with all possible fields
  * This ensures consistent data structure across all Make.com scenarios
  */
-export function createStandardizedPayload(
+function createStandardizedPayload(
   eventType: string,
   bookingData: BookingData,
   options: {
@@ -66,9 +66,9 @@ export function createStandardizedPayload(
       visit: {
         date: bookingData.visitDate,
         time: bookingData.preferredTime,
-        bouquets: bookingData.numberOfVisitors || null, // Primary field using bouquet terminology
-        visitors: bookingData.numberOfVisitors || null, // Deprecated: kept for backward compatibility
+        visitors: bookingData.numberOfVisitors || null,
         amount: bookingData.totalAmount || null,
+        ...(eventType === 'booking_confirmed' && { bouquets: bookingData.numberOfVisitors }),
       },
       payment: {
         method: bookingData.paymentMethod || null,
@@ -89,8 +89,7 @@ export function createStandardizedPayload(
         new: {
           date: bookingData.visitDate,
           time: bookingData.preferredTime,
-          bouquets: bookingData.numberOfVisitors, // Primary field using bouquet terminology
-          visitors: bookingData.numberOfVisitors, // Deprecated: kept for backward compatibility
+          visitors: bookingData.numberOfVisitors,
           amount: bookingData.totalAmount,
         }
       }),
@@ -183,7 +182,7 @@ interface BookingData {
   phone: string;
   visitDate: string;
   preferredTime: string;
-  numberOfVisitors: number; // Keep for API compatibility, represents number of bouquets
+  numberOfVisitors: number;
   totalAmount: number;
   paymentMethod: string;
   createdAt?: string;
@@ -292,9 +291,9 @@ interface StandardizedWebhookPayload {
     visit: {
       date: string;
       time: string;
-      bouquets: number | null; // Primary field using bouquet terminology
-      visitors: number | null; // Deprecated: kept for backward compatibility
+      visitors: number | null;
       amount: number | null;
+      bouquets?: number | null; // Only for booking confirmations
     };
     payment: {
       method: string | null;
@@ -318,8 +317,7 @@ interface StandardizedWebhookPayload {
     new?: {
       date: string;
       time: string;
-      bouquets: number; // Primary field using bouquet terminology
-      visitors: number; // Deprecated: kept for backward compatibility
+      visitors: number;
       amount: number;
     } | null;
     // Cancellation details (only for cancellations)

@@ -2,8 +2,8 @@
 -- Run these commands in your Supabase SQL Editor
 
 -- 1. Add missing columns to bookings table
-ALTER TABLE bookings 
-ADD COLUMN IF NOT EXISTS number_of_visitors INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE bookings
+ADD COLUMN IF NOT EXISTS number_of_bouquets INTEGER NOT NULL DEFAULT 1;
 
 ALTER TABLE bookings 
 ADD COLUMN IF NOT EXISTS total_amount DECIMAL(10,2);

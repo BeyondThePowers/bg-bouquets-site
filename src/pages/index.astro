@@ -355,15 +355,15 @@ import Layout from '../layouts/Layout.astro';
 
 									<!-- Bouquet Selection -->
 									<div class="mb-6">
-										<label for="numberOfVisitors" class="block text-sm font-playfair font-medium text-charcoal mb-3">Number of Bouquets *</label>
+										<label for="numberOfBouquets" class="block text-sm font-playfair font-medium text-charcoal mb-3">Number of Bouquets *</label>
 										<div class="bouquet-counter">
 											<div class="counter-row">
 												<div class="counter-controls">
 													<button type="button" id="counter-minus" class="counter-btn minus" aria-label="Decrease bouquet count">−</button>
 													<input
 														type="number"
-														id="numberOfVisitors"
-														name="numberOfVisitors"
+														id="numberOfBouquets"
+														name="numberOfBouquets"
 														value="1"
 														min="1"
 														max="30"
@@ -492,7 +492,7 @@ import Layout from '../layouts/Layout.astro';
 												<!-- Date and time will be inserted here -->
 											</p>
 											<p class="font-roboto text-sm text-charcoal mt-1" id="success-visitors">
-												<!-- Visitor count will be inserted here -->
+												<!-- Bouquet count will be inserted here -->
 											</p>
 										</div>
 									</div>
@@ -1093,7 +1093,7 @@ import Layout from '../layouts/Layout.astro';
 				<h2 class="text-4xl md:text-5xl font-playfair font-bold mb-6" style="color: #333333;">About Our Garden</h2>
 				<p class="text-xl font-roboto max-w-3xl mx-auto" style="color: #333333;">
 					Our bouquet garden is a carefully curated collection of the most beautiful flowers,
-					designed to inspire and delight visitors of all ages.
+					designed to inspire and delight guests of all ages.
 				</p>
 			</div>
 
@@ -1352,7 +1352,7 @@ import Layout from '../layouts/Layout.astro';
 								</button>
 								<div class="faq-answer hidden overflow-hidden">
 									<div class="pt-2 pb-4">
-										<p class="font-roboto" style="color: #333333;">Yes! We provide everything you need. Professional-grade cutting shears are available for all visitors, along with collection vessels (buckets or baskets) to gather your flowers. You don't need to bring any tools - just come ready to enjoy the experience!</p>
+										<p class="font-roboto" style="color: #333333;">Yes! We provide everything you need. Professional-grade cutting shears are available for all guests, along with collection vessels (buckets or baskets) to gather your flowers. You don't need to bring any tools - just come ready to enjoy the experience!</p>
 									</div>
 								</div>
 							</div>
@@ -1397,7 +1397,7 @@ import Layout from '../layouts/Layout.astro';
 								</button>
 								<div class="faq-answer hidden overflow-hidden">
 									<div class="pt-2 pb-4">
-										<p class="font-roboto" style="color: #333333;">We love pets, but to protect our flowers and ensure the safety of all visitors, we ask that pets remain in the parking area. This helps preserve the flower beds and prevents any accidents. You're welcome to bring your furry friends along for the car ride - they can enjoy the fresh country air while you create your beautiful bouquet!</p>
+										<p class="font-roboto" style="color: #333333;">We love pets, but to protect our flowers and ensure the safety of all guests, we ask that pets remain in the parking area. This helps preserve the flower beds and prevents any accidents. You're welcome to bring your furry friends along for the car ride - they can enjoy the fresh country air while you create your beautiful bouquet!</p>
 									</div>
 								</div>
 							</div>
@@ -1734,6 +1734,9 @@ import Layout from '../layouts/Layout.astro';
 		// Initialize contact form
 		initializeContactForm();
 
+		// Load dynamic pricing
+		loadPricing();
+
 		// Multi-step booking form elements
 		const bookingForm = document.getElementById('booking-form') as HTMLFormElement;
 		const bookNowBtn = document.getElementById('bookNowBtn') as HTMLButtonElement;
@@ -1757,7 +1760,7 @@ import Layout from '../layouts/Layout.astro';
 		// Form inputs
 		const visitDateInput = document.getElementById('visitDate') as HTMLInputElement;
 		const preferredTimeInput = document.getElementById('preferredTime') as HTMLInputElement;
-		const visitorsSelect = document.getElementById('numberOfVisitors') as HTMLSelectElement;
+		const bouquetsSelect = document.getElementById('numberOfBouquets') as HTMLSelectElement;
 		const fullNameInput = document.getElementById('fullName') as HTMLInputElement;
 		const emailInput = document.getElementById('email') as HTMLInputElement;
 		const phoneInput = document.getElementById('phone') as HTMLInputElement;
@@ -1782,7 +1785,8 @@ import Layout from '../layouts/Layout.astro';
 
 
 
-		const PRICE_PER_BOUQUET = 35;
+		// Dynamic pricing - loaded from API
+		let currentPrice = 35.00; // Fallback price
 
 		// Global variables for multi-step form
 		let currentStep = 1;
@@ -1797,6 +1801,24 @@ import Layout from '../layouts/Layout.astro';
 			return new Date().toLocaleDateString('en-CA', {
 				timeZone: 'America/Edmonton'
 			}); // Returns YYYY-MM-DD format
+		}
+
+		// Load dynamic pricing from API
+		async function loadPricing(): Promise<void> {
+			try {
+				const response = await fetch('/api/settings/pricing');
+				const data = await response.json();
+				currentPrice = parseFloat(data.price_per_bouquet) || 35.00;
+
+				console.log('Loaded dynamic pricing:', currentPrice);
+
+				// Update price display immediately
+				updateTotalPrice();
+			} catch (error) {
+				console.error('Failed to load pricing:', error);
+				// Keep fallback price
+				currentPrice = 35.00;
+			}
 		}
 
 		// Modern Multi-step form management with smooth slide transitions
@@ -1915,8 +1937,8 @@ import Layout from '../layouts/Layout.astro';
 
 
 		function updateTotalPrice() {
-			const count = parseInt(visitorsSelect.value) || 1;
-			const total = count * PRICE_PER_BOUQUET;
+			const count = parseInt(bouquetsSelect.value) || 1;
+			const total = count * currentPrice;
 
 			// Update counter price with pulse animation
 			if (counterPrice) {
@@ -1950,17 +1972,17 @@ import Layout from '../layouts/Layout.astro';
 
 		// Counter increment function
 		function incrementCounter() {
-			const currentValue = parseInt(visitorsSelect.value) || 1;
+			const currentValue = parseInt(bouquetsSelect.value) || 1;
 			const newValue = Math.min(currentValue + 1, 30);
-			visitorsSelect.value = newValue.toString();
+			bouquetsSelect.value = newValue.toString();
 			updateTotalPrice();
 		}
 
 		// Counter decrement function
 		function decrementCounter() {
-			const currentValue = parseInt(visitorsSelect.value) || 1;
+			const currentValue = parseInt(bouquetsSelect.value) || 1;
 			const newValue = Math.max(currentValue - 1, 1);
-			visitorsSelect.value = newValue.toString();
+			bouquetsSelect.value = newValue.toString();
 			updateTotalPrice();
 		}
 
@@ -2719,7 +2741,7 @@ import Layout from '../layouts/Layout.astro';
 			if (!validateForm()) return alert('Please complete all required fields.');
 
 			const formData = new FormData(bookingForm);
-			const numberOfVisitors = parseInt(formData.get('numberOfVisitors') as string) || 1;
+			const numberOfBouquets = parseInt(formData.get('numberOfBouquets') as string) || 1;
 			const paymentMethod = formData.get('paymentMethod') as string || 'pay_on_arrival';
 
 			const booking = {
@@ -2728,8 +2750,8 @@ import Layout from '../layouts/Layout.astro';
 				phone: formData.get('phone'),
 				visitDate: formData.get('visitDate'),
 				preferredTime: formData.get('preferredTime'),
-				numberOfVisitors,
-				totalAmount: numberOfVisitors * PRICE_PER_BOUQUET,
+				numberOfVisitors: numberOfBouquets, // Keep API field name for compatibility
+				totalAmount: numberOfBouquets * currentPrice,
 				paymentMethod
 			};
 
@@ -2809,8 +2831,8 @@ import Layout from '../layouts/Layout.astro';
 				successDateTime.textContent = `${formattedDate} at ${booking.preferredTime}`;
 			}
 			if (successVisitors) {
-				const visitorText = booking.numberOfVisitors === 1 ? 'bouquet' : 'bouquets';
-				successVisitors.textContent = `${booking.numberOfVisitors} ${visitorText} ($${booking.totalAmount} CAD)`;
+				const bouquetText = booking.numberOfVisitors === 1 ? 'bouquet' : 'bouquets';
+				successVisitors.textContent = `${booking.numberOfVisitors} ${bouquetText} ($${booking.totalAmount} CAD)`;
 			}
 			if (successEmailMessage) {
 				successEmailMessage.textContent = message || 'You\'ll receive a confirmation email shortly.';

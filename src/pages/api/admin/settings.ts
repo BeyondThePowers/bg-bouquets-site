@@ -11,7 +11,7 @@ export const GET: APIRoute = async () => {
         'operating_days',
         'time_slots',
         'max_bookings_per_slot',
-        'max_visitors_per_slot',
+        'max_bouquets_per_slot',
         'season_start_month',
         'season_start_day',
         'season_end_month',
@@ -52,7 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
       operating_days,
       time_slots,
       max_bookings_per_slot,
-      max_visitors_per_slot,
+      max_visitors_per_slot, // Keep this for backward compatibility, will map to max_bouquets_per_slot
       season_start_month,
       season_start_day,
       season_end_month,
@@ -64,7 +64,7 @@ export const POST: APIRoute = async ({ request }) => {
     console.log('Operating days:', operating_days);
     console.log('Time slots:', time_slots);
     console.log('Max bookings per slot:', max_bookings_per_slot);
-    console.log('Max visitors per slot:', max_visitors_per_slot);
+    console.log('Max bouquets per slot:', max_visitors_per_slot);
     console.log('Season start:', season_start_month, season_start_day);
     console.log('Season end:', season_end_month, season_end_day);
 
@@ -91,7 +91,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (!max_visitors_per_slot || max_visitors_per_slot < 1) {
-      return new Response(JSON.stringify({ success: false, error: 'Max visitors per slot must be at least 1' }), {
+      return new Response(JSON.stringify({ success: false, error: 'Max bouquets per slot must be at least 1' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -102,7 +102,7 @@ export const POST: APIRoute = async ({ request }) => {
       { setting_key: 'operating_days', setting_value: JSON.stringify(operating_days) },
       { setting_key: 'time_slots', setting_value: JSON.stringify(time_slots) },
       { setting_key: 'max_bookings_per_slot', setting_value: JSON.stringify(max_bookings_per_slot) },
-      { setting_key: 'max_visitors_per_slot', setting_value: JSON.stringify(max_visitors_per_slot) }
+      { setting_key: 'max_bouquets_per_slot', setting_value: JSON.stringify(max_visitors_per_slot) }
     ];
 
     // Add seasonal settings if provided

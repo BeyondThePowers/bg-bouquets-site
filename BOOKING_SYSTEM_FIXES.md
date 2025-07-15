@@ -17,10 +17,10 @@ This document outlines the fixes implemented for the dynamic booking functionali
 ```
 
 ### 2. Improved Booking Logic
-**Problem**: Race conditions could cause overbooking, and visitor counting was incorrect.
+**Problem**: Race conditions could cause overbooking, and bouquet counting was incorrect.
 
 **Solution**: Updated `src/pages/api/bookings.ts` to:
-- Count total visitors (not just bookings) per time slot
+- Count total bouquets (not just bookings) per time slot
 - Add comprehensive server-side validation
 - Improve error handling and messaging
 - Add email format validation
@@ -45,7 +45,7 @@ This document outlines the fixes implemented for the dynamic booking functionali
 Based on your schema, I found these critical issues:
 
 1. **Missing columns in `bookings` table:**
-   - `number_of_visitors` (integer) - CRITICAL for capacity calculations
+   - `number_of_bouquets` (integer) - CRITICAL for capacity calculations (was `number_of_visitors`)
    - `total_amount` (decimal) - for storing booking totals
 
 2. **Data type mismatch:**
@@ -72,7 +72,7 @@ Run the test queries in `test-database.sql` to verify everything works:
 ```sql
 -- This will show you the table structure and sample data
 -- Make sure you see:
--- - bookings table has number_of_visitors and total_amount columns
+-- - bookings table has number_of_bouquets and total_amount columns
 -- - time_slots and bookings have TEXT time columns
 -- - Sample data exists for testing
 ```

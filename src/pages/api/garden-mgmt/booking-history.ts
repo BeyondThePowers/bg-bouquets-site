@@ -2,6 +2,30 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../../lib/supabase';
 
+// Helper function to provide default reasons for actions
+function getDefaultReasonForAction(actionType: string): string {
+  switch (actionType) {
+    case 'created':
+      return 'Booking created';
+    case 'modified':
+      return 'Booking details updated';
+    case 'cancelled':
+      return 'Booking cancelled';
+    case 'rescheduled':
+      return 'Booking rescheduled';
+    case 'payment_updated':
+      return 'Payment status updated';
+    case 'status_changed':
+      return 'Booking status changed';
+    case 'refund_processed':
+      return 'Refund processed';
+    case 'admin_action':
+      return 'Admin action performed';
+    default:
+      return 'Action performed';
+  }
+}
+
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {
   try {
@@ -57,63 +81,67 @@ export const GET: APIRoute = async ({ request, url }) => {
       });
     }
 
-    // Get booking details
+    // Get booking details with comprehensive audit trail
     const { data: booking, error: bookingError } = await supabase
-      .from('bookings')
-      .select('id, full_name, email, date, time, status, created_at')
+      .from('admin_booking_history')
+      .select('*')
       .eq('id', bookingId)
       .single();
 
     if (bookingError || !booking) {
-      return new Response(JSON.stringify({ 
-        error: 'Booking not found' 
+      return new Response(JSON.stringify({
+        error: 'Booking not found'
       }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Get booking action history
-    const { data: actions, error: actionsError } = await supabase
-      .from('booking_actions')
+    // Get comprehensive audit trail from new audit logging system
+    const { data: auditLogs, error: auditError } = await supabase
+      .from('booking_audit_log')
       .select('*')
       .eq('booking_id', bookingId)
-      .order('action_timestamp', { ascending: true });
+      .order('created_at', { ascending: true });
 
-    if (actionsError) {
-      console.error('Error fetching booking actions:', actionsError);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to fetch booking history' 
+    if (auditError) {
+      console.error('Error fetching audit logs:', auditError);
+      return new Response(JSON.stringify({
+        error: 'Failed to fetch booking history'
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Always include booking creation as the first history entry
-    const allActions = [];
-
-    // Add creation event as first entry
-    allActions.push({
-      id: 'creation',
-      booking_id: booking.id,
-      action_type: 'booking_created',
-      action_timestamp: booking.created_at,
-      reason: 'Booking created',
-      performed_by_customer: true,
-      performed_by_admin: null,
-      original_booking_data: {
+    // Format audit logs for frontend consumption
+    const formattedActions = (auditLogs || []).map(log => ({
+      id: log.id,
+      booking_id: log.booking_id,
+      action_type: log.action_type,
+      action_timestamp: log.created_at,
+      reason: log.reason || getDefaultReasonForAction(log.action_type),
+      performed_by_customer: log.performed_by === 'customer',
+      performed_by_admin: log.performed_by === 'admin' ? log.performed_by_id : null,
+      performed_by: log.performed_by,
+      performed_by_id: log.performed_by_id,
+      ip_address: log.ip_address,
+      user_agent: log.user_agent,
+      old_values: log.old_values,
+      new_values: log.new_values,
+      // Legacy fields for backward compatibility
+      original_booking_data: log.old_values || {
         customer_name: booking.full_name,
         email: booking.email,
         date: booking.date,
         time: booking.time
-      }
-    });
-
-    // Add any additional actions
-    if (actions && actions.length > 0) {
-      allActions.push(...actions);
-    }
+      },
+      // Extract reschedule info if available
+      original_date: log.old_values?.date,
+      original_time: log.old_values?.time,
+      new_date: log.new_values?.date,
+      new_time: log.new_values?.time
+    }));
 
     return new Response(JSON.stringify({
       booking: {
@@ -123,9 +151,12 @@ export const GET: APIRoute = async ({ request, url }) => {
         currentDate: booking.date,
         currentTime: booking.time,
         status: booking.status,
-        createdAt: booking.created_at
+        createdAt: booking.created_at,
+        version: booking.version,
+        totalActions: booking.total_actions || formattedActions.length
       },
-      actions: allActions
+      actions: formattedActions,
+      auditTrail: booking.audit_trail || [] // Full audit trail from view
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

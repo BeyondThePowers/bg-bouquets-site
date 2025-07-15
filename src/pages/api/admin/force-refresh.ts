@@ -50,7 +50,7 @@ export const POST: APIRoute = async () => {
     const settingsMap = new Map(settings?.map(s => [s.setting_key, s.setting_value]) || []);
     const operatingDaysStr = settingsMap.get('operating_days') as string;
     const timeSlotsStr = settingsMap.get('time_slots') as string;
-    const maxCapacity = parseInt(settingsMap.get('max_visitors_per_slot') as string || '10');
+    const maxCapacity = parseInt(settingsMap.get('max_bouquets_per_slot') as string || '10');
     const seasonStartMonth = parseInt(settingsMap.get('season_start_month') as string || '5');
     const seasonStartDay = parseInt(settingsMap.get('season_start_day') as string || '15');
     const seasonEndMonth = parseInt(settingsMap.get('season_end_month') as string || '9');

@@ -183,7 +183,7 @@ async function handlePaymentEvent(webhookData: any) {
         phone: booking.phone,
         visitDate: booking.date,
         preferredTime: booking.time,
-        numberOfVisitors: booking.number_of_visitors,
+        numberOfVisitors: booking.number_of_bouquets, // Updated to use new column name
         totalAmount: booking.total_amount,
         paymentMethod: booking.payment_method,
         createdAt: booking.created_at,

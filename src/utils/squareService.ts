@@ -62,7 +62,7 @@ export interface BookingDetails {
   email: string;
   visitDate: string;
   preferredTime: string;
-  numberOfVisitors: number;
+  numberOfBouquets: number; // Updated to use bouquet terminology
   totalAmount: number;
 }
 
@@ -105,9 +105,9 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
         location_id: config.SQUARE_LOCATION_ID,
         line_items: [{
           name: `Garden Visit - ${booking.visitDate} at ${booking.preferredTime}`,
-          quantity: booking.numberOfVisitors.toString(),
+          quantity: booking.numberOfBouquets.toString(),
           base_price_money: {
-            amount: Math.round(booking.totalAmount / booking.numberOfVisitors * 100), // Convert to cents
+            amount: Math.round(booking.totalAmount / booking.numberOfBouquets * 100), // Convert to cents
             currency: 'CAD'
           }
         }]

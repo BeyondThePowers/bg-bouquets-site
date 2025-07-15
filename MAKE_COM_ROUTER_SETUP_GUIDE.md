@@ -54,8 +54,8 @@ Both email modules will use the same template, but Make.com will automatically h
 {{booking.customer.email}}
 {{booking.visit.date}}
 {{booking.visit.time}}
-{{booking.visit.visitors}}
-{{booking.visit.bouquets}}
+{{booking.visit.bouquets}}     // ← Primary field (recommended)
+{{booking.visit.visitors}}     // ← Deprecated (for backward compatibility)
 {{booking.visit.amount}}
 {{booking.payment.status}}
 {{booking.payment.method}}
@@ -63,6 +63,8 @@ Both email modules will use the same template, but Make.com will automatically h
 {{booking.payment.completedAt}}
 {{booking.metadata.cancellationToken}}
 ```
+
+**Note**: Use `{{booking.visit.bouquets}}` for new scenarios. The `visitors` field is kept for backward compatibility.
 
 #### Conditional Content in Email:
 Use Make.com's conditional formatting:

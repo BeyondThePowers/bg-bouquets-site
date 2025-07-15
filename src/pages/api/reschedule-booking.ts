@@ -119,7 +119,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         phone: bookingData.phone,
         visitDate: bookingData.new_date,
         preferredTime: bookingData.new_time,
-        numberOfVisitors: bookingData.number_of_visitors,
+        numberOfVisitors: bookingData.number_of_bouquets,
         totalAmount: bookingData.total_amount,
         paymentMethod: bookingData.payment_method,
         originalDate: bookingData.original_date,
@@ -159,7 +159,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         originalTime: bookingData.original_time,
         newDate: bookingData.new_date,
         newTime: bookingData.new_time,
-        visitors: bookingData.number_of_visitors
+        visitors: bookingData.number_of_bouquets
       }
     }), {
       status: 200,
@@ -194,7 +194,7 @@ export const GET: APIRoute = async ({ url }) => {
     // Look up booking by cancellation token
     const { data: booking, error } = await supabase
       .from('bookings')
-      .select('id, full_name, email, date, time, number_of_visitors, total_amount, status, reschedule_count')
+      .select('id, full_name, email, date, time, number_of_bouquets, total_amount, status, reschedule_count')
       .eq('cancellation_token', cancellationToken)
       .single();
 
@@ -235,7 +235,7 @@ export const GET: APIRoute = async ({ url }) => {
         email: booking.email,
         currentDate: booking.date,
         currentTime: booking.time,
-        visitors: booking.number_of_visitors,
+        visitors: booking.number_of_bouquets,
         amount: booking.total_amount,
         rescheduleCount: booking.reschedule_count
       }

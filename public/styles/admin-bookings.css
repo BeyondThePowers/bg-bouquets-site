@@ -1495,3 +1495,22 @@ body {
 	outline: 2px solid var(--admin-black);
 	outline-offset: 2px;
 }
+
+/* Table Header with Clear All Button */
+.table-header-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+.table-header-content h2 {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--admin-black);
+}
+
+
+
+

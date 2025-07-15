@@ -1,6 +1,6 @@
 // Booking functionality module
 export class BookingManager {
-  private readonly PRICE_PER_BOUQUET = 35;
+  private currentPrice = 35.00; // Fallback price, loaded dynamically
 
   // Business timezone helper - Alberta, Canada (Mountain Time)
   private getBusinessToday(): string {
@@ -8,19 +8,38 @@ export class BookingManager {
       timeZone: 'America/Edmonton'
     }); // Returns YYYY-MM-DD format
   }
+
+  // Load dynamic pricing from API
+  private async loadPricing(): Promise<void> {
+    try {
+      const response = await fetch('/api/settings/pricing');
+      const data = await response.json();
+      this.currentPrice = parseFloat(data.price_per_bouquet) || 35.00;
+
+      console.log('BookingManager loaded dynamic pricing:', this.currentPrice);
+
+      // Update price display if elements exist
+      this.updateTotalPrice();
+    } catch (error) {
+      console.error('BookingManager failed to load pricing:', error);
+      // Keep fallback price
+      this.currentPrice = 35.00;
+    }
+  }
   private bookingForm: HTMLFormElement | null = null;
   private bookNowBtn: HTMLButtonElement | null = null;
   private bookingBtnText: HTMLElement | null = null;
   private bookingSpinner: HTMLElement | null = null;
   private visitDateInput: HTMLInputElement | null = null;
   private preferredTimeSelect: HTMLSelectElement | null = null;
-  private visitorsSelect: HTMLSelectElement | null = null;
+  private bouquetsSelect: HTMLSelectElement | null = null;
   private phoneInput: HTMLInputElement | null = null;
 
   constructor() {
     this.initializeElements();
     this.setupEventListeners();
     this.loadAvailability();
+    this.loadPricing();
   }
 
   private initializeElements(): void {
@@ -30,7 +49,7 @@ export class BookingManager {
     this.bookingSpinner = document.getElementById('bookingSpinner') as HTMLElement;
     this.visitDateInput = document.getElementById('visitDate') as HTMLInputElement;
     this.preferredTimeSelect = document.getElementById('preferredTime') as HTMLSelectElement;
-    this.visitorsSelect = document.getElementById('numberOfVisitors') as HTMLSelectElement;
+    this.bouquetsSelect = document.getElementById('numberOfBouquets') as HTMLSelectElement;
     this.phoneInput = document.getElementById('phone') as HTMLInputElement;
   }
 
@@ -38,8 +57,8 @@ export class BookingManager {
     // Form submission
     this.bookingForm?.addEventListener('submit', (e: Event) => this.handleSubmit(e));
     
-    // Visitor count change
-    this.visitorsSelect?.addEventListener('change', () => this.updateTotalPrice());
+    // Bouquet count change
+    this.bouquetsSelect?.addEventListener('change', () => this.updateTotalPrice());
     
     // Phone formatting
     this.phoneInput?.addEventListener('input', (e: Event) => this.formatPhone(e));
@@ -92,8 +111,8 @@ export class BookingManager {
   }
 
   private updateTotalPrice(): void {
-    const count = parseInt(this.visitorsSelect?.value || '1') || 1;
-    const total = count * this.PRICE_PER_BOUQUET;
+    const count = parseInt(this.bouquetsSelect?.value || '1') || 1;
+    const total = count * this.currentPrice;
     // Update any total display elements if they exist
     const totalElement = document.getElementById('totalPrice');
     if (totalElement) {
@@ -139,7 +158,7 @@ export class BookingManager {
     }
 
     const formData = new FormData(this.bookingForm);
-    const numberOfVisitors = parseInt(formData.get('numberOfVisitors') as string) || 1;
+    const numberOfBouquets = parseInt(formData.get('numberOfBouquets') as string) || 1;
 
     const booking = {
       fullName: formData.get('fullName'),
@@ -147,8 +166,8 @@ export class BookingManager {
       phone: formData.get('phone'),
       visitDate: formData.get('visitDate'),
       preferredTime: formData.get('preferredTime'),
-      numberOfVisitors,
-      totalAmount: numberOfVisitors * this.PRICE_PER_BOUQUET
+      numberOfVisitors: numberOfBouquets, // Keep API field name for compatibility
+      totalAmount: numberOfBouquets * this.currentPrice
     };
 
     // Loading state

@@ -16,7 +16,7 @@ export const GET: APIRoute = async () => {
     const { data: settings, error: settingsError } = await supabase
       .from('schedule_settings')
       .select('setting_key, setting_value')
-      .in('setting_key', ['max_bookings_per_slot', 'max_visitors_per_slot']);
+      .in('setting_key', ['max_bookings_per_slot', 'max_bouquets_per_slot']);
 
     if (settingsError) {
       console.error('Settings error:', settingsError);
@@ -26,9 +26,9 @@ export const GET: APIRoute = async () => {
     // Parse settings
     const settingsMap = new Map(settings?.map(s => [s.setting_key, s.setting_value]) || []);
     const maxBookingsPerSlot = parseInt(settingsMap.get('max_bookings_per_slot') as string || '3');
-    const maxVisitorsPerSlot = parseInt(settingsMap.get('max_visitors_per_slot') as string || '10');
+    const maxBouquetsPerSlot = parseInt(settingsMap.get('max_bouquets_per_slot') as string || '10');
 
-    console.log('Schedule settings:', { maxBookingsPerSlot, maxVisitorsPerSlot });
+    console.log('Schedule settings:', { maxBookingsPerSlot, maxBouquetsPerSlot });
 
     // Step 2: Get open days (using business timezone for "today")
     const businessToday = getBusinessToday();
@@ -53,34 +53,35 @@ export const GET: APIRoute = async () => {
       return new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // Step 3: Get time slots for open days
+    // Step 3: Get time slots for open days (exclude legacy slots from customer booking)
     const { data: slots, error: slotError } = await supabase
       .from('time_slots')
-      .select('id, date, time, max_capacity')
-      .in('date', openDays.map(d => d.date));
+      .select('id, date, time, max_bouquets')
+      .in('date', openDays.map(d => d.date))
+      .eq('is_legacy', false); // Only show active slots to customers
 
     if (slotError || !slots) {
       return new Response(JSON.stringify({ error: slotError?.message }), { status: 500 });
     }
 
-    // Step 4: Get bookings to count both booking count and visitor count
+    // Step 4: Get bookings to count both booking count and bouquet count
     const { data: bookings, error: bookingError } = await supabase
       .from('bookings')
-      .select('id, date, time, number_of_visitors');
+      .select('id, date, time, number_of_bouquets');
 
     if (bookingError || !bookings) {
       return new Response(JSON.stringify({ error: bookingError?.message }), { status: 500 });
     }
 
-    // Step 5: Organize availability - count both bookings and visitors per slot
-    const slotUsageMap = new Map<string, { bookingCount: number; visitorCount: number }>();
+    // Step 5: Organize availability - count both bookings and bouquets per slot
+    const slotUsageMap = new Map<string, { bookingCount: number; bouquetCount: number }>();
 
     for (const b of bookings) {
       const key = `${b.date}|${b.time}`;
-      const current = slotUsageMap.get(key) || { bookingCount: 0, visitorCount: 0 };
+      const current = slotUsageMap.get(key) || { bookingCount: 0, bouquetCount: 0 };
 
       current.bookingCount += 1;
-      current.visitorCount += (b.number_of_visitors || 1);
+      current.bouquetCount += (b.number_of_bouquets || 1);
 
       slotUsageMap.set(key, current);
     }
@@ -95,23 +96,23 @@ export const GET: APIRoute = async () => {
         .filter(slot => slot.date === day.date)
         .filter(slot => {
           const key = `${slot.date}|${slot.time}`;
-          const usage = slotUsageMap.get(key) || { bookingCount: 0, visitorCount: 0 };
+          const usage = slotUsageMap.get(key) || { bookingCount: 0, bouquetCount: 0 };
 
           // Check both limits using settings
           const bookingLimitReached = usage.bookingCount >= maxBookingsPerSlot;
-          const visitorLimitReached = usage.visitorCount >= maxVisitorsPerSlot;
+          const bouquetLimitReached = usage.bouquetCount >= maxBouquetsPerSlot;
 
           console.log(`Slot ${key}:`, {
             currentBookings: usage.bookingCount,
             maxBookings: maxBookingsPerSlot,
-            currentVisitors: usage.visitorCount,
-            maxCapacity: maxVisitorsPerSlot,
+            currentBouquets: usage.bouquetCount,
+            maxBouquets: maxBouquetsPerSlot,
             bookingLimitReached,
-            visitorLimitReached,
-            available: !bookingLimitReached && !visitorLimitReached
+            bouquetLimitReached,
+            available: !bookingLimitReached && !bouquetLimitReached
           });
 
-          return !bookingLimitReached && !visitorLimitReached;
+          return !bookingLimitReached && !bouquetLimitReached;
         })
         .map(slot => slot.time);
 

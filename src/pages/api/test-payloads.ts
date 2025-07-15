@@ -1,6 +1,10 @@
 // src/pages/api/test-payloads.ts
 import type { APIRoute } from 'astro';
 
+// Import the actual webhook service functions to show real payload structure
+// Note: We'll import the createStandardizedPayload function if it was exported
+// For now, we'll manually create payloads that match the actual webhook service structure
+
 /**
  * Generate standardized test payloads for all webhook event types
  * This endpoint helps verify the new unified payload structure
@@ -15,7 +19,7 @@ export const GET: APIRoute = async ({ url }) => {
     phone: '(555) 123-4567',
     visitDate: '2025-07-15',
     preferredTime: '10:00 AM',
-    numberOfVisitors: 2,
+    numberOfVisitors: 2, // Represents number of bouquets
     totalAmount: 70,
     paymentMethod: 'pay_on_arrival',
     createdAt: new Date().toISOString(),

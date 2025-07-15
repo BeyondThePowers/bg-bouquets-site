@@ -17,7 +17,7 @@ export const POST: APIRoute = async ({ request }) => {
       phone: '(555) 123-4567',
       visitDate: '2025-07-15',
       preferredTime: '10:00 AM',
-      numberOfVisitors: 2,
+      numberOfVisitors: 2, // Represents number of bouquets
       totalAmount: 70,
       paymentMethod: paymentStatus === 'completed' ? 'pay_now' : 'pay_on_arrival',
       createdAt: new Date().toISOString(),

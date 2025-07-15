@@ -64,4 +64,4 @@ Please think through this implementation carefully, step by step:
 - The booking confirmation process must handle both payment methods correctly
 - The form should integrate with the existing success/error handling
 
-Think carefully about each step of the implementation to ensure you don't break any existing functionality. Ask clarifying questions if needed. Keep styles consistent and follow best practices for UI/UX design always. Discuss your implementation plan with me before proceeding if you haven't already. If you have no questions proceed with implementaion.
+Think carefully about each step of the implementation to ensure you don't break any existing functionality. Ask clarifying questions if needed. Keep styles consistent and follow best practices for UI/UX design always. Discuss your implementation plan with me before proceeding if you haven't already. Always let me know if you need me to perform any actions in an external service, such as supabase SQL editor, etc. If you have no questions proceed with implementaion.

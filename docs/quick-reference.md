@@ -55,6 +55,7 @@ curl -X POST https://bluebellgardens.ca/api/bookings \
     "totalAmount": 35,
     "paymentMethod": "pay_now"
   }'
+# Note: API field is still "numberOfVisitors" for compatibility, but represents number of bouquets
 ```
 
 ---
