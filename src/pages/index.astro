@@ -131,12 +131,30 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 			</div>
 		</div>
-		<img loading="lazy" aria-hidden="true" src="/images/bg-bouquet-left-flower.webp" aria-hidden="true" alt="" pointer-events-none class="hero-decorative-flower-left-bottom desktop-decoration" />
-		<img loading="lazy" src="/images/bg-bouquet-right-flower.webp" aria-hidden="true" alt="" pointer-events-none class="hero-decorative-flower-right-bottom desktop-decoration" />
-		<img loading="lazy" src="/images/bg-bouguet-top-flowers.webp" aria-hidden="true" alt="" pointer-events-none class="hero-decorative-flower-left-top desktop-decoration" />
-		<img loading="lazy" src="/images/bg-bouguet-top-flowers.webp" aria-hidden="true" alt="" pointer-events-none class="hero-decorative-flower-left-top-2 desktop-decoration" />
-		<img loading="lazy" src="/images/bg-bouguet-top-flowers.webp" aria-hidden="true" alt="" pointer-events-none class="hero-decorative-flower-right-top-2 desktop-decoration" />
-		<img loading="lazy" src="/images/bg-bouguet-top-flowers.webp" aria-hidden="true" alt="" pointer-events-none class="hero-decorative-flower-right-top desktop-decoration" />
+		<picture class="hero-decorative-flower-left-bottom desktop-decoration">
+			<source media="(min-width: 1366px)" srcset="/images/bg-bouquet-left-flower.webp">
+			<img loading="lazy" aria-hidden="true" src="" alt="" decoding="async" style="pointer-events: none;" />
+		</picture>
+		<picture class="hero-decorative-flower-right-bottom desktop-decoration">
+			<source media="(min-width: 1366px)" srcset="/images/bg-bouquet-right-flower.webp">
+			<img loading="lazy" aria-hidden="true" src="" alt="" decoding="async" style="pointer-events: none;" />
+		</picture>
+		<picture class="hero-decorative-flower-left-top desktop-decoration">
+			<source media="(min-width: 1366px)" srcset="/images/bg-bouguet-top-flowers.webp">
+			<img loading="lazy" aria-hidden="true" src="" alt="" decoding="async" style="pointer-events: none;" />
+		</picture>
+		<picture class="hero-decorative-flower-left-top-2 desktop-decoration">
+			<source media="(min-width: 1366px)" srcset="/images/bg-bouguet-top-flowers.webp">
+			<img loading="lazy" aria-hidden="true" src="" alt="" decoding="async" style="pointer-events: none;" />
+		</picture>
+		<picture class="hero-decorative-flower-right-top-2 desktop-decoration">
+			<source media="(min-width: 1366px)" srcset="/images/bg-bouguet-top-flowers.webp">
+			<img loading="lazy" aria-hidden="true" src="" alt="" decoding="async" style="pointer-events: none;" />
+		</picture>
+		<picture class="hero-decorative-flower-right-top desktop-decoration">
+			<source media="(min-width: 1366px)" srcset="/images/bg-bouguet-top-flowers.webp">
+			<img loading="lazy" aria-hidden="true" src="" alt="" decoding="async" style="pointer-events: none;" />
+		</picture>
 	</section>
 
 	<!-- Pricing Banner Section -->
