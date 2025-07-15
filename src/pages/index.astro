@@ -286,7 +286,7 @@ import Layout from '../layouts/Layout.astro';
 																</svg>
 															</div>
 															<h4 class="font-playfair font-medium text-charcoal mb-2">Select a date</h4>
-															<p class="text-sm font-roboto text-gray-500">Choose a date from the calendar to see available time slots</p>
+															<p class="text-sm font-roboto" style="color: var(--color-status-neutral);">Choose a date from the calendar to see available time slots</p>
 														</div>
 														<!-- Time slot cards will be populated here by JavaScript -->
 														<div id="time-slots" class="hidden" role="radiogroup" aria-label="Select a time slot">
@@ -342,7 +342,7 @@ import Layout from '../layouts/Layout.astro';
 											>
 										</div>
 										<div>
-											<label for="phone" class="block text-sm font-playfair font-medium text-charcoal mb-2">Phone Number <span class="text-gray-500 font-normal">(optional)</span></label>
+											<label for="phone" class="block text-sm font-playfair font-medium text-charcoal mb-2">Phone Number <span class="font-normal" style="color: var(--color-status-neutral);">(optional)</span></label>
 											<input
 												type="tel"
 												id="phone"
@@ -1192,7 +1192,7 @@ import Layout from '../layouts/Layout.astro';
 				<!-- Image Placeholder -->
 				<div class="shabby-card p-8 distressed-shadow">
 					<div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
-						<span class="text-gray-500 font-roboto">Garden Image Placeholder</span>
+						<span class="font-roboto" style="color: var(--color-status-neutral);">Garden Image Placeholder</span>
 					</div>
 				</div>
 			</div>
@@ -2162,7 +2162,7 @@ import Layout from '../layouts/Layout.astro';
 				// Show "no slots available" message
 				noDateSelected.style.display = 'none';
 				timeSlotsContainer.classList.add('hidden');
-				timeSlotsContainer.innerHTML = '<div class="text-center py-8 px-4"><div class="text-gray-400 mb-2"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><h4 class="font-playfair font-medium text-charcoal mb-1">No available times</h4><p class="text-sm font-roboto text-gray-500">This date is fully booked. Please select another date.</p></div>';
+				timeSlotsContainer.innerHTML = '<div class="text-center py-8 px-4"><div class="mb-2" style="color: var(--color-status-neutral);"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><h4 class="font-playfair font-medium text-charcoal mb-1">No available times</h4><p class="text-sm font-roboto" style="color: var(--color-status-neutral);">This date is fully booked. Please select another date.</p></div>';
 				timeSlotsContainer.classList.remove('hidden');
 				return;
 			}
@@ -3813,8 +3813,8 @@ import Layout from '../layouts/Layout.astro';
 			// Check if currently in season
 			const isCurrentlyAvailable = flower.months.includes(currentMonth);
 			const availabilityStatus = isCurrentlyAvailable ?
-				'<span style="color: #22C55E; font-weight: 600;">● Available now</span>' :
-				'<span style="color: #F97316;">○ Out of season</span>';
+				'<span style="color: var(--color-status-available); font-weight: 600;">● Available now</span>' :
+				'<span style="color: var(--color-status-unavailable); font-weight: 600;">○ Out of season</span>';
 
 			// Format month range
 			const sortedMonths = [...flower.months].sort((a, b) => a - b);
@@ -3843,7 +3843,7 @@ import Layout from '../layouts/Layout.astro';
 				monthRanges.push(`${monthNames[rangeStart]}-${monthNames[rangeEnd]}`);
 			}
 
-			return `${availabilityStatus}<br><span style="color: #999;">${monthRanges.join(', ')}</span>`;
+			return `${availabilityStatus}<br><span style="color: var(--color-status-neutral);">${monthRanges.join(', ')}</span>`;
 		}
 
 

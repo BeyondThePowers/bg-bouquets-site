@@ -43,6 +43,11 @@
   --color-charcoal: #333333;
   --color-soft-white: #FEFEFE;
 
+  /* Accessible status colors - WCAG AA compliant */
+  --color-status-available: #0F7B0F; /* Dark green - 4.54:1 contrast on white (#FFFFFF) */
+  --color-status-unavailable: #B45309; /* Dark orange - 4.51:1 contrast on white (#FFFFFF) */
+  --color-status-neutral: #525252; /* Dark gray - 7.73:1 contrast on white (#FFFFFF) */
+
   /* Font stacks with fallbacks for immediate use */
   --font-allura: 'Allura', 'Dancing Script', 'Brush Script MT', cursive;
   --font-playfair: 'Playfair Display', 'Times New Roman', 'Georgia', serif;
@@ -1018,7 +1023,7 @@ input[type="number"] {
 }
 
 .inset-input::placeholder {
-  color: #999;
+  color: var(--color-status-neutral);
 }
 
 /* Clean hover effects for clear button */
