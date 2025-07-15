@@ -25,9 +25,9 @@ import Layout from '../layouts/Layout.astro';
 
 					<!-- Key Information -->
 					<div class="shabby-card p-6 distressed-shadow">
-						<h3 class="text-xl font-playfair font-bold text-charcoal mb-4 relative center-mobile-text keep-centered">
+						<h2 class="text-xl font-playfair font-bold text-charcoal mb-4 relative center-mobile-text keep-centered">
 							Visit Information
-						</h3>
+						</h2>
 						<div class="grid sm:grid-cols-2 gap-4 text-sm">
 							<div class="flex items-top space-x-3">
 								<div class="w-10 h-10 rounded-lg flex items-center justify-center vintage-border">
@@ -91,7 +91,7 @@ import Layout from '../layouts/Layout.astro';
 
 					<div class="mb-8">
 						<div class="font-allura mb-4 base-price" style="color: #E8B4B8;" id="hero-price">
-							$35
+							<div class="price-skeleton hero-price-skeleton"></div>
 						</div>
 						<div class="text-xl font-playfair font-semibold mb-2" style="color: #333333;">
 							Per Bouquet
@@ -374,7 +374,9 @@ import Layout from '../layouts/Layout.astro';
 													>
 													<button type="button" id="counter-plus" class="counter-btn plus" aria-label="Increase bouquet count">+</button>
 												</div>
-												<div class="counter-price" id="counter-price">$35 CAD</div>
+												<div class="counter-price" id="counter-price">
+													<div class="price-skeleton counter-price-skeleton"></div>
+												</div>
 												<div class="counter-message hidden" id="counter-message">For 30+ bouquets, please call us to confirm availability</div>
 											</div>
 										</div>
@@ -414,7 +416,9 @@ import Layout from '../layouts/Layout.astro';
 										<div class="total-price-display">
 											<div class="total-price-row">
 												<span class="total-label">Your Total:</span>
-												<span class="total-amount" id="booking-total-price">$40 CAD</span>
+												<span class="total-amount" id="booking-total-price">
+													<div class="price-skeleton total-price-skeleton"></div>
+												</span>
 											</div>
 										</div>
 									</div>
@@ -1375,7 +1379,7 @@ import Layout from '../layouts/Layout.astro';
 								</button>
 								<div class="faq-answer hidden overflow-hidden">
 									<div class="pt-2 pb-4">
-										<p class="font-roboto" style="color: #333333;">Your <span id="faq-price">$35</span> bouquet experience includes all cutting tools (professional shears), a collection vessel for gathering your flowers, expert guidance on flower selection and care, and detailed care instructions to keep your bouquet fresh longer. Free on-site parking is also included.</p>
+										<p class="font-roboto" style="color: #333333;">Your <span id="faq-price"><span class="price-skeleton faq-price-skeleton"></span></span> bouquet experience includes all cutting tools (professional shears), a collection vessel for gathering your flowers, expert guidance on flower selection and care, and detailed care instructions to keep your bouquet fresh longer. Free on-site parking is also included.</p>
 									</div>
 								</div>
 							</div>
@@ -1855,23 +1859,26 @@ import Layout from '../layouts/Layout.astro';
 			}); // Returns YYYY-MM-DD format
 		}
 
-		// Update all static price displays
+		// Update all static price displays and remove skeleton loaders
 		function updateStaticPriceDisplays() {
 			const formattedPrice = `$${currentBouquetPrice.toFixed(0)}`;
 
 			// Update hero section price
 			if (heroPrice) {
 				heroPrice.textContent = formattedPrice;
+				heroPrice.classList.add('price-loaded');
 			}
 
 			// Update FAQ price
 			if (faqPrice) {
 				faqPrice.textContent = formattedPrice;
+				faqPrice.classList.add('price-loaded');
 			}
 
 			// Update initial counter price (before user interaction)
 			if (counterPrice && bouquetsSelect.value === '1') {
 				counterPrice.textContent = `${formattedPrice} CAD`;
+				counterPrice.classList.add('price-loaded');
 			}
 		}
 
@@ -1907,8 +1914,9 @@ import Layout from '../layouts/Layout.astro';
 				currentVisitorPassPrice = 5.00;
 				maxVisitorPassesPerBooking = 20;
 
-				// Update displays with fallback prices
+				// Update displays with fallback prices (this will remove loading states)
 				updateStaticPriceDisplays();
+				updateTotalPrice();
 			}
 		}
 
@@ -1926,14 +1934,25 @@ import Layout from '../layouts/Layout.astro';
 			stepsContainer.classList.remove('show-step-1', 'show-step-2');
 			stepsContainer.classList.add(`show-step-${stepNumber}`);
 
-			// Update aria attributes for accessibility
+			// Update aria attributes and focusable elements for accessibility
 			steps.forEach((step, index) => {
 				if (index + 1 === stepNumber) {
 					step.setAttribute('aria-hidden', 'false');
 					step.classList.add('active');
+					// Enable focusable elements in active step
+					const focusableElements = step.querySelectorAll('input, select, button, textarea, [tabindex]');
+					focusableElements.forEach(el => {
+						el.removeAttribute('tabindex');
+						(el as HTMLElement).removeAttribute('inert');
+					});
 				} else {
 					step.setAttribute('aria-hidden', 'true');
 					step.classList.remove('active');
+					// Disable focusable elements in hidden steps
+					const focusableElements = step.querySelectorAll('input, select, button, textarea, [tabindex]:not([tabindex="-1"])');
+					focusableElements.forEach(el => {
+						(el as HTMLElement).setAttribute('tabindex', '-1');
+					});
 				}
 			});
 
@@ -2038,6 +2057,7 @@ import Layout from '../layouts/Layout.astro';
 			// Update bouquet counter price with pulse animation
 			if (counterPrice) {
 				counterPrice.classList.add('updating');
+				counterPrice.classList.add('price-loaded');
 				counterPrice.textContent = `$${bouquetTotal} CAD`;
 				setTimeout(() => counterPrice.classList.remove('updating'), 500);
 			}
@@ -2045,6 +2065,7 @@ import Layout from '../layouts/Layout.astro';
 			// Update visitor pass counter price with pulse animation
 			if (visitorCounterPrice) {
 				visitorCounterPrice.classList.add('updating');
+				visitorCounterPrice.classList.add('price-loaded');
 				visitorCounterPrice.textContent = `$${visitorPassTotal} CAD`;
 				setTimeout(() => visitorCounterPrice.classList.remove('updating'), 500);
 			}
@@ -2052,6 +2073,7 @@ import Layout from '../layouts/Layout.astro';
 			// Update total price with pulse animation
 			if (bookingTotalPrice) {
 				bookingTotalPrice.classList.add('updating');
+				bookingTotalPrice.classList.add('price-loaded');
 				bookingTotalPrice.textContent = `$${grandTotal.toFixed(2)} CAD`;
 				setTimeout(() => bookingTotalPrice.classList.remove('updating'), 500);
 			}

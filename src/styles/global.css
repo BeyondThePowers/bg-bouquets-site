@@ -521,9 +521,12 @@ input[name="paymentMethod"] {
 
 .what-to-expect-card-decorative-flower {
   width: 200px;
-  height: 83px;
+  height: auto;
+  aspect-ratio: 200 / 62; /* Use natural aspect ratio of the image */
+  object-fit: contain;
   pointer-events: none;
-  margin: 1.75rem auto
+  margin: 1.75rem auto;
+  display: block;
 }
 
 #home {
@@ -2168,4 +2171,53 @@ input[type="number"] {
 
 .base-price {
   font-size: 6rem;
+}
+
+/* Price skeleton loaders */
+.price-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Specific skeleton sizes for different price elements */
+.hero-price-skeleton {
+  width: 120px;
+  height: 80px;
+  border-radius: 8px;
+}
+
+.counter-price-skeleton {
+  width: 80px;
+  height: 20px;
+}
+
+.total-price-skeleton {
+  width: 90px;
+  height: 24px;
+}
+
+.faq-price-skeleton {
+  width: 40px;
+  height: 18px;
+  vertical-align: baseline;
+}
+
+/* Hide skeleton when price is loaded */
+.price-loaded .price-skeleton {
+  display: none;
 }
