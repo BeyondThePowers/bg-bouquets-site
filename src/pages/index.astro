@@ -3462,43 +3462,19 @@ import Layout from '../layouts/Layout.astro';
 				updateMobileFilterButton();
 			}, 250));
 
-			// Enhanced touch/swipe support for carousel
-			let startX = 0;
-			let currentX = 0;
-			let isDragging = false;
-			let startTime = 0;
-
+			// Scroll detection for updating current card index
 			const carouselContainer = mobileCarousel?.querySelector('.overflow-x-auto');
+			let scrollTimeout: NodeJS.Timeout;
 
-			carouselContainer?.addEventListener('touchstart', (e: any) => {
-				startX = e.touches[0].clientX;
-				startTime = Date.now();
-				isDragging = true;
-			}, { passive: true });
+			// Listen for scroll end to update current card index
+			carouselContainer?.addEventListener('scroll', () => {
+				// Clear previous timeout
+				clearTimeout(scrollTimeout);
 
-			carouselContainer?.addEventListener('touchmove', (e: any) => {
-				if (!isDragging) return;
-				currentX = e.touches[0].clientX;
-			}, { passive: true });
-
-			carouselContainer?.addEventListener('touchend', () => {
-				if (!isDragging) return;
-				const diff = startX - currentX;
-				const timeDiff = Date.now() - startTime;
-				const velocity = Math.abs(diff) / timeDiff;
-
-				// Lower threshold for faster swipes, higher for slower ones
-				const threshold = velocity > 0.5 ? 30 : 80;
-
-				if (Math.abs(diff) > threshold) {
-					// Navigate in the appropriate direction
-					if (diff > 0) {
-						navigateCarousel(1); // Swipe left = next flower
-					} else {
-						navigateCarousel(-1); // Swipe right = previous flower
-					}
-				}
-				isDragging = false;
+				// Set new timeout to detect when scrolling has stopped
+				scrollTimeout = setTimeout(() => {
+					updateCurrentCardFromScroll();
+				}, 150);
 			}, { passive: true });
 
 			// Keyboard navigation support
@@ -3747,7 +3723,37 @@ import Layout from '../layouts/Layout.astro';
 				currentCardIndex = filteredFlowers.length - 1; // Loop to end
 			}
 
-			updateDisplay();
+			// For button navigation, scroll to the target position
+			scrollToCurrentCard();
+			updateCarouselControls();
+		}
+
+		function scrollToCurrentCard() {
+			const carouselContainer = mobileCarousel?.querySelector('.overflow-x-auto');
+			if (carouselContainer && filteredFlowers.length > 0) {
+				const cardWidth = 336; // w-80 (320px) + gap-4 (16px) = 336px
+				const scrollPosition = currentCardIndex * cardWidth;
+
+				carouselContainer.scrollTo({
+					left: scrollPosition,
+					behavior: 'smooth'
+				});
+			}
+		}
+
+		function updateCurrentCardFromScroll() {
+			const carouselContainer = mobileCarousel?.querySelector('.overflow-x-auto');
+			if (!carouselContainer || filteredFlowers.length === 0) return;
+
+			const cardWidth = 336; // w-80 (320px) + gap-4 (16px) = 336px
+			const scrollLeft = carouselContainer.scrollLeft;
+			const newIndex = Math.round(scrollLeft / cardWidth);
+
+			// Only update if the index has actually changed and is valid
+			if (newIndex !== currentCardIndex && newIndex >= 0 && newIndex < filteredFlowers.length) {
+				currentCardIndex = newIndex;
+				updateCarouselControls();
+			}
 		}
 
 
@@ -4023,15 +4029,15 @@ import Layout from '../layouts/Layout.astro';
 			// Show all filtered flowers in carousel
 			carouselTrack.innerHTML = filteredFlowers.map(flower => createFlowerCard(flower)).join('');
 
-			// Scroll to current card position
-			const carouselContainer = mobileCarousel?.querySelector('.overflow-x-auto');
-			if (carouselContainer && filteredFlowers.length > 0) {
-				const cardWidth = 336; // w-80 (320px) + gap-4 (16px) = 336px
-				const scrollPosition = currentCardIndex * cardWidth;
+			// Reset to first card when content changes (like filtering)
+			currentCardIndex = 0;
 
+			// Scroll to first card without animation to avoid conflicts
+			const carouselContainer = mobileCarousel?.querySelector('.overflow-x-auto');
+			if (carouselContainer) {
 				carouselContainer.scrollTo({
-					left: scrollPosition,
-					behavior: 'smooth'
+					left: 0,
+					behavior: 'auto' // No animation for content updates
 				});
 			}
 
