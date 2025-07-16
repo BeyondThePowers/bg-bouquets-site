@@ -3653,7 +3653,12 @@ import Layout from '../layouts/Layout.astro';
 			// Update mobile filter button text
 			updateMobileFilterButton();
 
-			currentCardIndex = 0;
+			// Preserve current position when filtering - don't auto-reset
+			// Only reset if current position is now invalid
+			if (currentCardIndex >= filteredFlowers.length) {
+				currentCardIndex = Math.max(0, filteredFlowers.length - 1);
+			}
+
 			updateDisplay();
 		}
 
@@ -4119,14 +4124,18 @@ import Layout from '../layouts/Layout.astro';
 			// Show all filtered flowers in carousel
 			carouselTrack.innerHTML = filteredFlowers.map(flower => createFlowerCard(flower)).join('');
 
-			// Reset to first card when content changes (like filtering)
-			currentCardIndex = 0;
+			// Preserve user's position - only adjust if current position is invalid
+			if (currentCardIndex >= filteredFlowers.length) {
+				currentCardIndex = Math.max(0, filteredFlowers.length - 1);
+			}
 
-			// Scroll to first card without animation to avoid conflicts
+			// Scroll to current position (not always to start)
 			const carouselContainer = mobileCarousel?.querySelector('.overflow-x-auto');
-			if (carouselContainer) {
+			if (carouselContainer && filteredFlowers.length > 0) {
+				const cardWidth = 336; // w-80 (320px) + gap-4 (16px) = 336px
+				const scrollPosition = currentCardIndex * cardWidth;
 				carouselContainer.scrollTo({
-					left: 0,
+					left: scrollPosition,
 					behavior: 'auto' // No animation for content updates
 				});
 			}
@@ -4143,17 +4152,20 @@ import Layout from '../layouts/Layout.astro';
 		}
 
 		function updateCarouselControls() {
-			// For circular navigation, buttons are always enabled when there are flowers
 			const hasFlowers = filteredFlowers.length > 0;
+			const isAtStart = currentCardIndex === 0;
+			const isAtEnd = currentCardIndex >= filteredFlowers.length - 1;
 
+			// Previous button: disabled at start or when no flowers
 			if (prevBtn) {
-				prevBtn.disabled = !hasFlowers;
-				prevBtn.style.opacity = hasFlowers ? '1' : '0.5';
+				prevBtn.disabled = !hasFlowers || isAtStart;
+				prevBtn.style.opacity = (!hasFlowers || isAtStart) ? '0.5' : '1';
 			}
 
+			// Next button: disabled at end or when no flowers
 			if (nextBtn) {
-				nextBtn.disabled = !hasFlowers;
-				nextBtn.style.opacity = hasFlowers ? '1' : '0.5';
+				nextBtn.disabled = !hasFlowers || isAtEnd;
+				nextBtn.style.opacity = (!hasFlowers || isAtEnd) ? '0.5' : '1';
 			}
 		}
 
