@@ -4,7 +4,14 @@ Allow: /
 # Sitemap
 Sitemap: https://bgbouquet.com/sitemap.xml
 
-# Block access to admin areas
+# Block access to admin areas - CRITICAL SECURITY
+Disallow: /garden-mgmt
+Disallow: /garden-mgmt/
+Disallow: /garden-mgmt/*
+Disallow: /api/garden-mgmt/
+Disallow: /api/garden-mgmt/*
+Disallow: /api/admin/
+Disallow: /api/admin/*
 Disallow: /api/
 Disallow: /.env
 Disallow: /database-*

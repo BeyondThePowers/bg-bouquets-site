@@ -50,6 +50,30 @@
 /api/*
   Cache-Control: no-cache, no-store, must-revalidate
 
+# Admin routes - CRITICAL SECURITY PROTECTION
+/garden-mgmt/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: no-cache, no-store, must-revalidate, private
+  Pragma: no-cache
+  Expires: 0
+  Referrer-Policy: no-referrer
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+
+/api/garden-mgmt/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: no-cache, no-store, must-revalidate, private
+  Pragma: no-cache
+  Expires: 0
+  Referrer-Policy: no-referrer
+
+/api/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: no-cache, no-store, must-revalidate, private
+  Pragma: no-cache
+  Expires: 0
+  Referrer-Policy: no-referrer
+
 # HTTPS redirect (only applies when deployed with HTTPS)
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload

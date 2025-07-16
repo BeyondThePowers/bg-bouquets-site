@@ -1,5 +1,34 @@
 // Security and performance middleware
 export function onRequest(context, next) {
+  const url = new URL(context.request.url);
+
+  // Enhanced security for admin routes
+  if (url.pathname.startsWith('/garden-mgmt')) {
+    // Add extra security headers for admin pages
+    return next().then(response => {
+      const newResponse = new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: new Headers(response.headers)
+      });
+
+      // Prevent indexing and caching of admin pages
+      newResponse.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
+      newResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+      newResponse.headers.set('Pragma', 'no-cache');
+      newResponse.headers.set('Expires', '0');
+
+      // Enhanced security headers for admin
+      newResponse.headers.set('X-Frame-Options', 'DENY');
+      newResponse.headers.set('X-Content-Type-Options', 'nosniff');
+      newResponse.headers.set('X-XSS-Protection', '1; mode=block');
+      newResponse.headers.set('Referrer-Policy', 'no-referrer');
+      newResponse.headers.set('X-DNS-Prefetch-Control', 'off');
+
+      return newResponse;
+    });
+  }
+
   return next().then(response => {
     // Clone response to modify headers
     const newResponse = new Response(response.body, {
@@ -33,8 +62,7 @@ export function onRequest(context, next) {
     
     newResponse.headers.set('Content-Security-Policy', csp);
 
-    // Performance Headers
-    const url = new URL(context.request.url);
+    // Performance Headers (url already defined at top of function)
     
     // Cache static assets
     if (url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|webp|svg|woff|woff2|ttf|eot|ico)$/)) {

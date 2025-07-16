@@ -239,7 +239,10 @@ body {
 
 /* Form Elements */
 .form-group {
-	margin-bottom: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 120px;
 }
 
 /* Login form specific overrides */
@@ -254,9 +257,10 @@ body {
 .form-group label {
 	display: block;
 	margin-bottom: 6px;
+	font-weight: 500;
+	color: var(--admin-black);
+	font-size: 13px;
 	font-weight: 600;
-	color: var(--admin-gray-700);
-	font-size: 12px;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 }
@@ -265,7 +269,7 @@ body {
 .form-group textarea,
 .form-group select {
 	width: 100%;
-	padding: 8px 12px;
+	padding: 12px;
 	border: 1px solid var(--admin-gray-300);
 	border-radius: var(--radius);
 	font-size: 14px;

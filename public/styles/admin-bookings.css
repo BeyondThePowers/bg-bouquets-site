@@ -393,14 +393,6 @@ body {
 	min-width: 120px;
 }
 
-.form-group label {
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--admin-gray-700);
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-}
-
 .form-group input,
 .form-group select {
 	padding: 8px 12px;
@@ -934,6 +926,9 @@ body {
 	font-weight: 500;
 	color: var(--admin-black);
 	font-size: 13px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
 }
 
 .form-group input,
@@ -1332,7 +1327,6 @@ body {
 		padding: 24px 16px;
 		margin: 12px;
 	}
-}
 
 	.payment-main {
 		font-size: 11px;
