@@ -907,14 +907,102 @@ import Layout from '../layouts/Layout.astro';
 						<div class="flex flex-col sm:flex-row gap-4 lg:gap-6">
 
 
-							<!-- Filter Dropdowns -->
-							<div class="flex flex-row gap-3">
+							<!-- Mobile Filter Button (Hidden on Desktop) -->
+							<div class="lg:hidden mt-4">
+								<button id="mobileFilterBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-lg vintage-border font-roboto text-sm" style="background-color: #FAF7F4; color: #333333; border-color: #E8B4B8;" aria-expanded="false" aria-controls="mobileFilters">
+									<div class="flex items-center space-x-2">
+										<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+											<path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"></path>
+										</svg>
+										<span id="mobileFilterText">Filters</span>
+									</div>
+									<svg id="mobileFilterChevron" class="w-4 h-4 transition-transform duration-200" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+										<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+									</svg>
+								</button>
+							</div>
+
+							<!-- Mobile Collapsible Filters -->
+							<div id="mobileFilters" class="lg:hidden overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0;">
+								<div class="pt-4 pb-2">
+									<div class="flex flex-col gap-4">
+										<div>
+											<div class="mb-2">
+												<label for="colorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
+											</div>
+											<div class="relative">
+												<select id="colorFilter" name="colorFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm w-full appearance-none" aria-label="Filter flowers by color">
+													<option value="">All</option>
+													<option value="red">Red</option>
+													<option value="pink">Pink</option>
+													<option value="white">White</option>
+													<option value="yellow">Yellow</option>
+													<option value="purple">Purple</option>
+													<option value="orange">Orange</option>
+													<option value="blue">Blue</option>
+												</select>
+												<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+													<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+														<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+													</svg>
+												</div>
+											</div>
+										</div>
+
+										<div>
+											<div class="mb-2">
+												<label for="occasionFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Occasion</label>
+											</div>
+											<div class="relative">
+												<select id="occasionFilter" name="occasionFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm w-full appearance-none" aria-label="Filter flowers by occasion">
+													<option value="">All</option>
+													<option value="wedding">Wedding</option>
+													<option value="birthday">Birthday</option>
+													<option value="anniversary">Anniversary</option>
+													<option value="sympathy">Sympathy</option>
+													<option value="everyday">Everyday</option>
+												</select>
+												<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+													<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+														<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+													</svg>
+												</div>
+											</div>
+										</div>
+
+										<div>
+											<div class="mb-2">
+												<label for="seasonFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Season</label>
+											</div>
+											<div class="relative">
+												<select id="seasonFilter" name="seasonFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm w-full appearance-none" aria-label="Filter flowers by season">
+													<option value="">All Year</option>
+													<option value="current">Available Now</option>
+													<option value="6">June</option>
+													<option value="7">July</option>
+													<option value="8">August</option>
+													<option value="9">September</option>
+													<option value="10">October</option>
+												</select>
+												<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+													<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
+														<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+													</svg>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Desktop Filter Dropdowns (Always Visible) -->
+							<div class="hidden lg:flex lg:flex-row gap-3 mt-4">
 								<div>
 									<div class="mb-2">
-										<label for="colorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
+										<label for="desktopColorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
 									</div>
 									<div class="relative">
-										<select id="colorFilter" name="colorFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-28 appearance-none" aria-label="Filter flowers by color">
+										<select id="desktopColorFilter" name="desktopColorFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-28 appearance-none" aria-label="Filter flowers by color">
 											<option value="">All</option>
 											<option value="red">Red</option>
 											<option value="pink">Pink</option>
@@ -934,10 +1022,10 @@ import Layout from '../layouts/Layout.astro';
 
 								<div>
 									<div class="mb-2">
-										<label for="occasionFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Occasion</label>
+										<label for="desktopOccasionFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Occasion</label>
 									</div>
 									<div class="relative">
-										<select id="occasionFilter" name="occasionFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by occasion">
+										<select id="desktopOccasionFilter" name="desktopOccasionFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by occasion">
 											<option value="">All</option>
 											<option value="wedding">Wedding</option>
 											<option value="birthday">Birthday</option>
@@ -955,10 +1043,10 @@ import Layout from '../layouts/Layout.astro';
 
 								<div>
 									<div class="mb-2">
-										<label for="seasonFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Season</label>
+										<label for="desktopSeasonFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Season</label>
 									</div>
 									<div class="relative">
-										<select id="seasonFilter" name="seasonFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by season">
+										<select id="desktopSeasonFilter" name="desktopSeasonFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by season">
 											<option value="">All Year</option>
 											<option value="current">Available Now</option>
 											<option value="6">June</option>
@@ -1607,7 +1695,7 @@ import Layout from '../layouts/Layout.astro';
 					<a href="/#about" class="hover:text-dusty-rose transition-colors duration-300">About</a>
 					<a href="/#location" class="hover:text-dusty-rose transition-colors duration-300">Location</a>
 				</div>
-				<div class="text-xs text-gray-400">
+				<div class="text-xs text-charcoal">
 					<p>&copy; 2025 BG Bouquet Garden. All rights reserved.</p>
 				</div>
 			</div>
@@ -3299,6 +3387,9 @@ import Layout from '../layouts/Layout.astro';
 			desktopGrid: ''
 		};
 
+		// Mobile filter state
+		let mobileFiltersExpanded = false;
+
 		// Create autocomplete suggestions from flower names
 		const commonTypos = {
 			'rose': ['roses', 'ros', 'roze'],
@@ -3317,9 +3408,21 @@ import Layout from '../layouts/Layout.astro';
 		const searchInput = document.getElementById('flowerSearch') as HTMLInputElement;
 		const searchClear = document.getElementById('searchClear') as HTMLElement;
 		const searchSuggestions = document.getElementById('searchSuggestions') as HTMLElement;
+
+		// Mobile filter elements
+		const mobileFilterBtn = document.getElementById('mobileFilterBtn') as HTMLButtonElement;
+		const mobileFilters = document.getElementById('mobileFilters') as HTMLElement;
+		const mobileFilterText = document.getElementById('mobileFilterText') as HTMLElement;
+		const mobileFilterChevron = document.getElementById('mobileFilterChevron') as HTMLElement;
 		const colorFilter = document.getElementById('colorFilter') as HTMLSelectElement;
 		const occasionFilter = document.getElementById('occasionFilter') as HTMLSelectElement;
 		const seasonFilter = document.getElementById('seasonFilter') as HTMLSelectElement;
+
+		// Desktop filter elements
+		const desktopColorFilter = document.getElementById('desktopColorFilter') as HTMLSelectElement;
+		const desktopOccasionFilter = document.getElementById('desktopOccasionFilter') as HTMLSelectElement;
+		const desktopSeasonFilter = document.getElementById('desktopSeasonFilter') as HTMLSelectElement;
+
 		const mobileCarousel = document.getElementById('mobileCarousel') as HTMLElement;
 		const desktopGrid = document.getElementById('desktopGrid') as HTMLElement;
 		const carouselTrack = document.getElementById('carouselTrack') as HTMLElement;
@@ -3355,12 +3458,18 @@ import Layout from '../layouts/Layout.astro';
 			searchInput?.addEventListener('blur', debounce(hideSuggestions, 200));
 			searchClear?.addEventListener('click', clearSearch);
 
-			// Filter functionality
+			// Mobile filter toggle
+			mobileFilterBtn?.addEventListener('click', toggleMobileFilters);
+
+			// Mobile filter functionality
 			colorFilter?.addEventListener('change', applyFilters);
 			occasionFilter?.addEventListener('change', applyFilters);
 			seasonFilter?.addEventListener('change', applyFilters);
 
-
+			// Desktop filter functionality
+			desktopColorFilter?.addEventListener('change', applyFilters);
+			desktopOccasionFilter?.addEventListener('change', applyFilters);
+			desktopSeasonFilter?.addEventListener('change', applyFilters);
 
 			// Carousel controls
 			prevBtn?.addEventListener('click', () => navigateCarousel(-1));
@@ -3371,6 +3480,12 @@ import Layout from '../layouts/Layout.astro';
 
 			// Flower navigation dropdown
 			flowerNavBtn?.addEventListener('click', toggleFlowerNavDropdown);
+
+			// Window resize handler to sync filters between mobile and desktop
+			window.addEventListener('resize', debounce(() => {
+				// Update mobile filter button when switching views
+				updateMobileFilterButton();
+			}, 250));
 
 			// Keyboard support for dropdown
 			flowerNavBtn?.addEventListener('keydown', (e: any) => {
@@ -3476,11 +3591,65 @@ import Layout from '../layouts/Layout.astro';
 			applyFilters();
 		}
 
+		function toggleMobileFilters() {
+			mobileFiltersExpanded = !mobileFiltersExpanded;
+
+			if (mobileFiltersExpanded) {
+				// Expand filters
+				mobileFilters.style.maxHeight = mobileFilters.scrollHeight + 'px';
+				mobileFilterBtn.setAttribute('aria-expanded', 'true');
+				mobileFilterChevron.style.transform = 'rotate(180deg)';
+			} else {
+				// Collapse filters
+				mobileFilters.style.maxHeight = '0';
+				mobileFilterBtn.setAttribute('aria-expanded', 'false');
+				mobileFilterChevron.style.transform = 'rotate(0deg)';
+			}
+		}
+
+		function getActiveFilterCount() {
+			let count = 0;
+
+			// Check mobile filters (when on mobile)
+			if (window.innerWidth < 1024) {
+				if (colorFilter?.value) count++;
+				if (occasionFilter?.value) count++;
+				if (seasonFilter?.value) count++;
+			} else {
+				// Check desktop filters (when on desktop)
+				if (desktopColorFilter?.value) count++;
+				if (desktopOccasionFilter?.value) count++;
+				if (desktopSeasonFilter?.value) count++;
+			}
+
+			return count;
+		}
+
+		function updateMobileFilterButton() {
+			const activeCount = getActiveFilterCount();
+			if (activeCount > 0) {
+				mobileFilterText.textContent = `Filters (${activeCount})`;
+			} else {
+				mobileFilterText.textContent = 'Filters';
+			}
+		}
+
 		function applyFilters() {
 			const query = searchInput?.value.toLowerCase() || '';
-			const color = colorFilter?.value || '';
-			const occasion = occasionFilter?.value || '';
-			const season = seasonFilter?.value || '';
+
+			// Get filter values based on screen size
+			let color, occasion, season;
+			if (window.innerWidth < 1024) {
+				// Mobile filters
+				color = colorFilter?.value || '';
+				occasion = occasionFilter?.value || '';
+				season = seasonFilter?.value || '';
+			} else {
+				// Desktop filters
+				color = desktopColorFilter?.value || '';
+				occasion = desktopOccasionFilter?.value || '';
+				season = desktopSeasonFilter?.value || '';
+			}
 
 			// Get current month for "Available Now" filter
 			const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-indexed
@@ -3516,6 +3685,9 @@ import Layout from '../layouts/Layout.astro';
 
 			// Always sort alphabetically (default behavior)
 			filteredFlowers.sort((a, b) => a.name.localeCompare(b.name));
+
+			// Update mobile filter button text
+			updateMobileFilterButton();
 
 			currentCardIndex = 0;
 			updateDisplay();
@@ -3582,10 +3754,15 @@ import Layout from '../layouts/Layout.astro';
 			searchClear?.classList.add('hidden');
 			hideSuggestions();
 
-			// Reset all filters
+			// Reset mobile filters
 			if (colorFilter) colorFilter.value = '';
 			if (occasionFilter) occasionFilter.value = '';
 			if (seasonFilter) seasonFilter.value = '';
+
+			// Reset desktop filters
+			if (desktopColorFilter) desktopColorFilter.value = '';
+			if (desktopOccasionFilter) desktopOccasionFilter.value = '';
+			if (desktopSeasonFilter) desktopSeasonFilter.value = '';
 
 			applyFilters();
 		}
@@ -3679,7 +3856,7 @@ import Layout from '../layouts/Layout.astro';
 		}
 
 		function disableFiltersAndControls() {
-			// Disable filters (but keep them visible)
+			// Disable mobile filters
 			if (colorFilter) {
 				colorFilter.disabled = true;
 				colorFilter.style.opacity = '0.5';
@@ -3695,10 +3872,34 @@ import Layout from '../layouts/Layout.astro';
 				seasonFilter.style.opacity = '0.5';
 				seasonFilter.style.cursor = 'not-allowed';
 			}
+
+			// Disable desktop filters
+			if (desktopColorFilter) {
+				desktopColorFilter.disabled = true;
+				desktopColorFilter.style.opacity = '0.5';
+				desktopColorFilter.style.cursor = 'not-allowed';
+			}
+			if (desktopOccasionFilter) {
+				desktopOccasionFilter.disabled = true;
+				desktopOccasionFilter.style.opacity = '0.5';
+				desktopOccasionFilter.style.cursor = 'not-allowed';
+			}
+			if (desktopSeasonFilter) {
+				desktopSeasonFilter.disabled = true;
+				desktopSeasonFilter.style.opacity = '0.5';
+				desktopSeasonFilter.style.cursor = 'not-allowed';
+			}
+
+			// Disable mobile filter button
+			if (mobileFilterBtn) {
+				mobileFilterBtn.disabled = true;
+				mobileFilterBtn.style.opacity = '0.5';
+				mobileFilterBtn.style.cursor = 'not-allowed';
+			}
 		}
 
 		function enableFiltersAndControls() {
-			// Enable filters
+			// Enable mobile filters
 			if (colorFilter) {
 				colorFilter.disabled = false;
 				colorFilter.style.opacity = '1';
@@ -3713,6 +3914,30 @@ import Layout from '../layouts/Layout.astro';
 				seasonFilter.disabled = false;
 				seasonFilter.style.opacity = '1';
 				seasonFilter.style.cursor = 'pointer';
+			}
+
+			// Enable desktop filters
+			if (desktopColorFilter) {
+				desktopColorFilter.disabled = false;
+				desktopColorFilter.style.opacity = '1';
+				desktopColorFilter.style.cursor = 'pointer';
+			}
+			if (desktopOccasionFilter) {
+				desktopOccasionFilter.disabled = false;
+				desktopOccasionFilter.style.opacity = '1';
+				desktopOccasionFilter.style.cursor = 'pointer';
+			}
+			if (desktopSeasonFilter) {
+				desktopSeasonFilter.disabled = false;
+				desktopSeasonFilter.style.opacity = '1';
+				desktopSeasonFilter.style.cursor = 'pointer';
+			}
+
+			// Enable mobile filter button
+			if (mobileFilterBtn) {
+				mobileFilterBtn.disabled = false;
+				mobileFilterBtn.style.opacity = '1';
+				mobileFilterBtn.style.cursor = 'pointer';
 			}
 		}
 
