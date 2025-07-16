@@ -1063,10 +1063,6 @@ import Layout from '../layouts/Layout.astro';
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 
 			<!-- Mobile Carousel View -->
 			<div id="mobileCarousel" class="lg:hidden">
@@ -3792,6 +3788,14 @@ import Layout from '../layouts/Layout.astro';
 			updateDisplay();
 		}
 
+		function navigateToIndex(targetIndex: number) {
+			if (filteredFlowers.length === 0 || targetIndex < 0 || targetIndex >= filteredFlowers.length) return;
+
+			// Set the target index directly
+			currentCardIndex = targetIndex;
+			updateDisplay();
+		}
+
 		function updateDisplay() {
 			const query = searchInput?.value.toLowerCase() || '';
 			const hasSearchQuery = query.length > 0;
@@ -4129,9 +4133,9 @@ import Layout from '../layouts/Layout.astro';
 				item.setAttribute('aria-label', `Go to ${flower.name}`);
 
 				item.addEventListener('click', () => {
-					currentCardIndex = index;
+					// Navigate directly to selected index
+					navigateToIndex(index);
 					hideFlowerNavDropdown();
-					updateDisplay();
 				});
 
 				flowerNavList.appendChild(item);
