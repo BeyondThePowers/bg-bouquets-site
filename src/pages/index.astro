@@ -863,16 +863,14 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 
 			<!-- Search and Controls -->
-			<div class="mb-12">
+			<div class="mb-12 search-and-controls">
 				<div class="max-w-6xl mx-auto">
 					<!-- Desktop: Side by side layout -->
-					<div class="flex flex-col lg:flex-row lg:items-end gap-6">
+					<div class="mb-8">
 
 						<!-- Search Section -->
-						<div class="flex-1">
-							<div class="mb-3">
-								<h3 class="text-lg font-playfair font-semibold" style="color: #333333;">Search Flowers</h3>
-							</div>
+						<div class="search-section">
+								<h3 class="text-lg font-playfair font-semibold mx-auto text-center mb-4" style="color: #333333;">Search Flowers</h3>
 							<div class="relative">
 								<label for="flowerSearch" class="sr-only">Search for flowers</label>
 								<input
@@ -904,11 +902,9 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 
 						<!-- Filters Section -->
-						<div class="flex flex-col sm:flex-row gap-4 lg:gap-6">
-
-
+						<div class="lg:flex-1">
 							<!-- Mobile Filter Button (Hidden on Desktop) -->
-							<div class="lg:hidden mt-4">
+							<div class="mt-4">
 								<button id="mobileFilterBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-lg vintage-border font-roboto text-sm" style="background-color: #FAF7F4; color: #333333; border-color: #E8B4B8;" aria-expanded="false" aria-controls="mobileFilters">
 									<div class="flex items-center space-x-2">
 										<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -923,7 +919,7 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 
 							<!-- Mobile Collapsible Filters -->
-							<div id="mobileFilters" class="lg:hidden overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0;">
+							<div id="mobileFilters" class="overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0;">
 								<div class="pt-4 pb-2">
 									<div class="flex flex-col gap-4">
 										<div>
@@ -996,7 +992,11 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 
 							<!-- Desktop Filter Dropdowns (Always Visible) -->
-							<div class="hidden lg:flex lg:flex-row gap-3 mt-4">
+							<div class="hidden lg:block">
+								<div class="mb-3">
+									<h3 class="text-lg font-playfair font-semibold" style="color: #333333;">Filter Flowers</h3>
+								</div>
+								<div class="flex flex-row gap-3">
 								<div>
 									<div class="mb-2">
 										<label for="desktopColorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
@@ -1063,6 +1063,9 @@ import Layout from '../layouts/Layout.astro';
 									</div>
 								</div>
 							</div>
+						</div>
+				</div>
+			</div>
 
 			<!-- Mobile Carousel View -->
 			<div id="mobileCarousel" class="lg:hidden">
