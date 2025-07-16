@@ -1082,24 +1082,8 @@ import Layout from '../layouts/Layout.astro';
 							</svg>
 						</button>
 
-						<!-- Flower Navigation Dropdown -->
-						<div class="relative">
-							<button id="flowerNavBtn" class="px-4 py-2 rounded-lg vintage-border font-roboto text-sm min-h-12 flex items-center space-x-2" style="background-color: #FAF7F4; color: #333333; border-color: #E8B4B8;" aria-label="Select flower to view">
-								<span id="flowerNavText">1 of 15</span>
-								<svg class="w-4 h-4" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-									<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-								</svg>
-							</button>
-
-							<!-- Dropdown Menu -->
-							<div id="flowerNavDropdown" class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 max-h-60 overflow-y-auto bg-white rounded-lg shadow-lg border-2 hidden z-20" style="border-color: #E8B4B8;">
-								<div class="p-2">
-									<div id="flowerNavList" class="space-y-1">
-										<!-- Flower list will be populated by JavaScript -->
-									</div>
-								</div>
-							</div>
-						</div>
+						<!-- Spacer for centered layout -->
+						<div></div>
 
 						<button id="nextBtn" class="p-3 rounded-lg vintage-border min-w-12 min-h-12" style="background-color: #FAF7F4; color: #E8B4B8;" aria-label="Next flower">
 							<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -3386,6 +3370,8 @@ import Layout from '../layouts/Layout.astro';
 		// Mobile filter state
 		let mobileFiltersExpanded = false;
 
+
+
 		// Create autocomplete suggestions from flower names
 		const commonTypos = {
 			'rose': ['roses', 'ros', 'roze'],
@@ -3424,10 +3410,6 @@ import Layout from '../layouts/Layout.astro';
 		const carouselTrack = document.getElementById('carouselTrack') as HTMLElement;
 		const prevBtn = document.getElementById('prevBtn') as HTMLButtonElement;
 		const nextBtn = document.getElementById('nextBtn') as HTMLButtonElement;
-		const flowerNavBtn = document.getElementById('flowerNavBtn') as HTMLButtonElement;
-		const flowerNavText = document.getElementById('flowerNavText') as HTMLElement;
-		const flowerNavDropdown = document.getElementById('flowerNavDropdown') as HTMLElement;
-		const flowerNavList = document.getElementById('flowerNavList') as HTMLElement;
 		const noResults = document.getElementById('noResults') as HTMLElement;
 		const resetSearchBtn = document.getElementById('resetSearchBtn') as HTMLButtonElement;
 		const flowerRequestForm = document.getElementById('flowerRequestForm') as HTMLFormElement;
@@ -3474,31 +3456,11 @@ import Layout from '../layouts/Layout.astro';
 			// Reset search button
 			resetSearchBtn?.addEventListener('click', resetSearch);
 
-			// Flower navigation dropdown
-			flowerNavBtn?.addEventListener('click', toggleFlowerNavDropdown);
-
 			// Window resize handler to sync filters between mobile and desktop
 			window.addEventListener('resize', debounce(() => {
 				// Update mobile filter button when switching views
 				updateMobileFilterButton();
 			}, 250));
-
-			// Keyboard support for dropdown
-			flowerNavBtn?.addEventListener('keydown', (e: any) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					toggleFlowerNavDropdown();
-				} else if (e.key === 'Escape') {
-					hideFlowerNavDropdown();
-				}
-			});
-
-			// Close dropdown when clicking outside
-			document.addEventListener('click', (e) => {
-				if (!flowerNavBtn?.contains(e.target as Node) && !flowerNavDropdown?.contains(e.target as Node)) {
-					hideFlowerNavDropdown();
-				}
-			});
 
 			// Enhanced touch/swipe support for carousel
 			let startX = 0;
@@ -3788,13 +3750,7 @@ import Layout from '../layouts/Layout.astro';
 			updateDisplay();
 		}
 
-		function navigateToIndex(targetIndex: number) {
-			if (filteredFlowers.length === 0 || targetIndex < 0 || targetIndex >= filteredFlowers.length) return;
 
-			// Set the target index directly
-			currentCardIndex = targetIndex;
-			updateDisplay();
-		}
 
 		function updateDisplay() {
 			const query = searchInput?.value.toLowerCase() || '';
@@ -4080,7 +4036,6 @@ import Layout from '../layouts/Layout.astro';
 			}
 
 			updateCarouselControls();
-			updateFlowerNavigation();
 		}
 
 
@@ -4105,60 +4060,9 @@ import Layout from '../layouts/Layout.astro';
 			}
 		}
 
-		function updateFlowerNavigation() {
-			if (!flowerNavText || !flowerNavList) return;
 
-			const totalFlowers = filteredFlowers.length;
-			const currentFlower = filteredFlowers[currentCardIndex];
 
-			// Update the button text
-			if (totalFlowers > 0 && currentFlower) {
-				flowerNavText.textContent = `${currentFlower.name} (${currentCardIndex + 1} of ${totalFlowers})`;
-			} else {
-				flowerNavText.textContent = '0 of 0';
-			}
 
-			// Update the dropdown list
-			flowerNavList.innerHTML = '';
-			filteredFlowers.forEach((flower, index) => {
-				const item = document.createElement('button');
-				item.className = `w-full text-left px-3 py-2 rounded font-roboto text-sm transition-colors duration-200 ${
-					index === currentCardIndex
-						? 'font-semibold'
-						: 'hover:bg-shabby-pink'
-				}`;
-				item.style.backgroundColor = index === currentCardIndex ? '#F8E7E8' : 'transparent';
-				item.style.color = '#333333';
-				item.textContent = `${index + 1}. ${flower.name}`;
-				item.setAttribute('aria-label', `Go to ${flower.name}`);
-
-				item.addEventListener('click', () => {
-					// Navigate directly to selected index
-					navigateToIndex(index);
-					hideFlowerNavDropdown();
-				});
-
-				flowerNavList.appendChild(item);
-			});
-		}
-
-		function toggleFlowerNavDropdown() {
-			if (!flowerNavDropdown) return;
-
-			if (flowerNavDropdown.classList.contains('hidden')) {
-				showFlowerNavDropdown();
-			} else {
-				hideFlowerNavDropdown();
-			}
-		}
-
-		function showFlowerNavDropdown() {
-			flowerNavDropdown?.classList.remove('hidden');
-		}
-
-		function hideFlowerNavDropdown() {
-			flowerNavDropdown?.classList.add('hidden');
-		}
 
 		async function handleFlowerRequest(e: Event) {
 			e.preventDefault();
