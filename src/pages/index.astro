@@ -1068,7 +1068,7 @@ import Layout from '../layouts/Layout.astro';
 			<div id="mobileCarousel" class="lg:hidden">
 				<div class="relative">
 					<!-- Carousel Container -->
-					<div class="overflow-x-auto scrollbar-hide touch-scroll px-4" style="scroll-snap-type: x mandatory; scroll-behavior: smooth;">
+					<div class="overflow-x-auto scrollbar-hide touch-scroll px-4" style="scroll-snap-type: x mandatory; scroll-behavior: smooth; scroll-snap-stop: always;">
 						<div id="carouselTrack" class="flex gap-4 pb-2" role="region" aria-label="Flower carousel" tabindex="0">
 							<!-- Flower cards will be inserted here by JavaScript -->
 						</div>
@@ -3912,8 +3912,10 @@ import Layout from '../layouts/Layout.astro';
 				'flower-card shabby-card distressed-shadow p-6 hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer group' :
 				'flower-card shabby-card distressed-shadow p-5 flex-shrink-0 w-80 sm:w-72 snap-center min-h-96 group';
 
+			const cardStyle = isDesktop ? '' : 'scroll-snap-stop: always;';
+
 			return `
-				<div class="${cardClass}">
+				<div class="${cardClass}" style="${cardStyle}">
 					<div class="relative mb-4 overflow-hidden rounded-lg">
 						<div class="w-full h-48 bg-gradient-to-br from-shabby-pink to-dusty-blue">
 							<img class="flower-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" src="./images/flowers/${flower.image}" alt="${flower.name}" />

@@ -137,6 +137,7 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 	.touch-scroll {
 		-webkit-overflow-scrolling: touch;
 		overscroll-behavior-x: contain;
+		scroll-snap-stop: always; /* Ensure each swipe stops at one card */
 	}
 
 	/* Mobile text alignment - Industry standard left-aligned approach */
