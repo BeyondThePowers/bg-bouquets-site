@@ -1,6 +1,6 @@
 // src/pages/api/garden-mgmt/toggle-payment.ts
 import type { APIRoute } from 'astro';
-import { supabaseAdmin } from '../../../../lib/supabase-admin';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {

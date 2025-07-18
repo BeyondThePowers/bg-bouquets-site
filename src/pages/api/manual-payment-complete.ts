@@ -61,7 +61,7 @@ export const POST: APIRoute = async ({ request }) => {
     console.log('✅ Booking updated to paid status');
 
     // Send confirmation email
-    const { sendBookingConfirmation } = await import('../../utils/webhookService');
+    const { sendBookingConfirmation } = await import('../../services/webhook');
     
     const bookingData = {
       id: updatedBooking.id,
