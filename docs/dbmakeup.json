@@ -1811,7 +1811,7 @@
   {
     "table_schema": "public",
     "table_name": "active_bookings",
-    "column_name": "number_of_visitors",
+    "column_name": "number_of_bouquets",
     "ordinal_position": 7,
     "data_type": "integer",
     "is_nullable": "YES",
@@ -1820,8 +1820,17 @@
   {
     "table_schema": "public",
     "table_name": "active_bookings",
-    "column_name": "total_amount",
+    "column_name": "number_of_visitor_passes",
     "ordinal_position": 8,
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "total_amount",
+    "ordinal_position": 9,
     "data_type": "numeric",
     "is_nullable": "YES",
     "column_default": null
@@ -1830,15 +1839,6 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "payment_method",
-    "ordinal_position": 9,
-    "data_type": "text",
-    "is_nullable": "YES",
-    "column_default": null
-  },
-  {
-    "table_schema": "public",
-    "table_name": "active_bookings",
-    "column_name": "payment_status",
     "ordinal_position": 10,
     "data_type": "text",
     "is_nullable": "YES",
@@ -1847,16 +1847,16 @@
   {
     "table_schema": "public",
     "table_name": "active_bookings",
-    "column_name": "created_at",
+    "column_name": "payment_status",
     "ordinal_position": 11,
-    "data_type": "timestamp without time zone",
+    "data_type": "text",
     "is_nullable": "YES",
     "column_default": null
   },
   {
     "table_schema": "public",
     "table_name": "active_bookings",
-    "column_name": "updated_at",
+    "column_name": "created_at",
     "ordinal_position": 12,
     "data_type": "timestamp without time zone",
     "is_nullable": "YES",
@@ -1865,8 +1865,17 @@
   {
     "table_schema": "public",
     "table_name": "active_bookings",
-    "column_name": "cancellation_token",
+    "column_name": "updated_at",
     "ordinal_position": 13,
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "cancellation_token",
+    "ordinal_position": 14,
     "data_type": "uuid",
     "is_nullable": "YES",
     "column_default": null
@@ -1875,7 +1884,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "status",
-    "ordinal_position": 14,
+    "ordinal_position": 15,
     "data_type": "character varying",
     "is_nullable": "YES",
     "column_default": null
@@ -1884,7 +1893,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "cancelled_at",
-    "ordinal_position": 15,
+    "ordinal_position": 16,
     "data_type": "timestamp with time zone",
     "is_nullable": "YES",
     "column_default": null
@@ -1893,7 +1902,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "reschedule_count",
-    "ordinal_position": 16,
+    "ordinal_position": 17,
     "data_type": "integer",
     "is_nullable": "YES",
     "column_default": null
@@ -1902,7 +1911,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "last_rescheduled_at",
-    "ordinal_position": 17,
+    "ordinal_position": 18,
     "data_type": "timestamp with time zone",
     "is_nullable": "YES",
     "column_default": null
@@ -1911,7 +1920,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "admin_refund_amount",
-    "ordinal_position": 18,
+    "ordinal_position": 19,
     "data_type": "numeric",
     "is_nullable": "YES",
     "column_default": null
@@ -1920,7 +1929,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "admin_refund_method",
-    "ordinal_position": 19,
+    "ordinal_position": 20,
     "data_type": "character varying",
     "is_nullable": "YES",
     "column_default": null
@@ -1929,7 +1938,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "admin_refund_notes",
-    "ordinal_position": 20,
+    "ordinal_position": 21,
     "data_type": "text",
     "is_nullable": "YES",
     "column_default": null
@@ -1938,7 +1947,7 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "admin_refund_date",
-    "ordinal_position": 21,
+    "ordinal_position": 22,
     "data_type": "timestamp with time zone",
     "is_nullable": "YES",
     "column_default": null
@@ -1947,8 +1956,62 @@
     "table_schema": "public",
     "table_name": "active_bookings",
     "column_name": "admin_refund_by",
-    "ordinal_position": 22,
+    "ordinal_position": 23,
     "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "square_order_id",
+    "ordinal_position": 24,
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "square_payment_id",
+    "ordinal_position": 25,
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "payment_completed_at",
+    "ordinal_position": 26,
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "version",
+    "ordinal_position": 27,
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "last_modified_by",
+    "ordinal_position": 28,
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_schema": "public",
+    "table_name": "active_bookings",
+    "column_name": "last_modified_ip",
+    "ordinal_position": 29,
+    "data_type": "inet",
     "is_nullable": "YES",
     "column_default": null
   },

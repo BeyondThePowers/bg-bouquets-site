@@ -87,8 +87,25 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         });
       }
 
+      // Provide more specific error messages based on the error type
+      let errorMessage = 'Failed to process reschedule. Please try again.';
+
+      if (error.message) {
+        if (error.message.includes('constraint') || error.message.includes('check')) {
+          errorMessage = 'Database constraint error. Please contact support.';
+        } else if (error.message.includes('not found')) {
+          errorMessage = 'Booking not found or already cancelled.';
+        } else if (error.message.includes('past date')) {
+          errorMessage = 'Cannot reschedule to past dates.';
+        } else if (error.message.includes('capacity') || error.message.includes('full')) {
+          errorMessage = 'Selected time slot is fully booked. Please choose another time.';
+        } else {
+          errorMessage = `Database error: ${error.message}`;
+        }
+      }
+
       return new Response(JSON.stringify({
-        error: `Database error: ${error.message || 'Failed to process reschedule. Please try again.'}`
+        error: errorMessage
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
