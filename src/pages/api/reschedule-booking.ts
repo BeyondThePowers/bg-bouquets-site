@@ -151,7 +151,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           bookingData.id,
           'reschedule',
           success,
-          success ? undefined : 'Failed after retries'
+          success ? null : 'Failed after retries',
+          1
         );
         if (success) {
           console.log('✅ Reschedule webhook sent successfully');
@@ -164,7 +165,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           bookingData.id,
           'reschedule',
           false,
-          error.message
+          error.message,
+          1
         );
       });
     }
