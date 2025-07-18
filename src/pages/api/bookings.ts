@@ -257,10 +257,11 @@ export const POST: APIRoute = async ({ request }) => {
       // Send webhook directly with retry logic (async, don't block response)
       sendBookingConfirmation(webhookBookingData, insertedBooking.cancellation_token).then(success => {
         logWebhookAttempt(
-          webhookBookingData.id,
-          'confirmation',
+          'booking_confirmed',
+          webhookBookingData,
           success,
-          success ? undefined : 'Failed after retries'
+          success ? null : 'Failed after retries',
+          1
         );
         if (success) {
           console.log('✅ Booking confirmation webhook sent successfully');
@@ -270,10 +271,11 @@ export const POST: APIRoute = async ({ request }) => {
       }).catch(error => {
         console.error('Webhook sending failed:', error);
         logWebhookAttempt(
-          webhookBookingData.id,
-          'confirmation',
+          'booking_confirmed',
+          webhookBookingData,
           false,
-          error.message
+          error.message,
+          1
         );
       });
     }
