@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
 function getBusinessToday(): string {

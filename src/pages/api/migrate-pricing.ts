@@ -1,6 +1,6 @@
 // src/pages/api/migrate-pricing.ts
 import type { APIRoute } from 'astro';
-import { supabaseAdmin } from '../../../lib/supabase-admin';
+import { supabaseAdmin } from '../../lib/supabase-admin';
 
 export const POST: APIRoute = async () => {
   try {

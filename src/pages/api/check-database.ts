@@ -1,6 +1,6 @@
 // Diagnostic endpoint to check database schema and data
 import type { APIRoute } from 'astro';
-import { supabaseAdmin } from '../../../lib/supabase-admin';
+import { supabaseAdmin } from '../../lib/supabase-admin';
 
 export const GET: APIRoute = async () => {
   try {

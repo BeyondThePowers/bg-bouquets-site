@@ -1,4 +1,4 @@
-// src/utils/squareService.ts
+// src/services/square.ts
 import { ApiClient, OrdersApi, CreateOrderRequest } from 'square-connect';
 
 // Square configuration - get from environment
@@ -80,20 +80,13 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
   try {
     console.log('Creating Square payment link for booking:', booking.bookingId);
 
-    // Initialize Square client
-    const { ordersApi, config, apiClient } = getSquareClient();
+    const { ordersApi, config } = getSquareClient();
 
-    // Validate required environment variables
-    if (!config.SQUARE_ACCESS_TOKEN || !config.SQUARE_LOCATION_ID) {
-      console.error('Missing Square configuration:', {
-        hasAccessToken: !!config.SQUARE_ACCESS_TOKEN,
-        hasLocationId: !!config.SQUARE_LOCATION_ID
-      });
-      return {
-        success: false,
-        error: 'Square payment configuration is incomplete'
-      };
+    if (!config.SQUARE_LOCATION_ID) {
+      throw new Error('Square location ID is not configured');
     }
+
+    console.log('Using Square location ID:', config.SQUARE_LOCATION_ID);
 
     // Create payment link directly with order data (no need for separate order creation)
 
@@ -118,10 +111,10 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
       }
     };
 
-    console.log('Creating Square payment link:', JSON.stringify(paymentLinkRequest, null, 2));
+    console.log('Payment link request:', JSON.stringify(paymentLinkRequest, null, 2));
 
-    // Use direct HTTP request since the old SDK doesn't support Payment Links API
-    const response = await fetch(`${apiClient.basePath}/v2/online-checkout/payment-links`, {
+    // Use the Payment Links API
+    const response = await fetch(`${ordersApi.apiClient.basePath}/v2/online-checkout/payment-links`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${config.SQUARE_ACCESS_TOKEN}`,
@@ -131,55 +124,37 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
       body: JSON.stringify(paymentLinkRequest)
     });
 
+    const responseData = await response.json();
+    console.log('Square payment link response:', JSON.stringify(responseData, null, 2));
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Square payment link creation failed:', response.status, errorText);
-      throw new Error(`Payment link creation failed: ${response.status} ${errorText}`);
+      console.error('Square API error:', responseData);
+      throw new Error(`Square API error: ${responseData.errors?.[0]?.detail || 'Unknown error'}`);
     }
 
-    const paymentLinkResponse = await response.json();
-
-    console.log('🔍 Full Square API Response:', JSON.stringify(paymentLinkResponse, null, 2));
-
-    if (!paymentLinkResponse.payment_link?.url) {
-      console.error('Failed to create Square payment link:', paymentLinkResponse);
-      return {
-        success: false,
-        error: 'Failed to create payment link'
-      };
+    if (responseData.errors && responseData.errors.length > 0) {
+      console.error('Square API errors:', responseData.errors);
+      throw new Error(`Square API error: ${responseData.errors[0].detail}`);
     }
 
-    console.log('Square payment link created successfully:', paymentLinkResponse.payment_link.url);
+    const paymentLink = responseData.payment_link;
+    if (!paymentLink || !paymentLink.url) {
+      throw new Error('No payment URL returned from Square');
+    }
 
-    // Extract order ID from related_resources (this is where Square puts the actual order ID)
-    const orderId = paymentLinkResponse.related_resources?.orders?.[0]?.id || 'unknown';
-    console.log('🎯 Square order ID extracted:', orderId);
-    console.log('🔍 Related resources structure:', JSON.stringify(paymentLinkResponse.related_resources, null, 2));
+    console.log('✅ Square payment link created successfully:', paymentLink.url);
 
     return {
       success: true,
-      paymentUrl: paymentLinkResponse.payment_link.url,
-      orderId: orderId
+      paymentUrl: paymentLink.url,
+      orderId: paymentLink.order_id
     };
 
   } catch (error) {
-    console.error('Error creating Square payment link:', error);
-
-    // Check if it's a Square API error by looking at the error structure
-    if (error && typeof error === 'object' && 'statusCode' in error && 'errors' in error) {
-      console.error('Square API Error:', {
-        statusCode: error.statusCode,
-        errors: error.errors
-      });
-      return {
-        success: false,
-        error: `Payment system error: ${error.errors?.[0]?.detail || 'Unknown error'}`
-      };
-    }
-
+    console.error('❌ Error creating Square payment link:', error);
     return {
       success: false,
-      error: 'Failed to create payment link'
+      error: error instanceof Error ? error.message : 'Unknown error creating payment link'
     };
   }
 }
@@ -209,32 +184,22 @@ export function verifyWebhookSignature(body: string, signature: string, url: str
 }
 
 /**
- * Get the base URL for redirects
+ * Get base URL for redirects
  */
 function getBaseUrl(): string {
-  // Check multiple environment variables for production URL
-  const productionUrl = process.env.PUBLIC_URL ||
-                       process.env.SITE_URL ||
-                       import.meta.env.PUBLIC_URL ||
-                       import.meta.env.SITE_URL;
-
-  // If we have a production URL, use it
-  if (productionUrl && productionUrl !== 'http://localhost:4321') {
-    return productionUrl;
+  // Production URL
+  if (process.env.URL) {
+    return process.env.URL;
   }
 
-  // In browser context, use current origin
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
+  // Netlify deploy preview
+  if (process.env.DEPLOY_PRIME_URL) {
+    return process.env.DEPLOY_PRIME_URL;
   }
 
-  // Check if we're in production environment
-  const isProduction = process.env.NODE_ENV === 'production' ||
-                      import.meta.env.PROD;
-
-  if (isProduction) {
-    // Default production URL - update this to your actual domain
-    return 'https://bgbouquet.com';
+  // Branch deploy
+  if (process.env.DEPLOY_URL) {
+    return process.env.DEPLOY_URL;
   }
 
   // Development fallback

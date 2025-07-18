@@ -1,6 +1,6 @@
 // Test database connection and basic queries
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 export const GET: APIRoute = async () => {
   try {

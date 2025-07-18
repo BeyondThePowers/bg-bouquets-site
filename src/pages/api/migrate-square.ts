@@ -1,7 +1,7 @@
 // src/pages/api/migrate-square.ts
 // Temporary API endpoint to run Square integration migration
 import type { APIRoute } from 'astro';
-import { supabaseAdmin } from '../../../lib/supabase-admin';
+import { supabaseAdmin } from '../../lib/supabase-admin';
 
 async function runMigration() {
   try {

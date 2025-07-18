@@ -1,7 +1,7 @@
 // src/pages/api/garden-mgmt/cancel-booking.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../../lib/supabase';
-import { sendCancellationConfirmation, sendCancellationNotification } from '../../../utils/webhookService';
+import { supabase } from '../../../lib/supabase';
+import { sendCancellationConfirmation, sendCancellationNotification } from '../../../services/webhook';
 
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {

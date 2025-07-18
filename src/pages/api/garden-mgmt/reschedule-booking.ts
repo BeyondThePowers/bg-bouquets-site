@@ -1,7 +1,7 @@
 // src/pages/api/garden-mgmt/reschedule-booking.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../../lib/supabase';
-import { sendRescheduleConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../../utils/webhookService';
+import { supabase } from '../../../lib/supabase';
+import { sendRescheduleConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../../services/webhook';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
 function getBusinessToday(): string {

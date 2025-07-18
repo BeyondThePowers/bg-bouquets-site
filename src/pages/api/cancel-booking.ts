@@ -1,7 +1,7 @@
 // src/pages/api/cancel-booking.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
-import { sendCancellationConfirmation, sendCancellationNotification } from '../../utils/webhookService';
+import { supabase } from '../../lib/supabase';
+import { sendCancellationConfirmation, sendCancellationNotification } from '../../services/webhook';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
 function getBusinessToday(): string {

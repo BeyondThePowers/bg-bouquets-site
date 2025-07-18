@@ -1,7 +1,7 @@
 // src/pages/api/test-square.ts
 // Test endpoint to check Square integration
 import type { APIRoute } from 'astro';
-import { validateSquareConfig } from '../../utils/squareService';
+import { validateSquareConfig } from '../../services/square';
 
 export const GET: APIRoute = async ({ request }) => {
   try {

@@ -1,7 +1,7 @@
 // src/pages/api/garden-mgmt/document-refund.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../../lib/supabase';
-import { supabaseAdmin } from '../../../../lib/supabase-admin';
+import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {

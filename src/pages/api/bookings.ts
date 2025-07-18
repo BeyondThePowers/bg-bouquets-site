@@ -1,9 +1,9 @@
 // src/pages/api/bookings.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
-import { supabaseAdmin } from '../../../lib/supabase-admin';
-import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
-import { createPaymentLink, validateSquareConfig } from '../../utils/squareService';
+import { supabase } from '../../lib/supabase';
+import { supabaseAdmin } from '../../lib/supabase-admin';
+import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
+import { createPaymentLink, validateSquareConfig } from '../../services/square';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
 function getBusinessToday(): string {

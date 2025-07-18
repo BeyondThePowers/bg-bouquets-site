@@ -1,6 +1,6 @@
 // src/pages/api/test-webhook.ts
 import type { APIRoute } from 'astro';
-import { sendBookingConfirmation, sendErrorNotification, sendCancellationConfirmation, sendCancellationNotification, sendRescheduleConfirmation } from '../../utils/webhookService';
+import { sendBookingConfirmation, sendErrorNotification, sendCancellationConfirmation, sendCancellationNotification, sendRescheduleConfirmation } from '../../services/webhook';
 
 export const POST: APIRoute = async ({ request }) => {
   try {

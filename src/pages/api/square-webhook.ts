@@ -1,7 +1,7 @@
 // src/pages/api/square-webhook.ts
 import type { APIRoute } from 'astro';
 import { createClient } from '@supabase/supabase-js';
-import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
+import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
 import crypto from 'crypto';
 
 // Initialize Supabase admin client for server-side operations

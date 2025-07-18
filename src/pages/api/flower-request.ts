@@ -1,6 +1,6 @@
 // src/pages/api/flower-request.ts
 import type { APIRoute } from 'astro';
-import { sendContactFormMessage, sendWebhookWithRetry, logWebhookAttempt } from '../../utils/webhookService';
+import { sendContactFormMessage, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
 import { v4 as uuidv4 } from 'uuid';
 
 // Simple in-memory rate limiting (shared with contact form)

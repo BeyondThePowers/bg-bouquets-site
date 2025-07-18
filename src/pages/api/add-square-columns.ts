@@ -1,7 +1,7 @@
 // src/pages/api/add-square-columns.ts
 // Temporary endpoint to add Square columns to the database
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 export const POST: APIRoute = async ({ request }) => {
   try {

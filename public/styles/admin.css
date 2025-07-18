@@ -330,6 +330,13 @@ body {
 	margin-bottom: 24px;
 }
 
+/* Admin Columns */
+.admin-column {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
 .admin-section {
 	background: var(--admin-white);
 	border: 1px solid var(--admin-gray-200);

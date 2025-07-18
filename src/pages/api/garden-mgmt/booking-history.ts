@@ -1,6 +1,6 @@
 // src/pages/api/garden-mgmt/booking-history.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 
 // Helper function to provide default reasons for actions
 function getDefaultReasonForAction(actionType: string): string {

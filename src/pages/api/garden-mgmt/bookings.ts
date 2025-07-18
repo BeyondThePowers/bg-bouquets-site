@@ -1,6 +1,6 @@
 // src/pages/api/garden-mgmt/bookings.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {

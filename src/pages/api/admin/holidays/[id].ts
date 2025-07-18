@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { supabaseAdmin } from '../../../../../lib/supabase-admin';
+import { supabaseAdmin } from '../../../../lib/supabase-admin';
 
 export const DELETE: APIRoute = async ({ params }) => {
   try {
