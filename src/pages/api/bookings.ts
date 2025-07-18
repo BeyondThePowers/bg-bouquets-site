@@ -2,7 +2,7 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../lib/supabase';
 import { supabaseAdmin } from '../../lib/supabase-admin';
-import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
+import { sendBookingConfirmation, logWebhookAttempt } from '../../services/webhook';
 import { createPaymentLink, validateSquareConfig } from '../../services/square';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
@@ -255,11 +255,7 @@ export const POST: APIRoute = async ({ request }) => {
       console.log('Sending booking confirmation webhook for pay_on_arrival booking');
 
       // Send webhook directly with retry logic (async, don't block response)
-      sendWebhookWithRetry(
-        () => sendBookingConfirmation(webhookBookingData, insertedBooking.cancellation_token),
-        3, // max retries
-        2000 // initial delay
-      ).then(success => {
+      sendBookingConfirmation(webhookBookingData, insertedBooking.cancellation_token).then(success => {
         logWebhookAttempt(
           webhookBookingData.id,
           'confirmation',

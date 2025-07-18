@@ -75,11 +75,11 @@ function createStandardizedPayload(
         status: eventType.includes('cancelled') ? 'cancelled' :
                 eventType === 'booking_rescheduled' ? 'confirmed' :
                 isPaymentCompleted ? 'completed' : 'pending',
-        // Include Square payment details if available
-        ...(bookingData.squareOrderId && { squareOrderId: bookingData.squareOrderId }),
-        ...(bookingData.squarePaymentId && { squarePaymentId: bookingData.squarePaymentId }),
-        ...(bookingData.paymentCompletedAt && { completedAt: bookingData.paymentCompletedAt }),
-        ...(bookingData.paymentDetails && { details: bookingData.paymentDetails }),
+        // Always include Square payment details (null when not applicable)
+        squareOrderId: bookingData.squareOrderId || null,
+        squarePaymentId: bookingData.squarePaymentId || null,
+        completedAt: bookingData.paymentCompletedAt || null,
+        details: bookingData.paymentDetails || null,
       },
       // Add event-specific sections
       ...(originalDate && originalTime && {
@@ -298,11 +298,11 @@ interface StandardizedWebhookPayload {
     payment: {
       method: string | null;
       status: string;
-      // Square payment details (only for online payments)
-      squareOrderId?: string | null;
-      squarePaymentId?: string | null;
-      completedAt?: string | null;
-      details?: {
+      // Square payment details (always present, null when not applicable)
+      squareOrderId: string | null;
+      squarePaymentId: string | null;
+      completedAt: string | null;
+      details: {
         payment_id?: string;
         amount_money?: { amount: number; currency: string };
         status?: string;

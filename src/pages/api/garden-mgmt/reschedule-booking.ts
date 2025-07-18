@@ -1,7 +1,7 @@
 // src/pages/api/garden-mgmt/reschedule-booking.ts
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
-import { sendRescheduleConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../../services/webhook';
+import { sendRescheduleConfirmation, logWebhookAttempt } from '../../../services/webhook';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
 function getBusinessToday(): string {
@@ -171,17 +171,18 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       };
 
       // Send reschedule confirmation webhook
-      sendWebhookWithRetry(
-        () => sendRescheduleConfirmation(webhookData),
-        3, // max retries
-        2000 // initial delay
-      ).then(success => {
+      sendRescheduleConfirmation(webhookData, originalDate, originalTime, reason, bookingData.cancellation_token).then(success => {
         logWebhookAttempt(
           bookingData.id,
           'admin_reschedule',
           success,
           success ? undefined : 'Failed after retries'
         );
+        if (success) {
+          console.log('✅ Admin reschedule webhook sent successfully');
+        } else {
+          console.error('❌ Failed to send admin reschedule webhook');
+        }
       }).catch(error => {
         console.error('Admin reschedule webhook sending failed:', error);
         logWebhookAttempt(

@@ -76,11 +76,11 @@ export function createStandardizedPayload(
         status: eventType.includes('cancelled') ? 'cancelled' :
                 eventType === 'booking_rescheduled' ? 'confirmed' :
                 isPaymentCompleted ? 'completed' : 'pending',
-        // Include Square payment details if available
-        ...(bookingData.squareOrderId && { squareOrderId: bookingData.squareOrderId }),
-        ...(bookingData.squarePaymentId && { squarePaymentId: bookingData.squarePaymentId }),
-        ...(bookingData.paymentCompletedAt && { completedAt: bookingData.paymentCompletedAt }),
-        ...(bookingData.paymentDetails && { details: bookingData.paymentDetails }),
+        // Always include Square payment details (null when not applicable)
+        squareOrderId: bookingData.squareOrderId || null,
+        squarePaymentId: bookingData.squarePaymentId || null,
+        completedAt: bookingData.paymentCompletedAt || null,
+        details: bookingData.paymentDetails || null,
       },
       // Add event-specific sections
       ...(originalDate && originalTime && {
@@ -117,6 +117,7 @@ export function createStandardizedPayload(
       source: 'bg-bouquet-garden',
       version: '2.0',
       ...(emailType && { emailType }),
+      ...(cancellationToken && { cancellationToken }),
     }
   };
 
@@ -161,10 +162,10 @@ export interface StandardizedWebhookPayload {
     payment: {
       method: string | null;
       status: string;
-      squareOrderId?: string;
-      squarePaymentId?: string;
-      completedAt?: string;
-      details?: any;
+      squareOrderId: string | null;
+      squarePaymentId: string | null;
+      completedAt: string | null;
+      details: any | null;
     };
     original?: {
       date: string;
@@ -199,12 +200,17 @@ export interface StandardizedWebhookPayload {
 }
 
 export interface ContactFormData {
+  id: string;
   name: string;
   email: string;
   phone?: string;
   message: string;
   subject?: string;
-  type?: string;
+  type: 'general_contact' | 'flower_request';
+  // Flower-specific fields
+  flower?: string;
+  notes?: string;
+  createdAt: string;
 }
 
 /**
@@ -343,12 +349,14 @@ export async function sendRescheduleConfirmation(
   bookingData: BookingData,
   originalDate: string,
   originalTime: string,
-  rescheduleReason?: string
+  rescheduleReason?: string,
+  cancellationToken?: string
 ): Promise<boolean> {
   const payload = createStandardizedPayload('booking_rescheduled', bookingData, {
     originalDate,
     originalTime,
     rescheduleReason,
+    cancellationToken,
   });
 
   const result = await sendWebhookWithRetry('booking_rescheduled', payload);
@@ -356,23 +364,32 @@ export async function sendRescheduleConfirmation(
 }
 
 /**
- * Send contact form message webhook
+ * Send unified contact form message webhook (handles both contact forms and flower requests)
  */
 export async function sendContactFormMessage(contactData: ContactFormData): Promise<boolean> {
   const payload = {
     event: 'contact_form',
     contact: {
-      name: contactData.name,
-      email: contactData.email,
-      phone: contactData.phone || null,
-      message: contactData.message,
-      subject: contactData.subject || null,
-      type: contactData.type || 'general',
-    },
-    metadata: {
-      timestamp: new Date().toISOString(),
-      source: 'bg-bouquet-garden',
-      version: '2.0',
+      id: contactData.id,
+      type: contactData.type,
+      customer: {
+        name: contactData.name,
+        email: contactData.email,
+        phone: contactData.phone || null,
+      },
+      message: {
+        subject: contactData.subject || null,
+        content: contactData.message,
+        // Flower-specific fields (null for general contact forms)
+        flower: contactData.flower || null,
+        notes: contactData.notes || null,
+      },
+      metadata: {
+        timestamp: contactData.createdAt,
+        source: 'bg-bouquet-garden',
+        version: '2.0',
+        formType: contactData.type,
+      }
     }
   };
 

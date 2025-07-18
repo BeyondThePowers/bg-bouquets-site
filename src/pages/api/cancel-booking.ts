@@ -151,7 +151,7 @@ export const GET: APIRoute = async ({ url }) => {
     // Look up booking by cancellation token
     const { data: booking, error } = await supabase
       .from('bookings')
-      .select('id, full_name, email, date, time, number_of_visitors, total_amount, status')
+      .select('id, full_name, email, date, time, number_of_bouquets, total_amount, status')
       .eq('cancellation_token', cancellationToken)
       .single();
 
@@ -192,7 +192,7 @@ export const GET: APIRoute = async ({ url }) => {
         email: booking.email,
         date: booking.date,
         time: booking.time,
-        visitors: booking.number_of_visitors,
+        visitors: booking.number_of_bouquets,
         amount: booking.total_amount
       }
     }), {

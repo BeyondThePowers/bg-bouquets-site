@@ -1,7 +1,7 @@
 // src/pages/api/reschedule-booking.ts
 import type { APIRoute } from 'astro';
 import { supabase } from '../../lib/supabase';
-import { sendRescheduleConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
+import { sendRescheduleConfirmation, logWebhookAttempt } from '../../services/webhook';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
 function getBusinessToday(): string {
@@ -129,17 +129,18 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       };
 
       // Send reschedule confirmation webhook
-      sendWebhookWithRetry(
-        () => sendRescheduleConfirmation(webhookData),
-        3, // max retries
-        2000 // initial delay
-      ).then(success => {
+      sendRescheduleConfirmation(webhookData, originalDate, originalTime, reason, cancellationToken).then(success => {
         logWebhookAttempt(
           bookingData.id,
           'reschedule',
           success,
           success ? undefined : 'Failed after retries'
         );
+        if (success) {
+          console.log('✅ Reschedule webhook sent successfully');
+        } else {
+          console.error('❌ Failed to send reschedule webhook');
+        }
       }).catch(error => {
         console.error('Reschedule webhook sending failed:', error);
         logWebhookAttempt(

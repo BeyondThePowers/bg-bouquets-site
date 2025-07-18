@@ -1,7 +1,7 @@
 // src/pages/api/square-webhook.ts
 import type { APIRoute } from 'astro';
 import { createClient } from '@supabase/supabase-js';
-import { sendBookingConfirmation, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
+import { sendBookingConfirmation, logWebhookAttempt } from '../../services/webhook';
 import crypto from 'crypto';
 
 // Initialize Supabase admin client for server-side operations
@@ -199,17 +199,18 @@ async function handlePaymentEvent(webhookData: any) {
       };
 
       // Send webhook with retry logic in background
-      sendWebhookWithRetry(
-        () => sendBookingConfirmation(bookingData, booking.cancellation_token),
-        3, // max retries
-        2000 // initial delay
-      ).then(success => {
+      sendBookingConfirmation(bookingData, booking.cancellation_token).then(success => {
         logWebhookAttempt(
           booking.id,
           'confirmation',
           success,
           success ? undefined : 'Failed after retries'
         );
+        if (success) {
+          console.log('✅ Square payment webhook sent successfully');
+        } else {
+          console.error('❌ Failed to send Square payment webhook');
+        }
       }).catch(error => {
         console.error('Webhook sending failed:', error);
         logWebhookAttempt(

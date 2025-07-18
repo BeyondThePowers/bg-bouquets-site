@@ -1,6 +1,6 @@
 // src/pages/api/contact.ts
 import type { APIRoute } from 'astro';
-import { sendContactFormMessage, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
+import { sendContactFormMessage, logWebhookAttempt } from '../../services/webhook';
 import { v4 as uuidv4 } from 'uuid';
 
 // Simple in-memory rate limiting (for production, consider Redis or database)
@@ -212,17 +212,18 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Send webhook with retry logic (async, don't block response)
     console.log('Sending contact form message webhook');
-    sendWebhookWithRetry(
-      () => sendContactFormMessage(contactFormData),
-      3, // max retries
-      2000 // initial delay
-    ).then(success => {
+    sendContactFormMessage(contactFormData).then(success => {
       logWebhookAttempt(
         contactFormData.id,
         'contact',
         success,
         success ? undefined : 'Failed after retries'
       );
+      if (success) {
+        console.log('✅ Contact form webhook sent successfully');
+      } else {
+        console.error('❌ Failed to send contact form webhook');
+      }
     }).catch(error => {
       console.error('Contact form webhook sending failed:', error);
       logWebhookAttempt(

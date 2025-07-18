@@ -40,7 +40,11 @@ Each scenario uses the `event` field to filter and route to appropriate email te
     },
     "payment": {
       "method": "pay_on_arrival",
-      "status": "pending"
+      "status": "pending",
+      "squareOrderId": null,
+      "squarePaymentId": null,
+      "completedAt": null,
+      "details": null
     },
     "metadata": {
       "createdAt": "2025-06-22T10:30:00Z",

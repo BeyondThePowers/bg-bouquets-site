@@ -1,6 +1,6 @@
 // src/pages/api/flower-request.ts
 import type { APIRoute } from 'astro';
-import { sendContactFormMessage, sendWebhookWithRetry, logWebhookAttempt } from '../../services/webhook';
+import { sendContactFormMessage, logWebhookAttempt } from '../../services/webhook';
 import { v4 as uuidv4 } from 'uuid';
 
 // Simple in-memory rate limiting (shared with contact form)
@@ -118,15 +118,15 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const { flower, email, notes } = body;
+    const { flower, email, notes, name } = body;
 
-    console.log('Extracted fields:', { flower, email, notes });
+    console.log('Extracted fields:', { flower, email, notes, name });
 
     // Basic server-side validation
     if (!flower || !email) {
       console.log('Validation failed - missing required fields');
-      return new Response(JSON.stringify({ 
-        error: 'Flower name and email are required fields.' 
+      return new Response(JSON.stringify({
+        error: 'Flower name and email are required fields.'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -146,8 +146,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Validate field lengths
     if (flower.length > 100) {
-      return new Response(JSON.stringify({ 
-        error: 'Flower name must be less than 100 characters.' 
+      return new Response(JSON.stringify({
+        error: 'Flower name must be less than 100 characters.'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -155,8 +155,17 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (email.length > 255) {
-      return new Response(JSON.stringify({ 
-        error: 'Email must be less than 255 characters.' 
+      return new Response(JSON.stringify({
+        error: 'Email must be less than 255 characters.'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (name && name.length > 100) {
+      return new Response(JSON.stringify({
+        error: 'Name must be less than 100 characters.'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -164,8 +173,8 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (notes && notes.length > 1000) {
-      return new Response(JSON.stringify({ 
-        error: 'Notes must be less than 1000 characters.' 
+      return new Response(JSON.stringify({
+        error: 'Notes must be less than 1000 characters.'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -192,9 +201,10 @@ export const POST: APIRoute = async ({ request }) => {
     const flowerRequestData = {
       id: requestId,
       type: 'flower_request' as const,
-      name: email.split('@')[0], // Extract name from email as fallback
+      name: name ? name.trim() : email.split('@')[0], // Use provided name or extract from email as fallback
       email: email.trim().toLowerCase(),
-      message: `Flower request: ${flower.trim()}`,
+      message: `Flower request for: ${flower.trim()}${notes ? ` - ${notes.trim()}` : ''}`,
+      subject: `Flower Request: ${flower.trim()}`,
       flower: flower.trim(),
       notes: notes ? notes.trim() : undefined,
       createdAt: new Date().toISOString()
@@ -204,17 +214,18 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Send webhook with retry logic (async, don't block response)
     console.log('Sending flower request webhook');
-    sendWebhookWithRetry(
-      () => sendContactFormMessage(flowerRequestData),
-      3, // max retries
-      2000 // initial delay
-    ).then(success => {
+    sendContactFormMessage(flowerRequestData).then(success => {
       logWebhookAttempt(
         flowerRequestData.id,
         'contact',
         success,
         success ? undefined : 'Failed after retries'
       );
+      if (success) {
+        console.log('✅ Flower request webhook sent successfully');
+      } else {
+        console.error('❌ Failed to send flower request webhook');
+      }
     }).catch(error => {
       console.error('Flower request webhook sending failed:', error);
       logWebhookAttempt(
@@ -256,11 +267,12 @@ export const GET: APIRoute = async () => {
     method: 'POST',
     fields: {
       required: ['flower', 'email'],
-      optional: ['notes']
+      optional: ['name', 'notes']
     },
     limits: {
       flower: '100 characters',
       email: '255 characters',
+      name: '100 characters',
       notes: '1000 characters'
     },
     rateLimit: {
