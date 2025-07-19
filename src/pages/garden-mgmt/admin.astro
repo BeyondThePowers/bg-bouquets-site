@@ -850,12 +850,13 @@
 
 				const maxBookingsInput = document.getElementById('maxBookings') as HTMLInputElement;
 				const maxVisitorsInput = document.getElementById('maxVisitors') as HTMLInputElement;
+				const maxVisitorPassesInput = document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement;
 				const seasonStartMonthInput = document.getElementById('seasonStartMonth') as HTMLSelectElement;
 				const seasonStartDayInput = document.getElementById('seasonStartDay') as HTMLInputElement;
 				const seasonEndMonthInput = document.getElementById('seasonEndMonth') as HTMLSelectElement;
 				const seasonEndDayInput = document.getElementById('seasonEndDay') as HTMLInputElement;
 
-				if (!maxBookingsInput || !maxVisitorsInput) {
+				if (!maxBookingsInput || !maxVisitorsInput || !maxVisitorPassesInput) {
 					showMessage(messageDiv, 'Capacity elements not found.', 'error');
 					return;
 				}
@@ -867,6 +868,7 @@
 
 				const maxBookings = parseInt(maxBookingsInput.value);
 				const maxVisitors = parseInt(maxVisitorsInput.value);
+				const maxVisitorPasses = parseInt(maxVisitorPassesInput.value);
 				const seasonStartMonth = parseInt(seasonStartMonthInput.value);
 				const seasonStartDay = parseInt(seasonStartDayInput.value);
 				const seasonEndMonth = parseInt(seasonEndMonthInput.value);
@@ -880,6 +882,11 @@
 				
 				if (isNaN(maxVisitors) || maxVisitors < 1 || maxVisitors > 50) {
 					showMessage(messageDiv, 'Max bouquets per slot must be between 1 and 50.', 'error');
+					return;
+				}
+				
+				if (isNaN(maxVisitorPasses) || maxVisitorPasses < 0 || maxVisitorPasses > 20) {
+					showMessage(messageDiv, 'Max visitor passes per booking must be between 0 and 20.', 'error');
 					return;
 				}
 				
@@ -912,6 +919,7 @@
 				console.log('Time slots:', timeSlots);
 				console.log('Max bookings:', maxBookings);
 				console.log('Max visitors:', maxVisitors);
+				console.log('Max visitor passes:', maxVisitorPasses);
 				console.log('Season start:', seasonStartMonth, seasonStartDay);
 				console.log('Season end:', seasonEndMonth, seasonEndDay);
 
@@ -923,6 +931,7 @@
 						time_slots: timeSlots,
 						max_bookings_per_slot: maxBookings,
 						max_visitors_per_slot: maxVisitors, // Keep for API compatibility
+						max_visitor_passes_per_booking: maxVisitorPasses,
 						season_start_month: seasonStartMonth,
 						season_start_day: seasonStartDay,
 						season_end_month: seasonEndMonth,
