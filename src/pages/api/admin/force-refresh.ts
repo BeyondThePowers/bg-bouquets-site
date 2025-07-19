@@ -50,7 +50,8 @@ export const POST: APIRoute = async () => {
     const settingsMap = new Map(settings?.map(s => [s.setting_key, s.setting_value]) || []);
     const operatingDaysStr = settingsMap.get('operating_days') as string;
     const timeSlotsStr = settingsMap.get('time_slots') as string;
-    const maxCapacity = parseInt(settingsMap.get('max_bouquets_per_slot') as string || '10');
+    const maxBouquets = parseInt(settingsMap.get('max_bouquets_per_slot') as string || '10');
+    const maxBookings = parseInt(settingsMap.get('max_bookings_per_slot') as string || '3');
     const seasonStartMonth = parseInt(settingsMap.get('season_start_month') as string || '5');
     const seasonStartDay = parseInt(settingsMap.get('season_start_day') as string || '15');
     const seasonEndMonth = parseInt(settingsMap.get('season_end_month') as string || '9');
@@ -59,7 +60,8 @@ export const POST: APIRoute = async () => {
     console.log('Settings:', {
       operatingDaysStr,
       timeSlotsStr,
-      maxCapacity,
+      maxBouquets,
+      maxBookings,
       seasonStartMonth,
       seasonStartDay,
       seasonEndMonth,
@@ -132,7 +134,8 @@ export const POST: APIRoute = async () => {
           generatedSlots.push({
             date: dateStr,
             time: timeSlot,
-            max_capacity: maxCapacity
+            max_bouquets: maxBouquets,
+            max_bookings: maxBookings
           });
         }
       }
@@ -185,7 +188,7 @@ export const POST: APIRoute = async () => {
     
     const { data: timeSlotData } = await supabaseAdmin
       .from('time_slots')
-      .select('date, time, max_capacity')
+      .select('date, time, max_bouquets, max_bookings')
       .gte('date', today)
       .order('date, time', { ascending: true })
       .limit(10);

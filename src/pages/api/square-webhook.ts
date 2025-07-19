@@ -200,12 +200,6 @@ async function handlePaymentEvent(webhookData: any) {
 
       // Send webhook with retry logic in background
       sendBookingConfirmation(bookingData, booking.cancellation_token).then(success => {
-        logWebhookAttempt(
-          booking.id,
-          'confirmation',
-          success,
-          success ? undefined : 'Failed after retries'
-        );
         if (success) {
           console.log('✅ Square payment webhook sent successfully');
         } else {
@@ -213,12 +207,6 @@ async function handlePaymentEvent(webhookData: any) {
         }
       }).catch(error => {
         console.error('Webhook sending failed:', error);
-        logWebhookAttempt(
-          booking.id,
-          'confirmation',
-          false,
-          error.message
-        );
       });
 
     } else if (status === 'FAILED' || status === 'CANCELED') {

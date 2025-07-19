@@ -18,7 +18,7 @@ DECLARE
   -- Settings variables
   operating_days JSONB;
   time_slots JSONB;
-  max_capacity INTEGER;
+  max_bouquets INTEGER;
   max_bookings INTEGER;
   season_start_month INTEGER;
   season_start_day INTEGER;
@@ -39,7 +39,7 @@ BEGIN
   -- Get current settings
   SELECT setting_value INTO operating_days FROM schedule_settings WHERE setting_key = 'operating_days';
   SELECT setting_value INTO time_slots FROM schedule_settings WHERE setting_key = 'time_slots';
-  SELECT (setting_value #>> '{}')::INTEGER INTO max_capacity FROM schedule_settings WHERE setting_key = 'max_visitors_per_slot';
+  SELECT (setting_value #>> '{}')::INTEGER INTO max_bouquets FROM schedule_settings WHERE setting_key = 'max_bouquets_per_slot';
   SELECT (setting_value #>> '{}')::INTEGER INTO max_bookings FROM schedule_settings WHERE setting_key = 'max_bookings_per_slot';
   SELECT (setting_value #>> '{}')::INTEGER INTO season_start_month FROM schedule_settings WHERE setting_key = 'season_start_month';
   SELECT (setting_value #>> '{}')::INTEGER INTO season_start_day FROM schedule_settings WHERE setting_key = 'season_start_day';
@@ -103,10 +103,10 @@ BEGIN
       -- Insert time slots for this open day
       FOR j IN 0..jsonb_array_length(time_slots) - 1 LOOP
         time_slot := time_slots ->> j;
-        INSERT INTO time_slots (date, time, max_capacity, max_bookings)
-        VALUES (current_date_iter, time_slot, max_capacity, max_bookings)
-        ON CONFLICT (date, time) DO UPDATE SET 
-          max_capacity = EXCLUDED.max_capacity,
+        INSERT INTO time_slots (date, time, max_bouquets, max_bookings)
+        VALUES (current_date_iter, time_slot, max_bouquets, max_bookings)
+        ON CONFLICT (date, time) DO UPDATE SET
+          max_bouquets = EXCLUDED.max_bouquets,
           max_bookings = EXCLUDED.max_bookings;
         
         generated_slots := generated_slots + 1;

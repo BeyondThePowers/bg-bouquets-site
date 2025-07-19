@@ -256,13 +256,6 @@ export const POST: APIRoute = async ({ request }) => {
 
       // Send webhook directly with retry logic (async, don't block response)
       sendBookingConfirmation(webhookBookingData, insertedBooking.cancellation_token).then(success => {
-        logWebhookAttempt(
-          'booking_confirmed',
-          webhookBookingData,
-          success,
-          success ? null : 'Failed after retries',
-          1
-        );
         if (success) {
           console.log('✅ Booking confirmation webhook sent successfully');
         } else {
@@ -270,13 +263,6 @@ export const POST: APIRoute = async ({ request }) => {
         }
       }).catch(error => {
         console.error('Webhook sending failed:', error);
-        logWebhookAttempt(
-          'booking_confirmed',
-          webhookBookingData,
-          false,
-          error.message,
-          1
-        );
       });
     }
 
@@ -294,11 +280,17 @@ export const POST: APIRoute = async ({ request }) => {
 
   } catch (error) {
     console.error('Booking API error:', error);
-    console.error('Error stack:', error.stack);
+    
+    // Type-safe error handling
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    console.error('Error stack:', errorStack);
+    
     return new Response(JSON.stringify({
       error: 'Internal server error. Please try again.',
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: errorMessage,
+      stack: process.env.NODE_ENV === 'development' ? errorStack : undefined
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

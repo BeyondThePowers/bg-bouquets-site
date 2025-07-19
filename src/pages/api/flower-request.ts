@@ -215,12 +215,6 @@ export const POST: APIRoute = async ({ request }) => {
     // Send webhook with retry logic (async, don't block response)
     console.log('Sending flower request webhook');
     sendContactFormMessage(flowerRequestData).then(success => {
-      logWebhookAttempt(
-        flowerRequestData.id,
-        'contact',
-        success,
-        success ? undefined : 'Failed after retries'
-      );
       if (success) {
         console.log('✅ Flower request webhook sent successfully');
       } else {
@@ -228,12 +222,6 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }).catch(error => {
       console.error('Flower request webhook sending failed:', error);
-      logWebhookAttempt(
-        flowerRequestData.id,
-        'contact',
-        false,
-        error.message
-      );
     });
 
     // Return success response immediately

@@ -1,6 +1,15 @@
 /**
  * Webhook Service for Make.com Integration
- * Handles sending booking confirmations and error notifications
+ *
+ * This service handles all webhook communications with Make.com scenarios,
+ * providing standardized payload formats, retry logic, and consistent error handling.
+ *
+ * The service implements a consolidated approach where:
+ * - All booking-related events route to a single Make.com scenario (MAKE_BOOKING_WEBHOOK_URL)
+ * - Contact form submissions route to a dedicated scenario (MAKE_CONTACT_WEBHOOK_URL)
+ *
+ * Each webhook function includes internal logging via the logWebhookAttempt function,
+ * which eliminates the need for redundant logging in API endpoints.
  */
 
 // Webhook configuration for easy future modifications
@@ -24,8 +33,22 @@ function getWebhookUrl(eventType: keyof typeof WEBHOOK_CONFIG): string | undefin
 }
 
 /**
- * Create standardized webhook payload with all possible fields
- * This ensures consistent data structure across all Make.com scenarios
+ * Creates a standardized webhook payload with all possible fields
+ *
+ * This function ensures consistent data structure across all Make.com scenarios by
+ * generating a unified payload format with appropriate sections based on the event type.
+ *
+ * @param eventType - The type of event being sent (e.g., 'booking_confirmed')
+ * @param bookingData - The booking data object containing all booking details
+ * @param options - Optional parameters specific to the event type:
+ *   - cancellationToken: Token used for cancellation verification
+ *   - cancellationReason: Reason for cancellation
+ *   - rescheduleReason: Reason for rescheduling
+ *   - originalDate: Original booking date (for reschedule events)
+ *   - originalTime: Original booking time (for reschedule events)
+ *   - errorInfo: Error details for error notifications
+ *   - emailType: Type of email notification to send
+ * @returns A standardized webhook payload object ready to be sent to Make.com
  */
 export function createStandardizedPayload(
   eventType: string,
@@ -90,10 +113,10 @@ export function createStandardizedPayload(
         new: {
           date: bookingData.visitDate,
           time: bookingData.preferredTime,
-          bouquets: bookingData.numberOfVisitors, // Primary field using bouquet terminology
-          visitors: bookingData.numberOfVisitors, // Deprecated: kept for backward compatibility
+          bouquets: bookingData.numberOfVisitors ?? 0, // Primary field using bouquet terminology
+          visitors: bookingData.numberOfVisitors ?? 0, // Deprecated: kept for backward compatibility
           visitorPasses: bookingData.numberOfVisitorPasses || null, // New field for visitor passes
-          amount: bookingData.totalAmount,
+          amount: bookingData.totalAmount ?? 0,
         }
       }),
       ...(cancellationReason && {
@@ -122,6 +145,34 @@ export function createStandardizedPayload(
   };
 
   return basePayload;
+}
+
+/**
+ * Prepares booking data for webhook delivery from API endpoint data
+ *
+ * This helper function standardizes the way booking data is prepared for webhooks
+ * across different API endpoints, ensuring consistent data format.
+ *
+ * @param booking - The booking data from the database
+ * @returns A properly formatted BookingData object ready for webhook delivery
+ */
+export function prepareBookingWebhookData(booking: any): BookingData {
+  return {
+    id: booking.id,
+    fullName: booking.full_name || booking.fullName,
+    email: booking.email,
+    phone: booking.phone,
+    visitDate: booking.visit_date || booking.visitDate,
+    preferredTime: booking.preferred_time || booking.preferredTime,
+    numberOfVisitors: booking.number_of_visitors || booking.numberOfVisitors,
+    numberOfVisitorPasses: booking.number_of_visitor_passes || booking.numberOfVisitorPasses,
+    totalAmount: booking.total_amount || booking.totalAmount,
+    paymentMethod: booking.payment_method || booking.paymentMethod,
+    paymentCompletedAt: booking.payment_completed_at || booking.paymentCompletedAt,
+    squareOrderId: booking.square_order_id || booking.squareOrderId,
+    squarePaymentId: booking.square_payment_id || booking.squarePaymentId,
+    paymentDetails: booking.payment_details || booking.paymentDetails
+  };
 }
 
 // Type definitions
@@ -199,6 +250,31 @@ export interface StandardizedWebhookPayload {
   };
 }
 
+/**
+ * Prepares contact form data for webhook delivery from API endpoint data
+ *
+ * This helper function standardizes the way contact form data is prepared
+ * for webhooks across different API endpoints.
+ *
+ * @param formData - The form submission data
+ * @param type - The type of contact form ('general_contact' or 'flower_request')
+ * @returns A properly formatted ContactFormData object ready for webhook delivery
+ */
+export function prepareContactFormData(formData: any, type: 'general_contact' | 'flower_request'): ContactFormData {
+  return {
+    id: formData.id,
+    name: formData.name || formData.fullName,
+    email: formData.email,
+    phone: formData.phone,
+    message: formData.message,
+    subject: formData.subject,
+    type: type,
+    flower: type === 'flower_request' ? formData.flower : undefined,
+    notes: formData.notes,
+    createdAt: formData.createdAt || new Date().toISOString()
+  };
+}
+
 export interface ContactFormData {
   id: string;
   name: string;
@@ -214,7 +290,16 @@ export interface ContactFormData {
 }
 
 /**
- * Send webhook with retry logic and proper error handling
+ * Sends a webhook with retry logic and proper error handling
+ *
+ * This function handles the actual delivery of webhook payloads to Make.com,
+ * with built-in retry logic, error handling, and logging.
+ *
+ * @param eventType - The type of event being sent (must match a key in WEBHOOK_CONFIG)
+ * @param payload - The payload data to send
+ * @param maxRetries - Maximum number of retry attempts (default: 3)
+ * @param retryDelay - Initial delay between retries in ms (default: 1000, doubles each retry)
+ * @returns Object containing success status, error message (if any), and number of attempts made
  */
 export async function sendWebhookWithRetry(
   eventType: keyof typeof WEBHOOK_CONFIG,
@@ -276,12 +361,41 @@ export async function sendWebhookWithRetry(
 }
 
 /**
- * Send booking confirmation webhook to Make.com
+ * Sends a booking confirmation webhook to Make.com
+ *
+ * This function creates and sends a standardized booking confirmation payload.
+ * If the webhook fails after all retries, it automatically sends an error notification.
+ *
+ * @param bookingData - The booking data object containing all booking details
+ * @param cancellationTokenOrOptions - Either a string token (legacy) or an options object
+ * @returns A promise resolving to a boolean indicating success or failure
+ *
+ * @example Legacy usage:
+ * ```
+ * sendBookingConfirmation(bookingData, 'abc123');
+ * ```
+ *
+ * @example Options object usage:
+ * ```
+ * sendBookingConfirmation(bookingData, { cancellationToken: 'abc123' });
+ * ```
  */
-export async function sendBookingConfirmation(bookingData: BookingData, cancellationToken?: string): Promise<boolean> {
-  const payload = createStandardizedPayload('booking_confirmed', bookingData, {
-    cancellationToken,
-  });
+export async function sendBookingConfirmation(
+  bookingData: BookingData,
+  cancellationTokenOrOptions?: string | { cancellationToken?: string }
+): Promise<boolean> {
+  // Support both old and new parameter patterns
+  let options: { cancellationToken?: string } = {};
+  
+  if (typeof cancellationTokenOrOptions === 'string') {
+    // Legacy parameter pattern
+    options.cancellationToken = cancellationTokenOrOptions;
+  } else if (cancellationTokenOrOptions) {
+    // New options object pattern
+    options = cancellationTokenOrOptions;
+  }
+  
+  const payload = createStandardizedPayload('booking_confirmed', bookingData, options);
 
   const result = await sendWebhookWithRetry('booking_confirmed', payload);
 
@@ -297,7 +411,15 @@ export async function sendBookingConfirmation(bookingData: BookingData, cancella
 }
 
 /**
- * Send error notification webhook
+ * Sends an error notification webhook to Make.com
+ *
+ * This function creates and sends a standardized error notification payload.
+ *
+ * @param bookingData - The booking data object containing all booking details
+ * @param errorInfo - Object containing error details:
+ *   - message: Error message
+ *   - type: Error type (e.g., 'payment_failed', 'webhook_failure')
+ * @returns A promise resolving to a boolean indicating success or failure
  */
 export async function sendErrorNotification(bookingData: BookingData, errorInfo: { message: string; type: string }): Promise<boolean> {
   const payload = createStandardizedPayload('booking_error', bookingData, {
@@ -309,62 +431,186 @@ export async function sendErrorNotification(bookingData: BookingData, errorInfo:
 }
 
 /**
- * Send cancellation confirmation webhook
+ * Sends a cancellation confirmation webhook to Make.com
+ *
+ * This function creates and sends a standardized cancellation confirmation payload
+ * to notify customers of booking cancellations.
+ *
+ * @param bookingData - The booking data object containing all booking details
+ * @param cancellationReasonOrOptions - Either a string reason for cancellation (legacy)
+ *   or an options object with cancellationReason and optional cancellationToken
+ * @param cancellationToken - Optional token used for cancellation verification (legacy parameter)
+ * @returns A promise resolving to a boolean indicating success or failure
+ *
+ * @example Legacy usage:
+ * ```
+ * sendCancellationConfirmation(bookingData, 'Customer requested cancellation', 'abc123');
+ * ```
+ *
+ * @example Options object usage:
+ * ```
+ * sendCancellationConfirmation(bookingData, {
+ *   cancellationReason: 'Customer requested cancellation',
+ *   cancellationToken: 'abc123'
+ * });
+ * ```
  */
 export async function sendCancellationConfirmation(
   bookingData: BookingData,
-  cancellationReason: string,
+  cancellationReasonOrOptions: string | {
+    cancellationReason: string;
+    cancellationToken?: string;
+  },
   cancellationToken?: string
 ): Promise<boolean> {
-  const payload = createStandardizedPayload('booking_cancelled', bookingData, {
-    cancellationReason,
-    cancellationToken,
-  });
+  // Support both old and new parameter patterns
+  let options: { cancellationReason: string; cancellationToken?: string };
+  
+  if (typeof cancellationReasonOrOptions === 'string') {
+    // Legacy parameter pattern
+    options = {
+      cancellationReason: cancellationReasonOrOptions,
+      cancellationToken
+    };
+  } else {
+    // New options object pattern
+    options = cancellationReasonOrOptions;
+  }
+  
+  const payload = createStandardizedPayload('booking_cancelled', bookingData, options);
 
   const result = await sendWebhookWithRetry('booking_cancelled', payload);
   return result.success;
 }
 
 /**
- * Send cancellation notification to admin
+ * Sends a cancellation notification to admin via Make.com
+ *
+ * This function creates and sends a standardized cancellation notification payload
+ * to notify administrators of booking cancellations.
+ *
+ * @param bookingData - The booking data object containing all booking details
+ * @param cancellationReasonOrOptions - Either a string reason for cancellation (legacy)
+ *   or an options object with cancellationReason and optional cancellationToken
+ * @param cancellationToken - Optional token used for cancellation verification (legacy parameter)
+ * @returns A promise resolving to a boolean indicating success or failure
+ *
+ * @example Legacy usage:
+ * ```
+ * sendCancellationNotification(bookingData, 'Admin cancelled due to weather', 'abc123');
+ * ```
+ *
+ * @example Options object usage:
+ * ```
+ * sendCancellationNotification(bookingData, {
+ *   cancellationReason: 'Admin cancelled due to weather',
+ *   cancellationToken: 'abc123'
+ * });
+ * ```
  */
 export async function sendCancellationNotification(
   bookingData: BookingData,
-  cancellationReason: string,
+  cancellationReasonOrOptions: string | {
+    cancellationReason: string;
+    cancellationToken?: string;
+  },
   cancellationToken?: string
 ): Promise<boolean> {
-  const payload = createStandardizedPayload('booking_cancelled_admin', bookingData, {
-    cancellationReason,
-    cancellationToken,
-  });
+  // Support both old and new parameter patterns
+  let options: { cancellationReason: string; cancellationToken?: string };
+  
+  if (typeof cancellationReasonOrOptions === 'string') {
+    // Legacy parameter pattern
+    options = {
+      cancellationReason: cancellationReasonOrOptions,
+      cancellationToken
+    };
+  } else {
+    // New options object pattern
+    options = cancellationReasonOrOptions;
+  }
+  
+  const payload = createStandardizedPayload('booking_cancelled_admin', bookingData, options);
 
   const result = await sendWebhookWithRetry('booking_cancelled_admin', payload);
   return result.success;
 }
 
 /**
- * Send reschedule confirmation webhook
+ * Sends a reschedule confirmation webhook to Make.com
+ *
+ * This function creates and sends a standardized reschedule confirmation payload
+ * to notify customers of booking reschedules.
+ *
+ * @param bookingData - The booking data object containing all booking details
+ * @param originalDateOrOptions - Either the original date (legacy) or an options object
+ * @param originalTime - The original time of the booking before rescheduling (legacy)
+ * @param rescheduleReason - Optional reason for rescheduling (legacy)
+ * @param cancellationToken - Optional token used for cancellation verification (legacy)
+ * @returns A promise resolving to a boolean indicating success or failure
+ *
+ * @example Legacy usage:
+ * ```
+ * sendRescheduleConfirmation(bookingData, '2023-01-01', '10:00 AM', 'Customer requested', 'abc123');
+ * ```
+ *
+ * @example Options object usage:
+ * ```
+ * sendRescheduleConfirmation(bookingData, {
+ *   originalDate: '2023-01-01',
+ *   originalTime: '10:00 AM',
+ *   rescheduleReason: 'Customer requested',
+ *   cancellationToken: 'abc123'
+ * });
+ * ```
  */
 export async function sendRescheduleConfirmation(
   bookingData: BookingData,
-  originalDate: string,
-  originalTime: string,
+  originalDateOrOptions: string | {
+    originalDate: string;
+    originalTime: string;
+    rescheduleReason?: string;
+    cancellationToken?: string;
+  },
+  originalTime?: string,
   rescheduleReason?: string,
   cancellationToken?: string
 ): Promise<boolean> {
-  const payload = createStandardizedPayload('booking_rescheduled', bookingData, {
-    originalDate,
-    originalTime,
-    rescheduleReason,
-    cancellationToken,
-  });
+  // Support both old and new parameter patterns
+  let options: {
+    originalDate: string;
+    originalTime: string;
+    rescheduleReason?: string;
+    cancellationToken?: string;
+  };
+  
+  if (typeof originalDateOrOptions === 'string') {
+    // Legacy parameter pattern
+    options = {
+      originalDate: originalDateOrOptions,
+      originalTime: originalTime!, // We know this is provided in legacy calls
+      rescheduleReason,
+      cancellationToken
+    };
+  } else {
+    // New options object pattern
+    options = originalDateOrOptions;
+  }
+  
+  const payload = createStandardizedPayload('booking_rescheduled', bookingData, options);
 
   const result = await sendWebhookWithRetry('booking_rescheduled', payload);
   return result.success;
 }
 
 /**
- * Send unified contact form message webhook (handles both contact forms and flower requests)
+ * Sends a unified contact form message webhook to Make.com
+ *
+ * This function handles both general contact forms and flower requests,
+ * creating and sending a standardized contact form payload.
+ *
+ * @param contactData - The contact form data containing all submission details
+ * @returns A promise resolving to a boolean indicating success or failure
  */
 export async function sendContactFormMessage(contactData: ContactFormData): Promise<boolean> {
   const payload = {

@@ -60,7 +60,7 @@ export const POST: APIRoute = async () => {
     
     const { data: timeSlotData, error: slotError } = await supabaseAdmin
       .from('time_slots')
-      .select('date, time, max_capacity')
+      .select('date, time, max_bouquets, max_bookings')
       .order('date, time', { ascending: true })
       .limit(10);
     
