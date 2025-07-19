@@ -75,8 +75,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Send cancellation confirmation emails (async, don't block response)
     if (bookingData) {
-      // Send confirmation to customer
-      sendCancellationConfirmation({
+      // Prepare booking data for webhooks
+      const webhookData = {
         id: bookingData.id,
         fullName: bookingData.full_name,
         email: bookingData.email,
@@ -85,27 +85,24 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         preferredTime: bookingData.time,
         numberOfVisitors: bookingData.number_of_visitors,
         totalAmount: bookingData.total_amount,
-        paymentMethod: bookingData.payment_method,
-        cancellationReason: reason,
-        cancellationToken: bookingData.cancellation_token
-      }).catch(error => {
+        paymentMethod: bookingData.payment_method
+      };
+
+      // Send confirmation to customer
+      sendCancellationConfirmation(
+        webhookData,
+        reason || 'No reason provided',
+        bookingData.cancellation_token
+      ).catch(error => {
         console.error('Failed to send cancellation confirmation:', error);
       });
 
       // Send notification to admin
-      sendCancellationNotification({
-        id: bookingData.id,
-        fullName: bookingData.full_name,
-        email: bookingData.email,
-        phone: bookingData.phone,
-        visitDate: bookingData.date,
-        preferredTime: bookingData.time,
-        numberOfVisitors: bookingData.number_of_visitors,
-        totalAmount: bookingData.total_amount,
-        paymentMethod: bookingData.payment_method,
-        cancellationReason: reason,
-        cancellationToken: bookingData.cancellation_token
-      }).catch(error => {
+      sendCancellationNotification(
+        webhookData,
+        reason || 'No reason provided',
+        bookingData.cancellation_token
+      ).catch(error => {
         console.error('Failed to send admin cancellation notification:', error);
       });
     }

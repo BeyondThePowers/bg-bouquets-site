@@ -484,22 +484,22 @@ input[name="paymentMethod"] {
   position: absolute;
   z-index: -1;
   top: -20vh;
-  right: -240px;
+  right: -159px;
   height: 100vh;
   width: auto;
   pointer-events: none;
-  transform: scaleX(-1) rotate(-20deg);
+  transform: scaleX(-1) rotate(1deg);
 }
 
 .hero-decorative-flower-right-top-2 {
   position: absolute;
   z-index: -1;
   top: -20vh;
-  right: -140px;
+  right: -290px;
   height: 80vh;
   width: auto;
   pointer-events: none;
-  transform: scaleX(-1) rotate(-20deg);
+  transform: scaleX(-1) rotate(-10deg);
 }
 
 

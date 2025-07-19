@@ -146,14 +146,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       };
 
       // Send reschedule confirmation webhook
-      sendRescheduleConfirmation(webhookData, originalDate, originalTime, reason, cancellationToken).then(success => {
-        logWebhookAttempt(
-          bookingData.id,
-          'reschedule',
-          success,
-          success ? null : 'Failed after retries',
-          1
-        );
+      sendRescheduleConfirmation(
+        webhookData,
+        webhookData.originalDate,
+        webhookData.originalTime,
+        reason,
+        cancellationToken
+      ).then(success => {
         if (success) {
           console.log('✅ Reschedule webhook sent successfully');
         } else {
@@ -161,13 +160,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         }
       }).catch(error => {
         console.error('Reschedule webhook sending failed:', error);
-        logWebhookAttempt(
-          bookingData.id,
-          'reschedule',
-          false,
-          error.message,
-          1
-        );
       });
     }
 
