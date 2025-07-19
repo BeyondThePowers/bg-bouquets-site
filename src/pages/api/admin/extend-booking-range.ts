@@ -6,7 +6,7 @@ export const POST: APIRoute = async () => {
     console.log('🔄 Manual booking range extension requested');
 
     // First get the current status using our GET logic
-    const statusResponse = await fetch('http://localhost:4322/api/admin/extend-booking-range');
+    const statusResponse = await fetch('/api/admin/extend-booking-range');
     const statusResult = await statusResponse.json();
 
     if (!statusResult.success) {
@@ -48,7 +48,7 @@ export const POST: APIRoute = async () => {
     // Extension needed - use the existing force-refresh logic
     console.log(`🔄 Extension needed: ${statusData.days_remaining} < ${minDaysThreshold} days`);
 
-    const forceRefreshResponse = await fetch('http://localhost:4322/api/admin/force-refresh', {
+    const forceRefreshResponse = await fetch('/api/admin/force-refresh', {
       method: 'POST'
     });
 
@@ -65,7 +65,7 @@ export const POST: APIRoute = async () => {
     }
 
     // Get updated status after extension
-    const updatedStatusResponse = await fetch('http://localhost:4322/api/admin/extend-booking-range');
+    const updatedStatusResponse = await fetch('/api/admin/extend-booking-range');
     const updatedStatusResult = await updatedStatusResponse.json();
     const updatedStatus = updatedStatusResult.success ? updatedStatusResult.status : statusData;
 

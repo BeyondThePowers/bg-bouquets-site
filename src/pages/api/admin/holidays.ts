@@ -33,10 +33,22 @@ export const GET: APIRoute = async () => {
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { date, name } = await request.json();
+    const { date, name, reason } = await request.json();
 
     if (!date || !name) {
       return new Response(JSON.stringify({ success: false, error: 'Date and name are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Validate date is not in the past
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return new Response(JSON.stringify({ success: false, error: 'Cannot add holidays in the past' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -62,6 +74,7 @@ export const POST: APIRoute = async ({ request }) => {
       .insert({
         date,
         name,
+        reason: reason || null, // Include reason if provided
         is_recurring: false,
         is_auto_generated: false
       });

@@ -127,8 +127,8 @@
 					</div>
 
 					<div class="form-group">
-						<label for="maxVisitorPasses">Max Visitor Passes per Booking:</label>
-						<input type="number" id="maxVisitorPasses" min="0" max="20" value="8">
+						<label for="maxVisitorPassesPerBooking">Max Visitor Passes per Booking:</label>
+						<input type="number" id="maxVisitorPassesPerBooking" min="0" max="20" value="8">
 					</div>
 
 					<div class="form-group">
@@ -263,6 +263,10 @@
 							</button>
 							<button id="extendRange" class="btn btn-primary">
 								<span class="btn-text">Extend Range</span>
+								<span class="btn-spinner hidden">⟳</span>
+							</button>
+							<button id="forceRefresh" class="btn btn-warning">
+								<span class="btn-text">Force Regenerate Schedule</span>
 								<span class="btn-spinner hidden">⟳</span>
 							</button>
 						</div>
@@ -438,6 +442,7 @@
 		async function addHoliday(): Promise<void> {
 			const dateElement = document.getElementById('holidayDate') as HTMLInputElement;
 			const nameElement = document.getElementById('holidayName') as HTMLInputElement;
+			const reasonElement = document.getElementById('holidayReason') as HTMLInputElement;
 			const messageDiv = document.getElementById('holidayMessage');
 
 			if (!dateElement || !nameElement || !messageDiv) {
@@ -447,20 +452,36 @@
 
 			const date = dateElement.value;
 			const name = nameElement.value;
+			const reason = reasonElement?.value || '';
 
-			if (!date || !name) {
-				showMessage(messageDiv, 'Please enter both date and name.', 'error');
+			if (!date) {
+				showMessage(messageDiv, 'Please select a date.', 'error');
+				return;
+			}
+
+			if (!name) {
+				showMessage(messageDiv, 'Please enter a holiday name.', 'error');
+				return;
+			}
+			
+			// Validate date is not in the past
+			const selectedDate = new Date(date);
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			
+			if (selectedDate < today) {
+				showMessage(messageDiv, 'Cannot add holidays in the past.', 'error');
 				return;
 			}
 
 			// Show loading state
-			setButtonLoading('addHolidayBtn', true);
+			setButtonLoading('addHoliday', true);
 
 			try {
 				const response = await fetch('/api/admin/holidays', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ date, name })
+					body: JSON.stringify({ date, name, reason })
 				});
 
 				const result = await response.json();
@@ -478,7 +499,7 @@
 				showMessage(messageDiv, 'Error adding holiday.', 'error');
 			} finally {
 				// Hide loading state
-				setButtonLoading('addHolidayBtn', false);
+				setButtonLoading('addHoliday', false);
 			}
 		}
 
@@ -491,7 +512,7 @@
 			}
 
 			// Show loading state
-			setButtonLoading('generateHolidaysBtn', true);
+			setButtonLoading('generateHolidays', true);
 
 			try {
 				showMessage(messageDiv, 'Generating holidays...', 'success');
@@ -514,7 +535,7 @@
 				showMessage(messageDiv, 'An error occurred while generating holidays.', 'error');
 			} finally {
 				// Hide loading state
-				setButtonLoading('generateHolidaysBtn', false);
+				setButtonLoading('generateHolidays', false);
 			}
 		}
 
@@ -844,12 +865,36 @@
 					return;
 				}
 
-				const maxBookings = maxBookingsInput.value;
-				const maxVisitors = maxVisitorsInput.value;
-				const seasonStartMonth = seasonStartMonthInput.value;
-				const seasonStartDay = seasonStartDayInput.value;
-				const seasonEndMonth = seasonEndMonthInput.value;
-				const seasonEndDay = seasonEndDayInput.value;
+				const maxBookings = parseInt(maxBookingsInput.value);
+				const maxVisitors = parseInt(maxVisitorsInput.value);
+				const seasonStartMonth = parseInt(seasonStartMonthInput.value);
+				const seasonStartDay = parseInt(seasonStartDayInput.value);
+				const seasonEndMonth = parseInt(seasonEndMonthInput.value);
+				const seasonEndDay = parseInt(seasonEndDayInput.value);
+				
+				// Additional validation for numeric values
+				if (isNaN(maxBookings) || maxBookings < 1 || maxBookings > 20) {
+					showMessage(messageDiv, 'Max bookings per slot must be between 1 and 20.', 'error');
+					return;
+				}
+				
+				if (isNaN(maxVisitors) || maxVisitors < 1 || maxVisitors > 50) {
+					showMessage(messageDiv, 'Max bouquets per slot must be between 1 and 50.', 'error');
+					return;
+				}
+				
+				// Validate season dates
+				if (isNaN(seasonStartMonth) || seasonStartMonth < 1 || seasonStartMonth > 12 ||
+					isNaN(seasonStartDay) || seasonStartDay < 1 || seasonStartDay > 31) {
+					showMessage(messageDiv, 'Invalid season start date.', 'error');
+					return;
+				}
+				
+				if (isNaN(seasonEndMonth) || seasonEndMonth < 1 || seasonEndMonth > 12 ||
+					isNaN(seasonEndDay) || seasonEndDay < 1 || seasonEndDay > 31) {
+					showMessage(messageDiv, 'Invalid season end date.', 'error');
+					return;
+				}
 
 				if (operatingDays.length === 0) {
 					showMessage(messageDiv, 'Please select at least one operating day.', 'error');
@@ -876,12 +921,12 @@
 					body: JSON.stringify({
 						operating_days: operatingDays,
 						time_slots: timeSlots,
-						max_bookings_per_slot: parseInt(maxBookings),
-						max_visitors_per_slot: parseInt(maxVisitors), // Keep for API compatibility
-						season_start_month: parseInt(seasonStartMonth),
-						season_start_day: parseInt(seasonStartDay),
-						season_end_month: parseInt(seasonEndMonth),
-						season_end_day: parseInt(seasonEndDay)
+						max_bookings_per_slot: maxBookings,
+						max_visitors_per_slot: maxVisitors, // Keep for API compatibility
+						season_start_month: seasonStartMonth,
+						season_start_day: seasonStartDay,
+						season_end_month: seasonEndMonth,
+						season_end_day: seasonEndDay
 					})
 				});
 
@@ -995,6 +1040,40 @@
 			setButtonLoading('refreshRangeStatus', false);
 		}
 
+		async function forceRegenerateSchedule(): Promise<void> {
+			const messageDiv = document.getElementById('rangeMessage');
+			if (!messageDiv) return;
+
+			if (!confirm('This will COMPLETELY REGENERATE all future schedule data. This is only necessary for major changes. Continue?')) {
+				return;
+			}
+
+			setButtonLoading('forceRefresh', true);
+
+			try {
+				showRangeMessage('Force regenerating schedule...', 'success');
+
+				const response = await fetch('/api/admin/force-refresh', {
+					method: 'POST'
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					showRangeMessage(`Schedule successfully regenerated! Created ${result.generatedDays} days and ${result.generatedSlots} time slots.`, 'success');
+					// Refresh the status display
+					await loadBookingRangeStatus();
+				} else {
+					showRangeMessage(result.error || 'Failed to regenerate schedule.', 'error');
+				}
+			} catch (error) {
+				console.error('Error force regenerating schedule:', error);
+				showRangeMessage('Error regenerating schedule.', 'error');
+			} finally {
+				setButtonLoading('forceRefresh', false);
+			}
+		}
+
 		async function extendBookingRange(): Promise<void> {
 			const messageDiv = document.getElementById('rangeMessage');
 			if (!messageDiv) return;
@@ -1041,9 +1120,25 @@
 		// Add event listeners for booking range buttons
 		const refreshRangeBtn = document.getElementById('refreshRangeStatus');
 		const extendRangeBtn = document.getElementById('extendRange');
+		const forceRefreshBtn = document.getElementById('forceRefresh');
 
 		if (refreshRangeBtn) refreshRangeBtn.addEventListener('click', refreshRangeStatus);
 		if (extendRangeBtn) extendRangeBtn.addEventListener('click', extendBookingRange);
+		if (forceRefreshBtn) forceRefreshBtn.addEventListener('click', forceRegenerateSchedule);
+
+		// Add event listeners for settings save buttons
+		const saveScheduleBtn = document.getElementById('saveSchedule');
+		const savePricingBtn = document.getElementById('savePricing');
+
+		if (saveScheduleBtn) saveScheduleBtn.addEventListener('click', updateScheduleSettings);
+		if (savePricingBtn) savePricingBtn.addEventListener('click', updatePricingSettings);
+		
+		// Add event listeners for holiday management buttons
+		const addHolidayBtn = document.getElementById('addHoliday');
+		const generateHolidaysBtn = document.getElementById('generateHolidays');
+		
+		if (addHolidayBtn) addHolidayBtn.addEventListener('click', addHoliday);
+		if (generateHolidaysBtn) generateHolidaysBtn.addEventListener('click', generateFutureHolidays);
 
 		// Pricing Settings Functions
 		async function loadPricingSettings(): Promise<void> {
@@ -1161,6 +1256,7 @@
 		(window as any).updatePricingSettings = updatePricingSettings;
 		(window as any).refreshRangeStatus = refreshRangeStatus;
 		(window as any).extendBookingRange = extendBookingRange;
+		(window as any).forceRegenerateSchedule = forceRegenerateSchedule;
 
 		console.log('Garden management page JavaScript loaded');
 	</script>

@@ -146,7 +146,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Refresh the schedule to apply the new settings using our working force refresh
     console.log('Refreshing schedule with new settings...');
     try {
-      const forceRefreshResponse = await fetch('http://localhost:4322/api/admin/force-refresh', {
+      const forceRefreshResponse = await fetch('/api/admin/force-refresh', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
