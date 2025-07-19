@@ -143,21 +143,20 @@ export const POST: APIRoute = async ({ request }) => {
       console.log(`Successfully updated ${update.setting_key}`);
     }
 
-    // Refresh the schedule to apply the new settings using our working force refresh
-    console.log('Refreshing schedule with new settings...');
+    // Refresh the schedule to apply the new settings directly using the RPC function
+    // instead of trying to call the other API endpoint with fetch
+    console.log('Refreshing schedule with new settings via RPC...');
     try {
-      const forceRefreshResponse = await fetch('/api/admin/force-refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (forceRefreshResponse.ok) {
-        console.log('Schedule refreshed successfully via force refresh');
+      const { error: refreshError } = await supabaseAdmin.rpc('refresh_future_schedule');
+      
+      if (refreshError) {
+        console.error('Schedule refresh failed:', refreshError);
+        console.warn('Settings updated but schedule refresh failed');
       } else {
-        console.error('Force refresh failed:', await forceRefreshResponse.text());
+        console.log('Schedule refreshed successfully via direct RPC call');
       }
     } catch (error) {
-      console.error('Error calling force refresh:', error);
+      console.error('Error refreshing schedule:', error);
       console.warn('Settings updated but schedule refresh failed');
     }
 
