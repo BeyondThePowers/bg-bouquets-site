@@ -3864,6 +3864,7 @@ import Layout from '../layouts/Layout.astro';
 			const lockMessage = document.getElementById('schedule-lock-message');
 			const unavailableMessage = document.getElementById('booking-unavailable-message');
 			const bookingFormContainer = document.getElementById('booking-form-container');
+			const bookingSuccess = document.getElementById('booking-success');
 
 			if (lockMessage) {
 				lockMessage.classList.add('hidden');
@@ -3871,15 +3872,22 @@ import Layout from '../layouts/Layout.astro';
 			if (unavailableMessage) {
 				unavailableMessage.classList.add('hidden');
 			}
-			if (bookingFormContainer) {
-				bookingFormContainer.classList.remove('hidden');
+
+			// Only show the booking form if we're not currently showing a success message
+			if (bookingFormContainer && bookingSuccess) {
+				const isSuccessVisible = !bookingSuccess.classList.contains('hidden');
+				if (!isSuccessVisible) {
+					bookingFormContainer.classList.remove('hidden');
+				}
 			}
 
 			// Also hide our new booking disabled message
 			hideBookingDisabledMessage();
 
-			// Re-enable form interactions
-			enableBookingForm();
+			// Re-enable form interactions (but only if not in success state)
+			if (bookingSuccess && bookingSuccess.classList.contains('hidden')) {
+				enableBookingForm();
+			}
 		}
 
 		function disableBookingForm() {
