@@ -5,7 +5,10 @@
 [build.environment]
   NODE_VERSION = "18"
 
+[functions]
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/entry/:splat"
+  to = "/.netlify/functions/ssr/:splat"
   status = 200

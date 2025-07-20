@@ -33,5 +33,7 @@ export default defineConfig({
     }
   },
   compressHTML: true,
-  adapter: netlify()
+  adapter: netlify({
+    functionPerRoute: false
+  })
 });

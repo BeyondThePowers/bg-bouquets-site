@@ -1,0 +1,5 @@
+# API Routes - Redirect to Netlify Functions
+/api/*  /.netlify/functions/ssr/:splat  200
+
+# SPA Fallback for client-side routing
+/*    /index.html   200
