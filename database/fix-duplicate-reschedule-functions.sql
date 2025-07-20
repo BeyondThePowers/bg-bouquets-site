@@ -1,14 +1,36 @@
--- Create the reschedule_booking function if it doesn't exist
--- This is based on the latest version from the migration files
+-- Fix duplicate reschedule_booking functions
+-- This removes the customer-only version and keeps the admin-capable version
 -- Run this in your Supabase SQL Editor
 
--- Create the reschedule_booking function
+-- 1. Check current reschedule_booking functions
+SELECT 'Current reschedule_booking functions:' as info;
+SELECT 
+    proname,
+    pg_get_function_identity_arguments(oid) as signature,
+    prosrc IS NOT NULL as has_source
+FROM pg_proc 
+WHERE proname = 'reschedule_booking'
+ORDER BY pg_get_function_identity_arguments(oid);
+
+-- 2. Drop the customer-only version (5 parameters)
+-- This is the version without p_admin_user parameter
+DROP FUNCTION IF EXISTS reschedule_booking(
+    p_cancellation_token UUID,
+    p_new_date DATE,
+    p_new_time VARCHAR(20),
+    p_reschedule_reason VARCHAR(500),
+    p_customer_ip VARCHAR(45)
+);
+
+-- 3. Ensure the admin-capable version exists (6 parameters)
+-- This version can handle both customer and admin reschedules
 CREATE OR REPLACE FUNCTION reschedule_booking(
     p_cancellation_token UUID,
     p_new_date DATE,
     p_new_time VARCHAR(20),
     p_reschedule_reason VARCHAR(500) DEFAULT NULL,
-    p_customer_ip VARCHAR(45) DEFAULT NULL
+    p_customer_ip VARCHAR(45) DEFAULT NULL,
+    p_admin_user VARCHAR(100) DEFAULT NULL
 )
 RETURNS TABLE (
     success BOOLEAN,
@@ -25,7 +47,7 @@ DECLARE
     v_slot_bookings INTEGER;
     v_current_bookings INTEGER;
     v_current_bouquets INTEGER;
-    v_schedule_settings RECORD;
+    v_is_admin_action BOOLEAN := (p_admin_user IS NOT NULL);
 BEGIN
     -- Find the booking by cancellation token
     SELECT * INTO v_booking_record
@@ -39,8 +61,8 @@ BEGIN
         RETURN;
     END IF;
 
-    -- Check if new date is in the future
-    IF p_new_date < CURRENT_DATE THEN
+    -- Check if new date is in the future (unless admin action)
+    IF p_new_date < CURRENT_DATE AND NOT v_is_admin_action THEN
         RETURN QUERY SELECT false, 'Cannot reschedule to past dates', NULL::JSONB;
         RETURN;
     END IF;
@@ -49,7 +71,8 @@ BEGIN
     v_booking_data := to_jsonb(v_booking_record);
 
     -- Get slot capacity and current bookings for the new slot
-    SELECT max_capacity, max_bookings INTO v_slot_capacity, v_slot_bookings
+    -- Use max_bouquets instead of max_capacity
+    SELECT max_bouquets, max_bookings INTO v_slot_capacity, v_slot_bookings
     FROM time_slots
     WHERE date = p_new_date AND time = p_new_time;
 
@@ -76,6 +99,7 @@ BEGIN
         RETURN;
     END IF;
 
+    -- Use number_of_bouquets instead of number_of_visitors
     IF (v_current_bouquets + v_booking_record.number_of_bouquets) > v_slot_capacity THEN
         RETURN QUERY SELECT false, 'Selected time slot does not have enough capacity', NULL::JSONB;
         RETURN;
@@ -94,6 +118,7 @@ BEGIN
             new_date,
             new_time,
             performed_by_customer,
+            performed_by_admin,
             customer_ip
         ) VALUES (
             v_booking_record.id,
@@ -104,7 +129,8 @@ BEGIN
             v_booking_record.time,
             p_new_date,
             p_new_time,
-            true,
+            NOT v_is_admin_action,
+            p_admin_user,
             p_customer_ip
         );
 
@@ -127,6 +153,7 @@ BEGIN
             new_date,
             new_time,
             performed_by_customer,
+            performed_by_admin,
             customer_ip
         ) VALUES (
             v_booking_record.id,
@@ -137,20 +164,15 @@ BEGIN
             v_booking_record.time,
             p_new_date,
             p_new_time,
-            true,
+            NOT v_is_admin_action,
+            p_admin_user,
             p_customer_ip
         );
 
-        -- Return success with updated booking data including both original and new date/time
-        -- Preserve original date/time and add new date/time for webhook payload
-        v_booking_data := jsonb_set(v_booking_data, '{original_date}', to_jsonb(v_booking_record.date));
-        v_booking_data := jsonb_set(v_booking_data, '{original_time}', to_jsonb(v_booking_record.time));
-        v_booking_data := jsonb_set(v_booking_data, '{new_date}', to_jsonb(p_new_date));
-        v_booking_data := jsonb_set(v_booking_data, '{new_time}', to_jsonb(p_new_time));
-        -- Update the main date/time fields to reflect the new booking time
+        -- Return success with updated booking data
         v_booking_data := jsonb_set(v_booking_data, '{date}', to_jsonb(p_new_date));
         v_booking_data := jsonb_set(v_booking_data, '{time}', to_jsonb(p_new_time));
-
+        
         RETURN QUERY SELECT true, 'Booking rescheduled successfully', v_booking_data;
 
     EXCEPTION
@@ -161,15 +183,34 @@ BEGIN
 END;
 $$;
 
--- Test the function with correct argument types
-SELECT 'Testing reschedule_booking function:' as info;
+-- 4. Verify only one reschedule_booking function remains
+SELECT 'Remaining reschedule_booking functions:' as info;
+SELECT 
+    proname,
+    pg_get_function_identity_arguments(oid) as signature
+FROM pg_proc 
+WHERE proname = 'reschedule_booking';
+
+-- 5. Test the function works for both customer and admin calls
+SELECT 'Testing customer reschedule (should fail - booking not found):' as info;
 SELECT * FROM reschedule_booking(
     '00000000-0000-0000-0000-000000000000'::UUID,
-    (CURRENT_DATE + INTERVAL '1 day')::DATE,  -- explicit DATE cast
-    '10:00 AM'::VARCHAR,                      -- explicit VARCHAR cast
-    'Test reschedule'::VARCHAR,               -- explicit VARCHAR cast
-    '127.0.0.1'::VARCHAR                      -- explicit VARCHAR cast
+    CURRENT_DATE + INTERVAL '1 day',
+    '10:00 AM',
+    'Customer test',
+    '127.0.0.1'
+    -- p_admin_user is NULL (customer reschedule)
+);
+
+SELECT 'Testing admin reschedule (should fail - booking not found):' as info;
+SELECT * FROM reschedule_booking(
+    '00000000-0000-0000-0000-000000000000'::UUID,
+    CURRENT_DATE + INTERVAL '1 day',
+    '10:00 AM',
+    'Admin test',
+    '127.0.0.1',
+    'admin@example.com'
 );
 
 -- Success message
-SELECT 'reschedule_booking function created successfully!' as status;
+SELECT 'Duplicate reschedule_booking functions fixed successfully!' as status;

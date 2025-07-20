@@ -1,14 +1,15 @@
--- Create the reschedule_booking function if it doesn't exist
--- This is based on the latest version from the migration files
+-- Fix reschedule webhook payload to include original date/time information
+-- This fixes the issue where Make.com webhooks don't receive original booking dates
 -- Run this in your Supabase SQL Editor
 
--- Create the reschedule_booking function
+-- Update the reschedule_booking function to properly include original date/time in returned data
 CREATE OR REPLACE FUNCTION reschedule_booking(
     p_cancellation_token UUID,
     p_new_date DATE,
     p_new_time VARCHAR(20),
     p_reschedule_reason VARCHAR(500) DEFAULT NULL,
-    p_customer_ip VARCHAR(45) DEFAULT NULL
+    p_customer_ip VARCHAR(45) DEFAULT NULL,
+    p_admin_user VARCHAR(100) DEFAULT NULL
 )
 RETURNS TABLE (
     success BOOLEAN,
@@ -25,7 +26,7 @@ DECLARE
     v_slot_bookings INTEGER;
     v_current_bookings INTEGER;
     v_current_bouquets INTEGER;
-    v_schedule_settings RECORD;
+    v_is_admin_action BOOLEAN := (p_admin_user IS NOT NULL);
 BEGIN
     -- Find the booking by cancellation token
     SELECT * INTO v_booking_record
@@ -39,8 +40,8 @@ BEGIN
         RETURN;
     END IF;
 
-    -- Check if new date is in the future
-    IF p_new_date < CURRENT_DATE THEN
+    -- Check if new date is in the future (unless admin action)
+    IF p_new_date < CURRENT_DATE AND NOT v_is_admin_action THEN
         RETURN QUERY SELECT false, 'Cannot reschedule to past dates', NULL::JSONB;
         RETURN;
     END IF;
@@ -49,7 +50,8 @@ BEGIN
     v_booking_data := to_jsonb(v_booking_record);
 
     -- Get slot capacity and current bookings for the new slot
-    SELECT max_capacity, max_bookings INTO v_slot_capacity, v_slot_bookings
+    -- Use max_bouquets instead of max_capacity
+    SELECT max_bouquets, max_bookings INTO v_slot_capacity, v_slot_bookings
     FROM time_slots
     WHERE date = p_new_date AND time = p_new_time;
 
@@ -76,6 +78,7 @@ BEGIN
         RETURN;
     END IF;
 
+    -- Use number_of_bouquets instead of number_of_visitors
     IF (v_current_bouquets + v_booking_record.number_of_bouquets) > v_slot_capacity THEN
         RETURN QUERY SELECT false, 'Selected time slot does not have enough capacity', NULL::JSONB;
         RETURN;
@@ -94,6 +97,7 @@ BEGIN
             new_date,
             new_time,
             performed_by_customer,
+            performed_by_admin,
             customer_ip
         ) VALUES (
             v_booking_record.id,
@@ -104,7 +108,8 @@ BEGIN
             v_booking_record.time,
             p_new_date,
             p_new_time,
-            true,
+            NOT v_is_admin_action,
+            p_admin_user,
             p_customer_ip
         );
 
@@ -127,6 +132,7 @@ BEGIN
             new_date,
             new_time,
             performed_by_customer,
+            performed_by_admin,
             customer_ip
         ) VALUES (
             v_booking_record.id,
@@ -137,7 +143,8 @@ BEGIN
             v_booking_record.time,
             p_new_date,
             p_new_time,
-            true,
+            NOT v_is_admin_action,
+            p_admin_user,
             p_customer_ip
         );
 
@@ -150,7 +157,7 @@ BEGIN
         -- Update the main date/time fields to reflect the new booking time
         v_booking_data := jsonb_set(v_booking_data, '{date}', to_jsonb(p_new_date));
         v_booking_data := jsonb_set(v_booking_data, '{time}', to_jsonb(p_new_time));
-
+        
         RETURN QUERY SELECT true, 'Booking rescheduled successfully', v_booking_data;
 
     EXCEPTION
@@ -161,15 +168,17 @@ BEGIN
 END;
 $$;
 
--- Test the function with correct argument types
-SELECT 'Testing reschedule_booking function:' as info;
+-- Test the updated function (this should return "Booking not found" but not error)
+SELECT 'Testing updated reschedule_booking function:' as info;
 SELECT * FROM reschedule_booking(
     '00000000-0000-0000-0000-000000000000'::UUID,
-    (CURRENT_DATE + INTERVAL '1 day')::DATE,  -- explicit DATE cast
-    '10:00 AM'::VARCHAR,                      -- explicit VARCHAR cast
-    'Test reschedule'::VARCHAR,               -- explicit VARCHAR cast
-    '127.0.0.1'::VARCHAR                      -- explicit VARCHAR cast
+    (CURRENT_DATE + INTERVAL '1 day')::DATE,
+    '10:00 AM'::VARCHAR,
+    'Test reschedule'::VARCHAR,
+    '127.0.0.1'::VARCHAR,
+    NULL::VARCHAR
 );
 
 -- Success message
-SELECT 'reschedule_booking function created successfully!' as status;
+SELECT 'Reschedule webhook payload fix applied successfully!' as status;
+SELECT 'The function now returns both original_date/original_time and new_date/new_time in the booking_data JSONB' as note;
