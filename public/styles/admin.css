@@ -207,14 +207,24 @@ body {
 	border-color: #dc2626;
 }
 
-/* Button Loading States */
-.btn-spinner {
-	display: flex;
-	align-items: center;
-	gap: 6px;
+/* Simple Button Loading States */
+.btn.loading {
+	position: relative;
+	pointer-events: none;
+	padding-left: 32px;
 }
 
-.btn-spinner svg {
+.btn.loading::before {
+	content: '';
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 14px;
+	height: 14px;
+	border: 2px solid transparent;
+	border-top: 2px solid currentColor;
+	border-radius: 50%;
 	animation: spin 1s linear infinite;
 }
 
@@ -324,6 +334,10 @@ body {
 	background-color: var(--admin-gray-50);
 	border-radius: 8px;
 	padding: 1.5rem;
+}
+
+.schedule-lock-section {
+	margin-bottom: 2rem;
 }
 
 /* Horizontal fields container */
@@ -646,7 +660,7 @@ body {
 	max-height: 300px;
 	overflow-y: auto;
 	padding: 4px;
-	border: 1px solid var(--admin-gray-200);
+	border: 1px solid transparent;
 	border-radius: var(--radius);
 	background: var(--admin-gray-25);
 }
@@ -852,6 +866,38 @@ body {
 }
 
 .time-filter.active {
+	background: var(--admin-black);
+	color: var(--admin-white);
+}
+
+/* Status filters styling */
+.status-filters {
+	display: flex;
+	gap: 2px;
+	background: var(--admin-gray-100);
+	border-radius: var(--radius);
+	padding: 2px;
+}
+
+.status-filter {
+	padding: 8px 16px;
+	border: none;
+	background: none;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--admin-gray-600);
+	border-radius: var(--radius);
+	transition: all var(--transition);
+	white-space: nowrap;
+}
+
+.status-filter:hover {
+	background: var(--admin-white);
+	color: var(--admin-black);
+}
+
+.status-filter.active {
 	background: var(--admin-black);
 	color: var(--admin-white);
 }
@@ -1192,6 +1238,73 @@ body {
 	color: var(--admin-black);
 }
 
+/* Past booking styling */
+.booking-card.past-booking {
+	opacity: 0.7;
+	background: #f9fafb;
+}
+
+.booking-card.past-booking:hover {
+	background: #f3f4f6;
+}
+
+.booking-card.past-booking .customer-name,
+.booking-card.past-booking .datetime-main {
+	color: #6b7280;
+}
+
+.past-booking-notice {
+	padding: 8px 12px;
+	font-size: 12px;
+	color: #6b7280;
+	font-style: italic;
+	text-align: center;
+	border-top: 1px solid #e5e7eb;
+	background: #f9fafb;
+}
+
+/* Past filter button styling */
+.time-filter.past-filter {
+	color: #6b7280;
+	border-color: #d1d5db;
+}
+
+.time-filter.past-filter:hover {
+	background: #f3f4f6;
+	color: #374151;
+}
+
+.time-filter.past-filter.active {
+	background: #6b7280;
+	color: white;
+	border-color: #6b7280;
+}
+
+/* Info banner styling */
+.info-banner {
+	background: #f0f9ff;
+	border: 1px solid #bae6fd;
+	border-radius: 6px;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+}
+
+.info-content {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.info-icon {
+	font-size: 16px;
+}
+
+.info-text {
+	color: #0369a1;
+	font-size: 14px;
+	font-weight: 500;
+}
+
 /* Clean Card Content Structure */
 .card-content {
 	display: grid;
@@ -1359,6 +1472,12 @@ body {
 	background: var(--admin-white);
 	color: var(--status-danger);
 	border-color: var(--status-danger);
+}
+
+.status-past {
+	background: var(--admin-white);
+	color: #6b7280;
+	border-color: #d1d5db;
 }
 
 /* Payment status styling with meaningful colors */
@@ -1792,6 +1911,10 @@ body {
 	outline-offset: 2px;
 }
 
+.form-group {
+	margin-bottom: 1rem;
+}
+
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
@@ -1943,13 +2066,15 @@ body {
 		gap: 16px;
 	}
 
-	.time-filters {
+	.time-filters,
+	.status-filters {
 		overflow-x: auto;
 		padding: 2px;
 		-webkit-overflow-scrolling: touch;
 	}
 
-	.time-filters::-webkit-scrollbar {
+	.time-filters::-webkit-scrollbar,
+	.status-filters::-webkit-scrollbar {
 		display: none;
 	}
 
@@ -2114,11 +2239,13 @@ body {
 		gap: 12px;
 	}
 
-	.time-filters {
+	.time-filters,
+	.status-filters {
 		justify-content: flex-start;
 	}
 
-	.time-filter {
+	.time-filter,
+	.status-filter {
 		padding: 6px 12px;
 		font-size: 13px;
 	}
@@ -2185,6 +2312,60 @@ body {
 	.payment-method {
 		font-size: 9px;
 	}
+}
+
+/* ========================================
+   SCHEDULE LOCK STATUS INDICATORS
+   ======================================== */
+
+/* Status indicators */
+.status-indicator {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	margin-left: 8px;
+}
+
+.status-indicator.unlocked {
+	background-color: #28a745;
+}
+
+.status-indicator.locked {
+	background-color: #dc3545;
+}
+
+/* Status text styling */
+.unlock-status {
+	color: #28a745;
+	font-weight: 600;
+}
+
+.lock-status {
+	color: #dc3545;
+	font-weight: 600;
+}
+
+/* Button variants for lock system */
+.btn-success {
+	background: var(--status-success);
+	color: var(--admin-white);
+	border-color: var(--status-success);
+}
+
+.btn-success:hover {
+	background: #15803d;
+	border-color: #15803d;
+}
+
+.btn-warning {
+	background: var(--status-warning);
+	color: var(--admin-white);
+	border-color: var(--status-warning);
+}
+
+.btn-warning:hover {
+	background: #b45309;
+	border-color: #b45309;
 }
 
 /* ========================================

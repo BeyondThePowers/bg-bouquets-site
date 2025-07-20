@@ -1,6 +1,6 @@
 // src/pages/api/garden-mgmt/booking-history.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 // Helper function to provide default reasons for actions
 function getDefaultReasonForAction(actionType: string): string {
@@ -37,7 +37,7 @@ async function verifyAdminAuth(request: Request): Promise<boolean> {
     const password = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Get admin password from settings
-    const { data: settings, error } = await supabase
+    const { data: settings, error } = await supabaseAdmin
       .from('schedule_settings')
       .select('setting_value')
       .eq('setting_key', 'admin_password')
@@ -82,7 +82,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     }
 
     // Get booking details with comprehensive audit trail
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await supabaseAdmin
       .from('admin_booking_history')
       .select('*')
       .eq('id', bookingId)
@@ -98,7 +98,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     }
 
     // Get comprehensive audit trail from new audit logging system
-    const { data: auditLogs, error: auditError } = await supabase
+    const { data: auditLogs, error: auditError } = await supabaseAdmin
       .from('booking_audit_log')
       .select('*')
       .eq('booking_id', bookingId)

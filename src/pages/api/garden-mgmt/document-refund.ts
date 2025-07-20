@@ -1,6 +1,5 @@
 // src/pages/api/garden-mgmt/document-refund.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
 import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 // Helper function to verify admin authentication
@@ -14,7 +13,7 @@ async function verifyAdminAuth(request: Request): Promise<boolean> {
     const password = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Get admin password from settings
-    const { data: settings, error } = await supabase
+    const { data: settings, error } = await supabaseAdmin
       .from('schedule_settings')
       .select('setting_value')
       .eq('setting_key', 'admin_password')

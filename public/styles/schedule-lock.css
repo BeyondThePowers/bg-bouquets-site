@@ -1,7 +1,6 @@
 /* Schedule Lock Styles */
 
 .schedule-lock-controls {
-  margin: 1.5rem 0;
   padding: 1.25rem;
   border: 1px solid var(--admin-gray-200);
   border-radius: var(--radius);
@@ -98,10 +97,9 @@
   margin-top: 1.5rem;
 }
 
-/* Disabled form elements */
+/* Disabled form elements (locked forms) */
 input.disabled,
-select.disabled,
-button.disabled {
+select.disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background-color: var(--admin-gray-100);
@@ -110,4 +108,18 @@ button.disabled {
 .toggle-chip.disabled {
   opacity: 0.6;
   pointer-events: none;
+}
+
+/* Hide action buttons when forms are locked - much cleaner approach */
+.section-disabled .admin-actions,
+.section-disabled .form-actions,
+.section-disabled .btn-primary,
+.section-disabled .btn-secondary,
+.section-disabled .btn-warning {
+  display: none !important;
+}
+
+/* Exception: Keep lock control button visible */
+.section-disabled #lockScheduleBtn {
+  display: inline-block !important;
 }

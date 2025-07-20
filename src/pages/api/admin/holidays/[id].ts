@@ -69,10 +69,32 @@ export const DELETE: APIRoute = async ({ params }) => {
       });
     }
 
-    // Refresh future schedule to account for removed holiday
-    const { error: refreshError } = await supabaseAdmin.rpc('refresh_future_schedule');
-    if (refreshError) {
-      console.warn('Warning: Could not refresh schedule:', refreshError);
+    // Refresh future schedule to account for removed holiday using the robust regeneration API
+    try {
+      const siteUrl = process.env.SITE_URL || import.meta.env.SITE_URL || 'http://localhost:4322';
+      const regenerateResponse = await fetch(`${siteUrl}/api/admin/regenerate-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (regenerateResponse.ok) {
+        const regenerateResult = await regenerateResponse.json();
+        console.log('Schedule regenerated successfully after removing holiday:', regenerateResult.message);
+      } else {
+        console.warn('Schedule regeneration failed after removing holiday:', regenerateResponse.status);
+        // Fallback to the SQL function if the API call fails
+        const { error: fallbackError } = await supabaseAdmin.rpc('refresh_future_schedule');
+        if (fallbackError) {
+          console.warn('Fallback schedule refresh also failed:', fallbackError);
+        }
+      }
+    } catch (refreshError) {
+      console.warn('Warning: Could not refresh schedule after removing holiday:', refreshError);
+      // Fallback to the SQL function if the API call fails
+      const { error: fallbackError } = await supabaseAdmin.rpc('refresh_future_schedule');
+      if (fallbackError) {
+        console.warn('Fallback schedule refresh also failed:', fallbackError);
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {

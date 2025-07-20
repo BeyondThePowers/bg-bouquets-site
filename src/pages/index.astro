@@ -2054,6 +2054,110 @@ import Layout from '../layouts/Layout.astro';
 		// Load dynamic pricing
 		loadPricing();
 
+		// Booking status validation utility
+		let bookingStatusCache = { isEnabled: true, lastChecked: 0 };
+		const BOOKING_STATUS_CACHE_DURATION = 30000; // 30 seconds
+
+		async function checkBookingStatus(showUserMessage = false) {
+			const now = Date.now();
+			console.log('checkBookingStatus called, showUserMessage:', showUserMessage);
+
+			// Use cached result if recent (within 30 seconds)
+			if (now - bookingStatusCache.lastChecked < BOOKING_STATUS_CACHE_DURATION) {
+				console.log('Using cached booking status:', bookingStatusCache.isEnabled);
+				return bookingStatusCache.isEnabled;
+			}
+
+			try {
+				console.log('Fetching fresh booking status from API...');
+				const response = await fetch('/api/admin/schedule-lock');
+				console.log('API response status:', response.status);
+
+				if (response.ok) {
+					const data = await response.json();
+					console.log('API response data:', data);
+					const isEnabled = !data.isLocked;
+					console.log('Booking enabled:', isEnabled);
+
+					// Update cache
+					bookingStatusCache = { isEnabled, lastChecked: now };
+
+					// Show user message if bookings are disabled and requested
+					if (!isEnabled && showUserMessage) {
+						console.log('Showing booking disabled message');
+						showBookingDisabledMessage();
+					}
+
+					return isEnabled;
+				} else {
+					// If API fails, assume bookings are enabled (fail-safe)
+					console.warn('Could not check booking status, assuming enabled');
+					return true;
+				}
+			} catch (error) {
+				console.warn('Booking status check failed:', error);
+				// If network fails, assume bookings are enabled (fail-safe)
+				return true;
+			}
+		}
+
+		function showBookingDisabledMessage() {
+			// Create or update booking disabled message
+			let messageDiv = document.getElementById('booking-disabled-message');
+			if (!messageDiv) {
+				messageDiv = document.createElement('div');
+				messageDiv.id = 'booking-disabled-message';
+				messageDiv.className = 'bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6';
+				messageDiv.innerHTML = `
+					<div class="flex items-start">
+						<svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+						</svg>
+						<div>
+							<h3 class="text-sm font-medium text-yellow-800 mb-1">Booking Temporarily Unavailable</h3>
+							<p class="text-sm text-yellow-700">
+								Our booking schedule is currently being updated. Please try again in 10-30 minutes.
+							</p>
+							<button type="button" id="retry-booking-btn" class="mt-3 text-sm font-medium text-yellow-800 hover:text-yellow-900 underline">
+								Check Again
+							</button>
+						</div>
+					</div>
+				`;
+
+				// Insert message at the top of the booking form container
+				const bookingContainer = document.getElementById('booking-form-container');
+				if (bookingContainer) {
+					bookingContainer.insertBefore(messageDiv, bookingContainer.firstChild);
+				}
+
+				// Add retry functionality
+				const retryBtn = messageDiv.querySelector('#retry-booking-btn');
+				if (retryBtn) {
+					retryBtn.addEventListener('click', async () => {
+						// Clear cache and check status again
+						bookingStatusCache = { isEnabled: true, lastChecked: 0 };
+						const isEnabled = await checkBookingStatus();
+						if (isEnabled) {
+							hideBookingDisabledMessage();
+							// Refresh availability data
+							loadAvailability();
+						}
+					});
+				}
+			}
+
+			// Scroll to message
+			messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+
+		function hideBookingDisabledMessage() {
+			const messageDiv = document.getElementById('booking-disabled-message');
+			if (messageDiv) {
+				messageDiv.remove();
+			}
+		}
+
 		// Multi-step booking form elements
 		const bookingForm = document.getElementById('booking-form') as HTMLFormElement;
 		const bookNowBtn = document.getElementById('bookNowBtn') as HTMLButtonElement;
@@ -2088,6 +2192,14 @@ import Layout from '../layouts/Layout.astro';
 		const step2Back = document.getElementById('step-2-back') as HTMLButtonElement;
 		const step2Next = document.getElementById('step-2-next') as HTMLButtonElement;
 		const step3Back = document.getElementById('step-3-back') as HTMLButtonElement;
+
+		// Debug: Check if elements exist
+		console.log('Navigation elements found:', {
+			step1Next: !!step1Next,
+			step2Back: !!step2Back,
+			step2Next: !!step2Next,
+			step3Back: !!step3Back
+		});
 
 		// Form inputs
 		const visitDateInput = document.getElementById('visitDate') as HTMLInputElement;
@@ -2693,27 +2805,77 @@ import Layout from '../layouts/Layout.astro';
 			}
 		});
 
-		// Step navigation handlers (3-step flow)
-		step1Next.addEventListener('click', () => {
-			if (validateStep1()) {
+		// Step navigation handlers (3-step flow) with booking status validation
+		if (step1Next) {
+			step1Next.addEventListener('click', async (e) => {
+				console.log('Step 1 Next button clicked');
+				e.preventDefault();
+				e.stopPropagation();
+
+				if (!validateStep1()) {
+					alert('Please select both a date and time slot.');
+					return;
+				}
+
+				// Check booking status before proceeding to step 2
+				const bookingEnabled = await checkBookingStatus(true);
+				if (!bookingEnabled) {
+					// Message already shown by checkBookingStatus
+					return;
+				}
+
+				hideBookingDisabledMessage();
 				showStep(2);
-			} else {
-				alert('Please select both a date and time slot.');
-			}
-		});
+			});
+		}
 
 		step2Back.addEventListener('click', () => {
 			showStep(1);
 		});
 
-		step2Next.addEventListener('click', () => {
-			if (validateStep2()) {
-				updateBookingSummary();
-				showStep(3);
-			} else {
-				alert('Please complete all required fields correctly.');
-			}
-		});
+		if (step2Next) {
+			// Remove any existing event listeners first
+			const newStep2Next = step2Next.cloneNode(true) as HTMLButtonElement;
+			step2Next.parentNode?.replaceChild(newStep2Next, step2Next);
+
+			newStep2Next.addEventListener('click', async (e) => {
+				console.log('Step 2 Next button clicked (new handler)');
+
+				// Always prevent default and stop propagation first
+				e.preventDefault();
+				e.stopPropagation();
+				e.stopImmediatePropagation();
+
+				try {
+					if (!validateStep2()) {
+						console.log('Step 2 validation failed');
+						alert('Please complete all required fields correctly.');
+						return;
+					}
+
+					console.log('Step 2 validation passed, checking booking status...');
+
+					// Check booking status before proceeding to step 3
+					const bookingEnabled = await checkBookingStatus(true);
+					console.log('Booking enabled status:', bookingEnabled);
+
+					if (!bookingEnabled) {
+						console.log('Bookings are disabled, preventing step transition');
+						// Message already shown by checkBookingStatus
+						return;
+					}
+
+					console.log('Bookings are enabled, proceeding to step 3');
+					hideBookingDisabledMessage();
+					updateBookingSummary();
+					showStep(3);
+				} catch (error) {
+					console.error('Error in step2Next handler:', error);
+				}
+			}, true); // Use capture phase
+		} else {
+			console.error('step2Next button not found!');
+		}
 
 		step3Back.addEventListener('click', () => {
 			showStep(2);
@@ -3455,6 +3617,13 @@ import Layout from '../layouts/Layout.astro';
 			e.preventDefault();
 			if (!validateForm()) return alert('Please complete all required fields.');
 
+			// Final booking status check before submission
+			const bookingEnabled = await checkBookingStatus(true);
+			if (!bookingEnabled) {
+				// Message already shown by checkBookingStatus
+				return;
+			}
+
 			const formData = new FormData(bookingForm);
 			const numberOfBouquets = parseInt(formData.get('numberOfBouquets') as string) || 1;
 			const numberOfVisitorPasses = parseInt(formData.get('numberOfVisitorPasses') as string) || 0;
@@ -3544,6 +3713,23 @@ import Layout from '../layouts/Layout.astro';
 
 		// Load available slots initially
 		loadAvailability();
+
+		// Set up periodic booking status check (every 60 seconds)
+		// This helps users automatically recover when bookings are re-enabled
+		setInterval(async () => {
+			// Only check if we currently have a booking disabled message showing
+			const disabledMessage = document.getElementById('booking-disabled-message');
+			if (disabledMessage) {
+				// Clear cache to force fresh check
+				bookingStatusCache = { isEnabled: true, lastChecked: 0 };
+				const isEnabled = await checkBookingStatus();
+				if (isEnabled) {
+					hideBookingDisabledMessage();
+					// Refresh availability data
+					loadAvailability();
+				}
+			}
+		}, 60000); // Check every 60 seconds
 
 		// Success state management functions
 		function showBookingSuccess(booking: any, message: string) {
@@ -3636,25 +3822,10 @@ import Layout from '../layouts/Layout.astro';
 
 		// Schedule lock state management functions
 		function showScheduleLockedMessage(message: string) {
-			const lockMessage = document.getElementById('schedule-lock-message');
-			const lockMessageText = document.getElementById('schedule-lock-message-text');
-			const bookingFormContainer = document.getElementById('booking-form-container');
-			const unavailableMessage = document.getElementById('booking-unavailable-message');
+			// Use our new unified booking disabled message instead
+			showBookingDisabledMessage();
 
-			if (lockMessage && lockMessageText) {
-				lockMessageText.textContent = message;
-				lockMessage.classList.remove('hidden');
-			}
-
-			// Hide booking form and other messages
-			if (bookingFormContainer) {
-				bookingFormContainer.classList.add('hidden');
-			}
-			if (unavailableMessage) {
-				unavailableMessage.classList.add('hidden');
-			}
-
-			// Disable form interactions
+			// Also disable form interactions as a backup
 			disableBookingForm();
 		}
 
@@ -3682,6 +3853,7 @@ import Layout from '../layouts/Layout.astro';
 		}
 
 		function hideScheduleMessages() {
+			// Hide old-style messages
 			const lockMessage = document.getElementById('schedule-lock-message');
 			const unavailableMessage = document.getElementById('booking-unavailable-message');
 			const bookingFormContainer = document.getElementById('booking-form-container');
@@ -3695,6 +3867,9 @@ import Layout from '../layouts/Layout.astro';
 			if (bookingFormContainer) {
 				bookingFormContainer.classList.remove('hidden');
 			}
+
+			// Also hide our new booking disabled message
+			hideBookingDisabledMessage();
 
 			// Re-enable form interactions
 			enableBookingForm();

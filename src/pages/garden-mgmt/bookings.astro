@@ -56,10 +56,18 @@
 			<!-- Dashboard Navigation -->
 			<div class="dashboard-nav">
 				<div class="time-filters">
-					<button class="time-filter active" data-period="today">Today</button>
+					<button class="time-filter active" data-period="upcoming" title="Today and future bookings">Upcoming</button>
+					<button class="time-filter" data-period="today">Today</button>
 					<button class="time-filter" data-period="week">This Week</button>
 					<button class="time-filter" data-period="month">This Month</button>
 					<button class="time-filter" data-period="all">All Bookings</button>
+					<button class="time-filter past-filter" data-period="past" title="Past bookings (read-only)">Past Bookings</button>
+				</div>
+
+				<div class="status-filters">
+					<button class="status-filter active" data-status="confirmed" title="Active confirmed bookings">Active</button>
+					<button class="status-filter" data-status="cancelled" title="Cancelled bookings">Cancelled</button>
+					<button class="status-filter" data-status="all" title="All bookings regardless of status">All Status</button>
 				</div>
 				<div class="payment-filters">
 					<span class="filter-label">Payment:</span>
@@ -166,6 +174,14 @@
 
 				<div id="error-container" style="display: none;"></div>
 
+				<!-- Past bookings info banner -->
+				<div id="past-bookings-info" class="info-banner" style="display: none;">
+					<div class="info-content">
+						<span class="info-icon">ℹ️</span>
+						<span class="info-text">Viewing past bookings - these cannot be cancelled or rescheduled</span>
+					</div>
+				</div>
+
 				<div id="bookings-container" style="display: none;">
 					<div class="column-headers">
 						<div>Customer</div>
@@ -195,7 +211,7 @@
 		let currentFilters = {
 			status: 'confirmed', // Default to active bookings
 			search: '',
-			period: 'today', // Default to today view
+			period: 'upcoming', // Default to upcoming bookings (today and future)
 			payment: 'all', // Default to all payment types
 			dateRange: null as { start: string; end: string } | null // Custom date range for "all" view
 		};
@@ -214,6 +230,7 @@
 
 		// Dashboard elements
 		const timeFilters = document.querySelectorAll('.time-filter');
+		const statusFilters = document.querySelectorAll('.status-filter');
 		const paymentFilters = document.querySelectorAll('.payment-filter');
 		const totalBookingsEl = document.getElementById('total-bookings') as HTMLElement;
 		const pendingPaymentEl = document.getElementById('pending-payment') as HTMLElement;
@@ -235,6 +252,7 @@
 		const bookingsContainer = document.getElementById('bookings-container') as HTMLElement;
 		const bookingsGrid = document.getElementById('bookings-grid') as HTMLElement;
 		const pagination = document.getElementById('pagination') as HTMLElement;
+		const pastBookingsInfo = document.getElementById('past-bookings-info') as HTMLElement;
 
 		// Event listeners
 		if (loginForm) loginForm.addEventListener('submit', handleLogin);
@@ -250,6 +268,10 @@
 		// Dashboard filter listeners
 		timeFilters.forEach(filter => {
 			filter.addEventListener('click', handleTimeFilter);
+		});
+
+		statusFilters.forEach(filter => {
+			filter.addEventListener('click', handleStatusFilter);
 		});
 
 		paymentFilters.forEach(filter => {
@@ -340,8 +362,33 @@
 				}
 			}
 
+			// Show/hide past bookings info banner
+			if (pastBookingsInfo) {
+				if (period === 'past') {
+					pastBookingsInfo.style.display = 'block';
+				} else {
+					pastBookingsInfo.style.display = 'none';
+				}
+			}
+
 			// Update filter and reload
 			currentFilters.period = period;
+			currentPage = 0;
+			loadBookings();
+		}
+
+		// Status filter handler
+		function handleStatusFilter(event: Event): void {
+			const target = event.target as HTMLButtonElement;
+			const status = target.dataset.status;
+			if (!status) return;
+
+			// Update active state
+			statusFilters.forEach(f => f.classList.remove('active'));
+			target.classList.add('active');
+
+			// Update filter and reload
+			currentFilters.status = status;
 			currentPage = 0;
 			loadBookings();
 		}
@@ -555,21 +602,31 @@
 		// Create booking card with professional horizontal layout
 		function createBookingCard(booking: any): HTMLElement {
 			const card = document.createElement('div');
-			card.className = 'booking-card';
+
+			// Check if booking is in the past
+			const [year, month, day] = booking.date.split('-').map(Number);
+			const visitDate = new Date(year, month - 1, day); // month is 0-indexed
+			const today = new Date();
+			today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+			const isPastBooking = visitDate < today;
+
+			// Set card classes based on booking status and date
+			card.className = `booking-card ${isPastBooking ? 'past-booking' : ''}`;
 
 			// Status should only be 'Active' or 'Cancelled' - refunds are separate
 			let statusClass, statusText;
 			if (booking.status === 'cancelled') {
 				statusClass = 'status-cancelled';
 				statusText = 'Cancelled';
+			} else if (isPastBooking) {
+				statusClass = 'status-past';
+				statusText = 'Past';
 			} else {
 				statusClass = 'status-active';
 				statusText = 'Active';
 			}
 
 			// Format date - parse as local date to avoid timezone issues
-			const [year, month, day] = booking.date.split('-').map(Number);
-			const visitDate = new Date(year, month - 1, day); // month is 0-indexed
 			const bookingDate = visitDate.toLocaleDateString('en-US', {
 				weekday: 'short',
 				month: 'short',
@@ -632,21 +689,22 @@
 						<div class="actions-menu">
 							<button class="actions-trigger" onclick="toggleActionsMenu('${booking.id}')"></button>
 							<div class="actions-dropdown" id="actions-${booking.id}">
-								${booking.status === 'confirmed' && booking.payment_method === 'pay_on_arrival' ?
+								${booking.status === 'confirmed' && booking.payment_method === 'pay_on_arrival' && !isPastBooking ?
 									`<button class="${booking.payment_status === 'paid' ? 'warning' : 'success'}" onclick="showPaymentToggleModal('${booking.id}', '${booking.payment_status}', '${booking.full_name}'); hideActionsMenu('${booking.id}')">
 										${booking.payment_status === 'paid' ? 'Mark Unpaid' : 'Mark Paid'}
 									</button>`
 									: ''
 								}
-								${booking.status === 'confirmed' ? `<button onclick="rescheduleBooking('${booking.id}'); hideActionsMenu('${booking.id}')">Reschedule</button>` : ''}
-								${booking.status === 'confirmed' && booking.payment_status === 'paid' ?
+								${booking.status === 'confirmed' && !isPastBooking ? `<button onclick="rescheduleBooking('${booking.id}'); hideActionsMenu('${booking.id}')">Reschedule</button>` : ''}
+								${booking.status === 'confirmed' && booking.payment_status === 'paid' && !isPastBooking ?
 									`<button onclick="documentRefund('${booking.id}'); hideActionsMenu('${booking.id}')">Document Refund</button>`
 									: ''
 								}
 								<button onclick="viewBookingHistory('${booking.id}'); hideActionsMenu('${booking.id}')">
 									View History
 								</button>
-								${booking.status === 'confirmed' ? `<button class="danger" onclick="cancelBooking('${booking.id}'); hideActionsMenu('${booking.id}')">Cancel Booking</button>` : ''}
+								${booking.status === 'confirmed' && !isPastBooking ? `<button class="danger" onclick="cancelBooking('${booking.id}'); hideActionsMenu('${booking.id}')">Cancel Booking</button>` : ''}
+								${isPastBooking && booking.status === 'confirmed' ? `<div class="past-booking-notice">Past bookings cannot be modified</div>` : ''}
 							</div>
 						</div>
 					</div>

@@ -1,6 +1,6 @@
 // src/pages/api/garden-mgmt/reschedule-booking.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 import { sendRescheduleConfirmation, logWebhookAttempt } from '../../../services/webhook';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
@@ -21,7 +21,7 @@ async function verifyAdminAuth(request: Request): Promise<boolean> {
     const password = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Get admin password from settings
-    const { data: settings, error } = await supabase
+    const { data: settings, error } = await supabaseAdmin
       .from('schedule_settings')
       .select('setting_value')
       .eq('setting_key', 'admin_password')
@@ -90,7 +90,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     // Get booking details first
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await supabaseAdmin
       .from('bookings')
       .select('id, cancellation_token, status, full_name, email')
       .eq('id', bookingId)
@@ -117,12 +117,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     console.log('Admin rescheduling booking:', { bookingId, adminUser, newDate, newTime });
 
     // Call the database function to reschedule booking
-    const { data, error } = await supabase.rpc('reschedule_booking', {
+    const { data, error } = await supabaseAdmin.rpc('reschedule_booking', {
       p_cancellation_token: booking.cancellation_token,
       p_new_date: newDate,
       p_new_time: newTime,
       p_reschedule_reason: reason || `Rescheduled by admin: ${adminUser}`,
-      p_customer_ip: clientAddress || null
+      p_customer_ip: clientAddress || null,
+      p_admin_user: adminUser
     });
 
     console.log('Admin reschedule result:', { data, error });

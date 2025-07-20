@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 export const GET: APIRoute = async () => {
   try {
-    const { data: holidays, error } = await supabase
+    const { data: holidays, error } = await supabaseAdmin
       .from('holidays')
       .select('*')
       .gte('date', new Date().toISOString().split('T')[0]) // Only future holidays
@@ -33,7 +33,7 @@ export const GET: APIRoute = async () => {
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { date, name, reason } = await request.json();
+    const { date, name } = await request.json();
 
     if (!date || !name) {
       return new Response(JSON.stringify({ success: false, error: 'Date and name are required' }), {
@@ -55,7 +55,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Check if holiday already exists
-    const { data: existing } = await supabase
+    const { data: existing } = await supabaseAdmin
       .from('holidays')
       .select('id')
       .eq('date', date)
@@ -69,12 +69,11 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Add new holiday
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('holidays')
       .insert({
         date,
         name,
-        reason: reason || null, // Include reason if provided
         is_recurring: false,
         is_auto_generated: false
       });
@@ -87,10 +86,33 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Refresh future schedule to account for new holiday
-    const { error: refreshError } = await supabase.rpc('refresh_future_schedule');
-    if (refreshError) {
-      console.warn('Warning: Could not refresh schedule:', refreshError);
+    // Refresh future schedule to account for new holiday using the robust regeneration API
+    try {
+      // Use the more robust regenerate-schedule API instead of the SQL function
+      const siteUrl = process.env.SITE_URL || import.meta.env.SITE_URL || 'http://localhost:4322';
+      const regenerateResponse = await fetch(`${siteUrl}/api/admin/regenerate-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (regenerateResponse.ok) {
+        const regenerateResult = await regenerateResponse.json();
+        console.log('Schedule regenerated successfully after adding holiday:', regenerateResult.message);
+      } else {
+        console.warn('Schedule regeneration failed after adding holiday:', regenerateResponse.status);
+        // Fallback to the SQL function if the API call fails
+        const { error: fallbackError } = await supabaseAdmin.rpc('refresh_future_schedule');
+        if (fallbackError) {
+          console.warn('Fallback schedule refresh also failed:', fallbackError);
+        }
+      }
+    } catch (refreshError) {
+      console.warn('Warning: Could not refresh schedule after adding holiday:', refreshError);
+      // Fallback to the SQL function if the API call fails
+      const { error: fallbackError } = await supabaseAdmin.rpc('refresh_future_schedule');
+      if (fallbackError) {
+        console.warn('Fallback schedule refresh also failed:', fallbackError);
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {

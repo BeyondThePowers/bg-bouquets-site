@@ -1,6 +1,6 @@
 // src/pages/api/garden-mgmt/bookings.ts
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 // Helper function to verify admin authentication
 async function verifyAdminAuth(request: Request): Promise<boolean> {
@@ -13,7 +13,7 @@ async function verifyAdminAuth(request: Request): Promise<boolean> {
     const password = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Get admin password from settings (same pattern as existing auth)
-    const { data: settings, error } = await supabase
+    const { data: settings, error } = await supabaseAdmin
       .from('schedule_settings')
       .select('setting_value')
       .eq('setting_key', 'admin_password')
@@ -66,6 +66,9 @@ export const GET: APIRoute = async ({ request, url }) => {
       const today = mtNow.toISOString().split('T')[0];
 
       switch (period) {
+        case 'upcoming':
+          // Today and future bookings
+          return { start: today, end: '2099-12-31' };
         case 'today':
           return { start: today, end: today };
         case 'week':
@@ -84,17 +87,20 @@ export const GET: APIRoute = async ({ request, url }) => {
             start: monthStart.toISOString().split('T')[0],
             end: monthEnd.toISOString().split('T')[0]
           };
+        case 'past':
+          // Past bookings only (before today)
+          return { start: '2020-01-01', end: new Date(mtNow.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] };
         default: // 'all'
           return null;
       }
     }
 
     // Build query
-    let query = supabase
+    let query = supabaseAdmin
       .from('admin_booking_view')
       .select('*')
-      .order('date', { ascending: true }) // Order by date for better dashboard view
-      .order('time', { ascending: true })
+      .order('date', { ascending: false }) // Newest bookings first
+      .order('time', { ascending: false }) // Latest times first for same date
       .range(offset, offset + limit - 1);
 
     // Apply status filter
@@ -152,11 +158,11 @@ export const GET: APIRoute = async ({ request, url }) => {
     }
 
     // Get total count for pagination and summary statistics
-    let countQuery = supabase
+    let countQuery = supabaseAdmin
       .from('admin_booking_view')
       .select('*', { count: 'exact', head: true });
 
-    let summaryQuery = supabase
+    let summaryQuery = supabaseAdmin
       .from('admin_booking_view')
       .select('payment_status, total_amount, status');
 

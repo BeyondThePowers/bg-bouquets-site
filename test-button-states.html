@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Button States - Loading vs Disabled</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background-color: #333;
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: #333;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #333;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #333;
+            color: white;
+        }
+        
+        /* Enhanced loading indicators for ALL buttons */
+        .btn-spinner {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        /* CSS-based spinner icon - more reliable than SVG */
+        .spinner-icon {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            flex-shrink: 0;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Button loading states - only for buttons that are actively loading */
+        .btn.loading {
+            opacity: 0.8;
+            cursor: not-allowed !important;
+            position: relative;
+        }
+        
+        .btn.loading .btn-text {
+            display: none;
+        }
+        
+        .btn.loading .btn-spinner {
+            display: flex;
+        }
+        
+        /* Disabled buttons (locked forms) - different from loading buttons */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+            /* Keep original colors, no special styling */
+        }
+        
+        /* Don't show spinners on disabled buttons (locked forms) */
+        .btn:disabled .btn-spinner {
+            display: none !important;
+        }
+        
+        /* Subtle pulse animation for loading text */
+        .btn.loading .btn-spinner {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Override pulse for spinner icon to keep it spinning */
+        .btn.loading .spinner-icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .status-indicator {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status-good {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-bad {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Button States Test - Loading vs Disabled</h1>
+    
+    <div class="test-section">
+        <h2>Normal Buttons (Should work normally)</h2>
+        <div class="button-grid">
+            <button id="normalBtn1" class="btn btn-primary">
+                <span class="btn-text">Save Schedule Settings</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Saving...
+                </span>
+            </button>
+            <button id="normalBtn2" class="btn btn-secondary">
+                <span class="btn-text">Add Holiday</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Adding...
+                </span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Loading Buttons (Should show spinners)</h2>
+        <div class="button-grid">
+            <button id="loadingBtn1" class="btn btn-primary loading" disabled>
+                <span class="btn-text">Save Schedule Settings</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Saving...
+                </span>
+            </button>
+            <button id="loadingBtn2" class="btn btn-secondary loading" disabled>
+                <span class="btn-text">Extend Range</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Extending...
+                </span>
+            </button>
+        </div>
+        <div class="status-indicator status-good">
+            ✅ CORRECT: These buttons show spinners because they have .loading class
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Disabled Buttons (Locked forms - Should NOT show spinners)</h2>
+        <div class="button-grid">
+            <button id="disabledBtn1" class="btn btn-primary" disabled>
+                <span class="btn-text">Save Schedule Settings</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Saving...
+                </span>
+            </button>
+            <button id="disabledBtn2" class="btn btn-secondary" disabled>
+                <span class="btn-text">Add Holiday</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Adding...
+                </span>
+            </button>
+        </div>
+        <div class="status-indicator status-good">
+            ✅ CORRECT: These buttons are just disabled (locked forms) - no spinners shown
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testLoadingState('normalBtn1')" class="btn">Test Loading State</button>
+        <button onclick="resetAll()" class="btn">Reset All</button>
+        
+        <div style="margin-top: 20px;">
+            <h3>Key Differences:</h3>
+            <ul>
+                <li><strong>Loading buttons:</strong> <code>.loading</code> class + <code>disabled</code> → Show spinner</li>
+                <li><strong>Locked form buttons:</strong> Only <code>disabled</code> → No spinner, just dimmed</li>
+                <li><strong>Colors:</strong> All buttons keep standard black color (no blue)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function setButtonLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+
+            if (loading) {
+                button.disabled = true;
+                button.classList.add('loading');
+            } else {
+                button.disabled = false;
+                button.classList.remove('loading');
+            }
+        }
+        
+        function testLoadingState(buttonId) {
+            setButtonLoading(buttonId, true);
+            
+            setTimeout(() => {
+                setButtonLoading(buttonId, false);
+            }, 3000);
+        }
+        
+        function resetAll() {
+            ['normalBtn1', 'normalBtn2', 'loadingBtn1', 'loadingBtn2'].forEach(id => {
+                setButtonLoading(id, false);
+            });
+        }
+        
+        // Show current states
+        function checkStates() {
+            const buttons = [
+                { id: 'normalBtn1', name: 'Normal 1' },
+                { id: 'loadingBtn1', name: 'Loading 1' },
+                { id: 'disabledBtn1', name: 'Disabled 1' }
+            ];
+            
+            console.log('Button States:');
+            buttons.forEach(btn => {
+                const el = document.getElementById(btn.id);
+                const hasLoading = el.classList.contains('loading');
+                const isDisabled = el.disabled;
+                const spinnerVisible = window.getComputedStyle(el.querySelector('.btn-spinner')).display !== 'none';
+                
+                console.log(`${btn.name}: loading=${hasLoading}, disabled=${isDisabled}, spinner=${spinnerVisible}`);
+            });
+        }
+        
+        // Check states on load
+        setTimeout(checkStates, 100);
+    </script>
+</body>
+</html>

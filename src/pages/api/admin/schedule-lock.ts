@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 // Route to get current schedule lock status
 export const GET: APIRoute = async () => {
   try {
     // Get the current lock status
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('schedule_settings')
       .select('schedule_update_in_progress, schedule_update_scheduled_at, schedule_update_scheduled_by')
       .eq('setting_key', 'max_bouquets_per_slot')
@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request }) => {
     switch (action) {
       case 'lock':
         // Lock the schedule for immediate editing
-        await supabase
+        await supabaseAdmin
           .from('schedule_settings')
           .update({
             schedule_update_in_progress: true,
@@ -71,15 +71,19 @@ export const POST: APIRoute = async ({ request }) => {
             })
           })
           .eq('setting_key', 'max_bouquets_per_slot');
-        
-        // Log the lock action
-        await supabase
-          .from('schedule_update_logs')
-          .insert({
-            updated_by: adminUser,
-            update_type: 'immediate_lock',
-            status: 'in_progress'
-          });
+
+        // Log the lock action (skip if table doesn't exist)
+        try {
+          await supabaseAdmin
+            .from('schedule_update_logs')
+            .insert({
+              updated_by: adminUser,
+              update_type: 'immediate_lock',
+              status: 'in_progress'
+            });
+        } catch (logError) {
+          console.warn('Could not log schedule lock action:', logError);
+        }
         
         return new Response(JSON.stringify({
           success: true,
@@ -95,19 +99,19 @@ export const POST: APIRoute = async ({ request }) => {
           // First update all the settings
           for (const setting of settings) {
             if (setting.key && setting.value !== undefined) {
-              await supabase
+              await supabaseAdmin
                 .from('schedule_settings')
                 .update({ setting_value: String(setting.value) })
                 .eq('setting_key', setting.key);
             }
           }
-          
+
           // Refresh the schedule with new settings
-          await supabase.rpc('refresh_future_schedule');
+          await supabaseAdmin.rpc('refresh_future_schedule');
         }
 
         // Unlock the schedule
-        await supabase
+        await supabaseAdmin
           .from('schedule_settings')
           .update({
             schedule_update_in_progress: false,
@@ -116,16 +120,20 @@ export const POST: APIRoute = async ({ request }) => {
             schedule_update_json: null
           })
           .eq('setting_key', 'max_bouquets_per_slot');
-        
-        // Log the unlock and apply action
-        await supabase
-          .from('schedule_update_logs')
-          .insert({
-            updated_by: adminUser,
-            update_type: 'immediate_apply',
-            update_data: settings ? JSON.stringify(settings) : null,
-            status: 'completed'
-          });
+
+        // Log the unlock and apply action (skip if table doesn't exist)
+        try {
+          await supabaseAdmin
+            .from('schedule_update_logs')
+            .insert({
+              updated_by: adminUser,
+              update_type: 'immediate_apply',
+              update_data: settings ? JSON.stringify(settings) : null,
+              status: 'completed'
+            });
+        } catch (logError) {
+          console.warn('Could not log schedule unlock action:', logError);
+        }
         
         return new Response(JSON.stringify({
           success: true,
@@ -145,7 +153,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         // Schedule an update for later
-        await supabase
+        await supabaseAdmin
           .from('schedule_settings')
           .update({
             schedule_update_in_progress: false,
@@ -158,19 +166,23 @@ export const POST: APIRoute = async ({ request }) => {
             })
           })
           .eq('setting_key', 'max_bouquets_per_slot');
-        
-        // Log the schedule action
-        await supabase
-          .from('schedule_update_logs')
-          .insert({
-            updated_by: adminUser,
-            update_type: 'scheduled',
-            update_data: JSON.stringify({
-              scheduled_at: scheduledTime,
-              settings: settings || []
-            }),
-            status: 'scheduled'
-          });
+
+        // Log the schedule action (skip if table doesn't exist)
+        try {
+          await supabaseAdmin
+            .from('schedule_update_logs')
+            .insert({
+              updated_by: adminUser,
+              update_type: 'scheduled',
+              update_data: JSON.stringify({
+                scheduled_at: scheduledTime,
+                settings: settings || []
+              }),
+              status: 'scheduled'
+            });
+        } catch (logError) {
+          console.warn('Could not log schedule action:', logError);
+        }
         
         return new Response(JSON.stringify({
           success: true,

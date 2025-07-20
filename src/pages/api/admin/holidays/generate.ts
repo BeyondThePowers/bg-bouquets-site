@@ -66,10 +66,32 @@ export const POST: APIRoute = async () => {
       });
     }
 
-    // Refresh the schedule to account for new holidays
-    const { error: refreshError } = await supabaseAdmin.rpc('refresh_future_schedule');
-    if (refreshError) {
-      console.warn('Warning: Could not refresh schedule:', refreshError);
+    // Refresh the schedule to account for new holidays using the robust regeneration API
+    try {
+      const siteUrl = process.env.SITE_URL || import.meta.env.SITE_URL || 'http://localhost:4322';
+      const regenerateResponse = await fetch(`${siteUrl}/api/admin/regenerate-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (regenerateResponse.ok) {
+        const regenerateResult = await regenerateResponse.json();
+        console.log('Schedule regenerated successfully after generating holidays:', regenerateResult.message);
+      } else {
+        console.warn('Schedule regeneration failed after generating holidays:', regenerateResponse.status);
+        // Fallback to the SQL function if the API call fails
+        const { error: fallbackError } = await supabaseAdmin.rpc('refresh_future_schedule');
+        if (fallbackError) {
+          console.warn('Fallback schedule refresh also failed:', fallbackError);
+        }
+      }
+    } catch (refreshError) {
+      console.warn('Warning: Could not refresh schedule after generating holidays:', refreshError);
+      // Fallback to the SQL function if the API call fails
+      const { error: fallbackError } = await supabaseAdmin.rpc('refresh_future_schedule');
+      if (fallbackError) {
+        console.warn('Fallback schedule refresh also failed:', fallbackError);
+      }
     }
 
     const yearsGenerated = endYear - startYear + 1;
