@@ -3762,15 +3762,18 @@ import Layout from '../layouts/Layout.astro';
 				successEmailMessage.textContent = message || 'You\'ll receive a confirmation email shortly.';
 			}
 
-			// Hide form with smooth transition
+			// Smooth transition: form fades out, then success message fades in
 			if (bookingFormContainer) {
+				// Start form fade-out transition
 				bookingFormContainer.style.opacity = '0';
 				bookingFormContainer.style.transform = 'translateY(-20px)';
 
+				// After form transition completes, hide it and show success
 				setTimeout(() => {
+					// Remove form from layout flow
 					bookingFormContainer.classList.add('hidden');
 
-					// Show success message
+					// Show success message with smooth fade-in
 					if (bookingSuccess) {
 						bookingSuccess.classList.remove('hidden');
 						// Trigger reflow to ensure the element is rendered
@@ -3778,7 +3781,7 @@ import Layout from '../layouts/Layout.astro';
 						bookingSuccess.classList.remove('opacity-0', 'translate-y-4');
 						bookingSuccess.classList.add('opacity-100', 'translate-y-0');
 					}
-				}, 300);
+				}, 300); // Match the CSS transition duration
 			}
 		}
 
@@ -3786,16 +3789,20 @@ import Layout from '../layouts/Layout.astro';
 			const bookingFormContainer = document.getElementById('booking-form-container');
 			const bookingSuccess = document.getElementById('booking-success');
 
-			// Hide success message
+			// Smooth transition: success message fades out, then form fades in
 			if (bookingSuccess) {
+				// Start success message fade-out transition
 				bookingSuccess.classList.add('opacity-0', 'translate-y-4');
 				bookingSuccess.classList.remove('opacity-100', 'translate-y-0');
 
+				// After success message transition completes, hide it and show form
 				setTimeout(() => {
+					// Remove success message from layout flow
 					bookingSuccess.classList.add('hidden');
 
-					// Show form again
+					// Show form again with smooth fade-in
 					if (bookingFormContainer) {
+						// Remove from layout hiding and reset any inline styles
 						bookingFormContainer.classList.remove('hidden');
 						bookingFormContainer.style.opacity = '1';
 						bookingFormContainer.style.transform = 'translateY(0)';
@@ -3812,7 +3819,7 @@ import Layout from '../layouts/Layout.astro';
 						selectedDate = '';
 						setupCalendarState();
 					}
-				}, 300);
+				}, 300); // Match the CSS transition duration
 			}
 		}
 
