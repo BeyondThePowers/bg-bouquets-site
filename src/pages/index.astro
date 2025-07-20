@@ -3815,9 +3815,27 @@ import Layout from '../layouts/Layout.astro';
 						const errorFields = document.querySelectorAll('.border-red-500');
 						errorFields.forEach(field => field.classList.remove('border-red-500'));
 
-						// Reset calendar state and clear selection
+						// Reset multi-step form state
+						currentStep = 1;
+						showStep(1, false); // Reset to step 1 without auto-focus
+
+						// Reset date and time selection state
 						selectedDate = '';
+						selectedTime = '';
+						visitDateInput.value = '';
+						preferredTimeInput.value = '';
+
+						// Reset calendar state and show date selection prompt
 						setupCalendarState();
+						showSelectDatePrompt();
+
+						// Clear any selected time slot cards
+						document.querySelectorAll('.time-slot-card').forEach(card => {
+							card.classList.remove('selected');
+						});
+
+						// Reset button states
+						step1Next.disabled = true;
 					}
 				}, 300); // Match the CSS transition duration
 			}
