@@ -3819,20 +3819,23 @@ import Layout from '../layouts/Layout.astro';
 						currentStep = 1;
 						showStep(1, false); // Reset to step 1 without auto-focus
 
-						// Reset date and time selection state
+						// Reset date and time selection state FIRST
 						selectedDate = '';
 						selectedTime = '';
 						visitDateInput.value = '';
 						preferredTimeInput.value = '';
 
-						// Reset calendar state and show date selection prompt
-						setupCalendarState();
-						showSelectDatePrompt();
-
-						// Clear any selected time slot cards
+						// Clear any selected time slot cards and hide time slots
 						document.querySelectorAll('.time-slot-card').forEach(card => {
 							card.classList.remove('selected');
 						});
+
+						// Clear time slots container and show date selection prompt
+						timeSlotsContainer.innerHTML = '';
+						showSelectDatePrompt();
+
+						// Reset calendar state AFTER clearing selections
+						setupCalendarState();
 
 						// Reset button states
 						step1Next.disabled = true;
