@@ -1,0 +1,113 @@
+/* Schedule Lock Styles */
+
+.schedule-lock-controls {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  border: 1px solid var(--admin-gray-200);
+  border-radius: var(--radius);
+  background-color: var(--admin-gray-50);
+}
+
+.lock-status-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.lock-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-text {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.status-indicator.unlocked {
+  background-color: var(--status-success);
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+}
+
+.status-indicator.locked {
+  background-color: var(--status-warning);
+  box-shadow: 0 0 0 2px rgba(202, 138, 4, 0.2);
+}
+
+.status-description {
+  font-size: 0.875rem;
+  color: var(--admin-gray-700);
+}
+
+.lock-action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.lock-action-buttons .btn {
+  flex-grow: 0;
+}
+
+/* Schedule Update Modal */
+.schedule-update-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--admin-white);
+  padding: 2rem;
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-content p {
+  margin-bottom: 1.5rem;
+  color: var(--admin-gray-700);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+/* Disabled form elements */
+input.disabled,
+select.disabled,
+button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--admin-gray-100);
+}
+
+.toggle-chip.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}

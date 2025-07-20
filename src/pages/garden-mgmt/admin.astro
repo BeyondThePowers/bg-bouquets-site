@@ -21,9 +21,512 @@
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 	<meta http-equiv="Pragma" content="no-cache">
 	<meta http-equiv="Expires" content="0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/styles/admin.css">
+<link rel="stylesheet" href="/styles/schedule-lock.css">
 
-	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-	<link rel="stylesheet" href="/styles/admin.css">
+<style>
+  /* Styles for disabled admin sections */
+  .section-disabled {
+    position: relative;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  
+  .section-disabled::before {
+    content: "Locked";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 10;
+  }
+  
+  .section-disabled::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    z-index: 1;
+    pointer-events: none;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+  }
+  
+  .section-disabled input,
+  .section-disabled select,
+  .section-disabled button:not(#lockScheduleBtn):not(#scheduleUpdateBtn) {
+    cursor: not-allowed;
+  }
+  
+  .disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+  }
+  
+  /* Exception for lock controls */
+  .schedule-lock-controls {
+    opacity: 1 !important;
+    pointer-events: all !important;
+  }
+  
+  .schedule-lock-controls button {
+    cursor: pointer !important;
+  }
+</style>
+
+<script>
+  // Inline the schedule-lock.ts functionality to ensure it's available
+  document.addEventListener('DOMContentLoaded', function() {
+    // Only initialize if we're on the admin page and logged in
+    const checkForAdmin = setInterval(() => {
+      const adminContent = document.getElementById('adminContent');
+      if (adminContent && !adminContent.classList.contains('hidden')) {
+        clearInterval(checkForAdmin);
+        initScheduleLockUI();
+      }
+    }, 500); // Check every 500ms
+  });
+
+  async function initScheduleLockUI() {
+    // Create a new section for schedule lock controls
+    const adminContainer = document.querySelector('.admin-container');
+    const pricingSection = document.querySelector('.pricing-section');
+    
+    if (!adminContainer || !pricingSection) {
+      console.error('Required elements not found');
+      return;
+    }
+    
+    // Create the schedule lock section
+    const lockSection = document.createElement('div');
+    lockSection.className = 'admin-section schedule-lock-section';
+    lockSection.innerHTML = `
+      <h2>Schedule Lock Controls</h2>
+      <div class="schedule-lock-controls">
+        <div class="lock-status-indicator">
+          <div class="lock-status">
+            <span class="status-text">Schedule is <span class="unlock-status">unlocked</span><span class="lock-status hidden">locked</span></span>
+            <span class="status-indicator unlocked"></span>
+          </div>
+          <p class="status-description">Customers can currently make bookings. Lock the schedule to make changes.</p>
+        </div>
+        
+        <div class="lock-action-buttons">
+          <button id="lockScheduleBtn" class="btn btn-warning">
+            <span class="btn-text">Lock Bookings to Edit Schedule</span>
+            <span class="btn-spinner hidden">⟳</span>
+          </button>
+          <button id="scheduleUpdateBtn" class="btn btn-secondary">
+            <span class="btn-text">Schedule Update for Later</span>
+            <span class="btn-spinner hidden">⟳</span>
+          </button>
+          <button id="applyChangesBtn" class="btn btn-primary hidden">
+            <span class="btn-text">Unlock Bookings</span>
+            <span class="btn-spinner hidden">⟳</span>
+          </button>
+        </div>
+        
+        <div id="scheduleLockMessage" class="hidden"></div>
+      </div>
+      
+      <div class="schedule-update-modal hidden" id="scheduleUpdateModal">
+        <div class="modal-content">
+          <h3>Schedule Update for Later</h3>
+          <p>Choose when to apply schedule changes. Booking will not be disrupted until the update time.</p>
+          
+          <div class="form-group">
+            <label for="updateDateTime">Update Date/Time:</label>
+            <input type="datetime-local" id="updateDateTime" min="${getMinDateTimeString()}">
+            <p class="help-text">Updates are applied in the America/Edmonton timezone.</p>
+          </div>
+          
+          <div class="modal-actions">
+            <button id="cancelScheduleUpdateBtn" class="btn btn-secondary">Cancel</button>
+            <button id="confirmScheduleUpdateBtn" class="btn btn-primary">
+              <span class="btn-text">Schedule Update</span>
+              <span class="btn-spinner hidden">⟳</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Insert the lock section after the pricing section
+    adminContainer.insertBefore(lockSection, pricingSection.nextSibling);
+    
+    // Set up event handlers
+    setupLockEventHandlers();
+    
+    // Check current lock status
+    await checkLockStatus();
+  }
+
+  function setupLockEventHandlers() {
+    // Lock Schedule button
+    document.getElementById('lockScheduleBtn')?.addEventListener('click', lockSchedule);
+    
+    // Apply Changes button
+    document.getElementById('applyChangesBtn')?.addEventListener('click', function() {
+      // Show warning about unsaved changes before unlocking
+      if (confirm('Any unsaved changes will be lost when unlocking. Continue?')) {
+        applyChangesAndUnlock();
+      }
+    });
+    
+    // Schedule Update button and modal
+    document.getElementById('scheduleUpdateBtn')?.addEventListener('click', showScheduleUpdateModal);
+    document.getElementById('cancelScheduleUpdateBtn')?.addEventListener('click', hideScheduleUpdateModal);
+    document.getElementById('confirmScheduleUpdateBtn')?.addEventListener('click', scheduleUpdate);
+    
+    // Hide modal when clicking outside
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('scheduleUpdateModal');
+      const target = e.target as HTMLElement;
+      if (modal && !modal.classList.contains('hidden') && !modal.contains(target) &&
+          target.id !== 'scheduleUpdateBtn') {
+        hideScheduleUpdateModal();
+      }
+    });
+  }
+
+  async function checkLockStatus() {
+    try {
+      setButtonLoading('lockScheduleBtn', true);
+      
+      const response = await fetch('/api/admin/schedule-lock');
+      const data = await response.json();
+      
+      updateLockStatusUI(data.isLocked, data.scheduledUpdate);
+      
+      // Initial state: forms are disabled until locked for editing
+      if (!data.isLocked) {
+        enableAllFormInputs(false);
+      }
+    } catch (error) {
+      console.error('Error checking lock status:', error);
+      showLockMessage('Could not check lock status', 'error');
+    } finally {
+      setButtonLoading('lockScheduleBtn', false);
+    }
+  }
+
+  function updateLockStatusUI(isLocked: boolean, scheduledUpdate: string | null) {
+    const lockStatusText = document.querySelector('.unlock-status');
+    const lockingStatusText = document.querySelector('.lock-status');
+    const statusIndicator = document.querySelector('.status-indicator');
+    const statusDescription = document.querySelector('.status-description');
+    const lockButton = document.getElementById('lockScheduleBtn');
+    const applyButton = document.getElementById('applyChangesBtn');
+    const scheduleButton = document.getElementById('scheduleUpdateBtn');
+    
+    // Update status text and indicator
+    if (lockStatusText && lockingStatusText && statusIndicator && statusDescription) {
+      if (isLocked) {
+        lockStatusText.classList.add('hidden');
+        lockingStatusText.classList.remove('hidden');
+        statusIndicator.classList.remove('unlocked');
+        statusIndicator.classList.add('locked');
+        statusDescription.textContent = 'Bookings are locked. Customers cannot make new bookings while you edit the schedule.';
+      } else {
+        lockStatusText.classList.remove('hidden');
+        lockingStatusText.classList.add('hidden');
+        statusIndicator.classList.add('unlocked');
+        statusIndicator.classList.remove('locked');
+        
+        if (scheduledUpdate) {
+          const updateTime = new Date(scheduledUpdate).toLocaleString();
+          statusDescription.textContent = `Schedule update is planned for ${updateTime}. Customers can continue booking until then.`;
+        } else {
+          statusDescription.textContent = 'Customers can currently make bookings. Lock bookings to make schedule changes.';
+        }
+      }
+    }
+    
+    // Update buttons
+    if (lockButton && applyButton && scheduleButton) {
+      if (isLocked) {
+        lockButton.classList.add('hidden');
+        applyButton.classList.remove('hidden');
+        scheduleButton.classList.add('hidden');
+        
+        // Enable all form inputs for editing when locked
+        enableAllFormInputs(true);
+      } else {
+        lockButton.classList.remove('hidden');
+        applyButton.classList.add('hidden');
+        scheduleButton.classList.remove('hidden');
+        
+        // Disable form inputs when not in edit mode
+        enableAllFormInputs(false);
+      }
+    }
+  }
+
+  async function lockSchedule() {
+    try {
+      setButtonLoading('lockScheduleBtn', true);
+      
+      const response = await fetch('/api/admin/schedule-lock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'lock' })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        updateLockStatusUI(true, null);
+        showLockMessage(result.message, 'success');
+      } else {
+        showLockMessage(result.error || 'Failed to lock schedule', 'error');
+      }
+    } catch (error) {
+      console.error('Error locking schedule:', error);
+      showLockMessage('Error locking schedule', 'error');
+    } finally {
+      setButtonLoading('lockScheduleBtn', false);
+    }
+  }
+
+  async function applyChangesAndUnlock() {
+    try {
+      setButtonLoading('applyChangesBtn', true);
+      
+      const response = await fetch('/api/admin/schedule-lock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'unlock',
+          // No settings included - just unlock
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        updateLockStatusUI(false, null);
+        showLockMessage('Bookings unlocked. Customers can now make bookings.', 'success');
+      } else {
+        showLockMessage(result.error || 'Failed to unlock bookings', 'error');
+      }
+    } catch (error) {
+      console.error('Error unlocking bookings:', error);
+      showLockMessage('Error unlocking bookings', 'error');
+    } finally {
+      setButtonLoading('applyChangesBtn', false);
+    }
+  }
+
+  function showScheduleUpdateModal() {
+    const modal = document.getElementById('scheduleUpdateModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+  }
+
+  function hideScheduleUpdateModal() {
+    const modal = document.getElementById('scheduleUpdateModal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+
+  async function scheduleUpdate() {
+    try {
+      const dateTimeInput = document.getElementById('updateDateTime') as HTMLInputElement;
+      if (!dateTimeInput || !dateTimeInput.value) {
+        showLockMessage('Please select a date and time for the update', 'error');
+        return;
+      }
+      
+      // Convert to ISO string
+      const scheduledTime = new Date(dateTimeInput.value).toISOString();
+      
+      // Collect all schedule settings
+      const settings = collectScheduleSettings();
+      
+      setButtonLoading('confirmScheduleUpdateBtn', true);
+      
+      const response = await fetch('/api/admin/schedule-lock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'schedule',
+          scheduledTime,
+          settings
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        hideScheduleUpdateModal();
+        updateLockStatusUI(false, scheduledTime);
+        showLockMessage(result.message, 'success');
+      } else {
+        showLockMessage(result.error || 'Failed to schedule update', 'error');
+      }
+    } catch (error) {
+      console.error('Error scheduling update:', error);
+      showLockMessage('Error scheduling update', 'error');
+    } finally {
+      setButtonLoading('confirmScheduleUpdateBtn', false);
+    }
+  }
+
+  function collectScheduleSettings() {
+    // Collect all settings from the form
+    const maxBookings = (document.getElementById('maxBookings') as HTMLInputElement)?.value;
+    const maxVisitors = (document.getElementById('maxVisitors') as HTMLInputElement)?.value;
+    const maxVisitorPasses = (document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement)?.value;
+    
+    // Get operating days
+    const operatingDays: string[] = [];
+    document.querySelectorAll('#operatingDays .toggle-chip.active').forEach((chip) => {
+      const element = chip as HTMLElement;
+      const day = element.dataset.day;
+      if (day) operatingDays.push(day);
+    });
+    
+    // Get time slots
+    const timeSlots: string[] = [];
+    document.querySelectorAll('#timeSlotsGrid .time-slot-chip.active').forEach((chip) => {
+      const element = chip as HTMLElement;
+      const time = element.dataset.time;
+      if (time) timeSlots.push(time);
+    });
+    
+    // Get season range
+    const seasonStartMonth = (document.getElementById('seasonStartMonth') as HTMLSelectElement)?.value;
+    const seasonStartDay = (document.getElementById('seasonStartDay') as HTMLInputElement)?.value;
+    const seasonEndMonth = (document.getElementById('seasonEndMonth') as HTMLSelectElement)?.value;
+    const seasonEndDay = (document.getElementById('seasonEndDay') as HTMLInputElement)?.value;
+    
+    return [
+      { key: 'max_bookings_per_slot', value: maxBookings },
+      { key: 'max_bouquets_per_slot', value: maxVisitors },
+      { key: 'max_visitor_passes_per_booking', value: maxVisitorPasses },
+      { key: 'operating_days', value: JSON.stringify(operatingDays) },
+      { key: 'time_slots', value: JSON.stringify(timeSlots) },
+      { key: 'season_start_month', value: seasonStartMonth },
+      { key: 'season_start_day', value: seasonStartDay },
+      { key: 'season_end_month', value: seasonEndMonth },
+      { key: 'season_end_day', value: seasonEndDay }
+    ];
+  }
+
+  function enableAllFormInputs(enabled: boolean) {
+    // Schedule settings
+    const scheduleInputs = [
+      '#maxBookings',
+      '#maxVisitors',
+      '#maxVisitorPassesPerBooking',
+      '#operatingDays .toggle-chip',
+      '#timeSlotsGrid .time-slot-chip',
+      '#seasonStartMonth',
+      '#seasonStartDay',
+      '#seasonEndMonth',
+      '#seasonEndDay'
+    ];
+    
+    // Holiday management
+    const holidayInputs = [
+      '#holidayDate',
+      '#holidayName',
+      '#holidayReason',
+      '#addHoliday',
+      '#generateHolidays'
+    ];
+    
+    // Booking range status
+    const bookingRangeInputs = [
+      '#extendRange',
+      '#forceRefresh'
+    ];
+    
+    // Apply disabled/enabled state to all form sections
+    const allInputs = [...scheduleInputs, ...holidayInputs, ...bookingRangeInputs];
+    
+    allInputs.forEach(selector => {
+      document.querySelectorAll(selector).forEach(el => {
+        if (el instanceof HTMLInputElement || el instanceof HTMLButtonElement || el instanceof HTMLSelectElement) {
+          el.disabled = !enabled;
+        }
+        if (!enabled) {
+          el.classList.add('disabled');
+        } else {
+          el.classList.remove('disabled');
+        }
+      });
+    });
+    
+    // Apply visual indication to admin sections, except pricing section
+    document.querySelectorAll('.admin-section').forEach(section => {
+      // Skip the pricing section - it should always be enabled
+      if (section.querySelector('h2')?.textContent?.includes('Pricing Settings')) {
+        return;
+      }
+      
+      if (!enabled) {
+        section.classList.add('section-disabled');
+      } else {
+        section.classList.remove('section-disabled');
+      }
+    });
+  }
+
+  function showLockMessage(message: string, type: 'success' | 'error') {
+    const messageEl = document.getElementById('scheduleLockMessage');
+    if (messageEl) {
+      messageEl.textContent = message;
+      messageEl.className = type === 'success' ? 'success-message' : 'error-message';
+      messageEl.classList.remove('hidden');
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        messageEl.classList.add('hidden');
+      }, 5000);
+    }
+  }
+
+  function setButtonLoading(buttonId: string, isLoading: boolean) {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+    
+    const textSpan = button.querySelector('.btn-text');
+    const spinnerSpan = button.querySelector('.btn-spinner');
+    
+    if (isLoading) {
+      (button as HTMLButtonElement).disabled = true;
+      if (textSpan) textSpan.classList.add('hidden');
+      if (spinnerSpan) spinnerSpan.classList.remove('hidden');
+    } else {
+      (button as HTMLButtonElement).disabled = false;
+      if (textSpan) textSpan.classList.remove('hidden');
+      if (spinnerSpan) spinnerSpan.classList.add('hidden');
+    }
+  }
+
+  function getMinDateTimeString() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+</script>
+
 
 </head>
 <body>
@@ -55,6 +558,35 @@
 
 	<!-- Main Admin Container -->
 	<div id="adminContent" class="admin-container hidden">
+		<!-- Pricing Settings - Full Width Section -->
+		<div class="admin-section pricing-section">
+			<h2>Pricing Settings</h2>
+			<div class="horizontal-fields-container">
+				<div class="form-group">
+					<label for="pricePerBouquet">Price per Bouquet (CAD):</label>
+					<input type="number" id="pricePerBouquet" min="0" step="0.01" value="35.00">
+				</div>
+				
+				<div class="form-group">
+					<label for="pricePerVisitorPass">Price per Visitor Pass (CAD):</label>
+					<input type="number" id="pricePerVisitorPass" min="0" step="0.01" value="5.00">
+				</div>
+				
+				<div class="form-group">
+					<label for="taxRate">Tax Rate (%):</label>
+					<input type="number" id="taxRate" min="0" max="100" step="0.01" value="5.00">
+				</div>
+				
+				<div class="form-group button-group">
+					<button id="savePricing" class="btn btn-primary">
+						<span class="btn-text">Save Pricing Settings</span>
+						<span class="btn-spinner hidden">⟳</span>
+					</button>
+				</div>
+			</div>
+			<div id="pricingMessage" class="hidden"></div>
+		</div>
+
 		<div class="admin-sections">
 			<!-- Left Column -->
 			<div class="admin-column admin-column-left">
@@ -201,32 +733,7 @@
 
 					<div id="scheduleMessage" class="hidden"></div>
 				</div>
-				<!-- Pricing Settings -->
-				<div class="admin-section">
-					<h2>Pricing Settings</h2>
-
-					<div class="form-group">
-						<label for="pricePerBouquet">Price per Bouquet (CAD):</label>
-						<input type="number" id="pricePerBouquet" min="0" step="0.01" value="35.00">
-					</div>
-
-					<div class="form-group">
-						<label for="pricePerVisitorPass">Price per Visitor Pass (CAD):</label>
-						<input type="number" id="pricePerVisitorPass" min="0" step="0.01" value="5.00">
-					</div>
-
-					<div class="form-group">
-						<label for="taxRate">Tax Rate (%):</label>
-						<input type="number" id="taxRate" min="0" max="100" step="0.01" value="5.00">
-					</div>
-
-					<button id="savePricing" class="btn btn-primary">
-						<span class="btn-text">Save Pricing Settings</span>
-						<span class="btn-spinner hidden">⟳</span>
-					</button>
-
-					<div id="pricingMessage" class="hidden"></div>
-				</div>
+				
 
 				<!-- Booking Range Monitoring -->
 				<div class="admin-section">

@@ -12,6 +12,39 @@ export const GET: APIRoute = async () => {
   try {
     console.log('Availability API called');
 
+    // Check if booking is currently allowed (no schedule update in progress)
+    const { data: lockStatus, error: lockError } = await supabase
+      .from('schedule_settings')
+      .select('schedule_update_in_progress, schedule_update_scheduled_at')
+      .eq('setting_key', 'max_bouquets_per_slot')
+      .single();
+
+    // If there's an error checking lock status, proceed anyway but log the error
+    if (lockError) {
+      console.warn('Warning: Could not check schedule lock status:', lockError);
+    } 
+    // If booking is locked, return an appropriate message
+    else if (lockStatus?.schedule_update_in_progress) {
+      return new Response(JSON.stringify({ 
+        error: 'schedule_update_in_progress',
+        message: 'The booking schedule is currently being updated. Please try again in a few minutes.' 
+      }), { 
+        status: 503, // Service Unavailable
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    // If there's a scheduled update coming very soon (within 5 minutes), also prevent booking
+    else if (lockStatus?.schedule_update_scheduled_at && 
+            new Date(lockStatus.schedule_update_scheduled_at).getTime() - new Date().getTime() < 300000) {
+      return new Response(JSON.stringify({ 
+        error: 'schedule_update_imminent',
+        message: 'The booking schedule is about to be updated. Please try again in a few minutes.' 
+      }), { 
+        status: 503, // Service Unavailable
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Step 1: Get schedule settings
     const { data: settings, error: settingsError } = await supabase
       .from('schedule_settings')
