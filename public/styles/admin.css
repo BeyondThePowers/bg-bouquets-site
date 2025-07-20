@@ -162,7 +162,8 @@ body {
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	transition: all var(--transition);
+	/* Changed from 'all' to specific properties to avoid size/position animations */
+	transition: color var(--transition), background var(--transition), border-color var(--transition);
 	background: var(--admin-white);
 	color: var(--admin-black);
 	position: relative;
@@ -197,14 +198,15 @@ body {
 }
 
 .btn-danger {
-	background: var(--status-danger);
-	color: var(--admin-white);
+	background: transparent;
+	color: var(--status-danger);
 	border-color: var(--status-danger);
 }
 
 .btn-danger:hover {
-	background: #dc2626;
-	border-color: #dc2626;
+	background: var(--status-danger);
+	color: var(--admin-white);
+	border-color: var(--status-danger);
 }
 
 /* Simple Button Loading States */
@@ -324,7 +326,6 @@ body {
 
 .loading {
 	text-align: center;
-	padding: 40px;
 	color: var(--admin-gray-600);
 }
 
@@ -628,7 +629,8 @@ body {
 	font-size: 14px;
 	font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	/* Changed from 'all' to only transition color and background to avoid size changes */
+	transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 	min-width: 80px;
 	text-align: center;
 }
@@ -642,8 +644,8 @@ body {
 	border-color: #15803d !important;
 	background: rgba(34, 197, 94, 0.1) !important;
 	color: #15803d !important;
-	font-weight: 600;
-	transform: scale(1.02);
+	/* Keep same font-weight to prevent text size changes */
+	font-weight: 500;
 }
 
 .toggle-chip.active:hover {
@@ -674,7 +676,8 @@ body {
 	font-size: 12px;
 	font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	/* Removed font-weight from transitions to prevent text size changes */
+	transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 	text-align: center;
 }
 
@@ -687,8 +690,8 @@ body {
 	border-color: #15803d !important;
 	background: rgba(34, 197, 94, 0.1) !important;
 	color: #15803d !important;
-	font-weight: 600;
-	transform: scale(1.05);
+	/* Keep same font-weight to prevent text size changes */
+	font-weight: 500;
 }
 
 .time-slot-chip.active:hover {
@@ -1522,12 +1525,10 @@ body {
 
 .actions-trigger:hover {
 	background: var(--admin-gray-100);
-	transform: scale(1.05);
 }
 
 .actions-trigger:active {
 	background: var(--admin-gray-200);
-	transform: scale(0.98);
 }
 
 .actions-trigger::before {
@@ -2318,12 +2319,21 @@ body {
    SCHEDULE LOCK STATUS INDICATORS
    ======================================== */
 
+.lock-status-display,
+.status-text {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap:0.5rem;
+}
+
 /* Status indicators */
 .status-indicator {
 	width: 12px;
 	height: 12px;
 	border-radius: 50%;
 	margin-left: 8px;
+	display: inline-block;
 }
 
 .status-indicator.unlocked {
@@ -2347,25 +2357,27 @@ body {
 
 /* Button variants for lock system */
 .btn-success {
-	background: var(--status-success);
-	color: var(--admin-white);
-	border-color: var(--status-success);
+	background: transparent;
+	color: var(--admin-gray-600);
+	border-color: var(--admin-gray-300);
 }
 
 .btn-success:hover {
-	background: #15803d;
-	border-color: #15803d;
+	background: var(--admin-gray-50);
+	color: var(--admin-black);
+	border-color: var(--admin-gray-400);
 }
 
 .btn-warning {
-	background: var(--status-warning);
-	color: var(--admin-white);
-	border-color: var(--status-warning);
+	background: transparent;
+	color: var(--admin-gray-600);
+	border-color: var(--admin-gray-300);
 }
 
 .btn-warning:hover {
-	background: #b45309;
-	border-color: #b45309;
+	background: var(--admin-gray-50);
+	color: var(--admin-black);
+	border-color: var(--admin-gray-400);
 }
 
 /* ========================================
