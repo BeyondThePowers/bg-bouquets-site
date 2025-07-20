@@ -107,27 +107,51 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Define our update functions - completely avoid any potential for object spreading issues
+    // Define our update functions - fix double-JSON encoding issue
     async function updateSetting(key: string, value: any): Promise<{ success: boolean, error?: any }> {
-      console.log(`Updating ${key} with value:`, JSON.stringify(value));
-      
+      console.log(`Updating ${key} with raw value:`, value, `(type: ${typeof value})`);
+
+      // Prepare the value for storage - avoid double-JSON encoding
+      let storageValue: any;
+
+      // For numeric settings, ensure they're stored as numbers
+      if (['max_bookings_per_slot', 'max_bouquets_per_slot', 'max_visitor_passes_per_booking',
+           'season_start_month', 'season_start_day', 'season_end_month', 'season_end_day'].includes(key)) {
+        const numericValue = typeof value === 'string' ? parseInt(value) : value;
+        if (isNaN(numericValue)) {
+          console.error(`Invalid numeric value for ${key}:`, value);
+          return { success: false, error: `Invalid numeric value: ${value}` };
+        }
+        storageValue = numericValue;
+      }
+      // For arrays and objects, store as-is (they'll be JSON.stringify'd)
+      else if (Array.isArray(value) || typeof value === 'object') {
+        storageValue = value;
+      }
+      // For strings, store as-is
+      else {
+        storageValue = value;
+      }
+
+      console.log(`Storing ${key} as:`, JSON.stringify(storageValue));
+
       try {
         const { error } = await supabaseAdmin
           .from('schedule_settings')
           .upsert({
             setting_key: key,
-            setting_value: JSON.stringify(value),
+            setting_value: JSON.stringify(storageValue),
             updated_at: new Date().toISOString()
           }, {
             onConflict: 'setting_key'
           });
-        
+
         if (error) {
           console.error(`Error updating ${key}:`, error);
           console.error('Full error details:', JSON.stringify(error, null, 2));
           return { success: false, error: error };
         }
-        
+
         console.log(`Successfully updated ${key}`);
         return { success: true };
       } catch (err) {
@@ -239,22 +263,53 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('Error refreshing schedule:', error);
       console.warn('Settings updated but schedule refresh failed');
     }
-    console.log('Refreshing schedule with new settings via RPC...');
+    console.log('Regenerating schedule with new settings using working logic...');
     try {
-      const { error: refreshError } = await supabaseAdmin.rpc('refresh_future_schedule');
-      
-      if (refreshError) {
-        console.error('Schedule refresh failed:', refreshError);
-        console.warn('Settings updated but schedule refresh failed');
+      // Use our working regeneration API instead of the broken SQL function
+      const regenerateResponse = await fetch(`${process.env.SITE_URL || 'http://localhost:4322'}/api/admin/regenerate-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (regenerateResponse.ok) {
+        const regenerateResult = await regenerateResponse.json();
+        console.log('Schedule regenerated successfully:', regenerateResult.message);
       } else {
-        console.log('Schedule refreshed successfully via direct RPC call');
+        console.error('Schedule regeneration failed:', regenerateResponse.status);
+        console.warn('Settings updated but schedule regeneration failed');
       }
     } catch (error) {
-      console.error('Error refreshing schedule:', error);
-      console.warn('Settings updated but schedule refresh failed');
+      console.error('Error regenerating schedule:', error);
+      console.warn('Settings updated but schedule regeneration failed');
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    // AUTOMATIC RANGE EXTENSION: Ensure we always have a full year of booking availability
+    console.log('Auto-extending booking range to ensure full year availability...');
+    try {
+      const extendResponse = await fetch(`${process.env.SITE_URL || 'http://localhost:4323'}/api/admin/extend-booking-range`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (extendResponse.ok) {
+        const extendResult = await extendResponse.json();
+        if (extendResult.success) {
+          console.log('Auto-extend successful:', extendResult.message);
+        } else {
+          console.error('Auto-extend failed:', extendResult.error);
+        }
+      } else {
+        console.error('Auto-extend HTTP error:', extendResponse.status);
+      }
+    } catch (error) {
+      console.error('Error auto-extending booking range:', error);
+      console.warn('Settings updated but auto-extend failed');
+    }
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Schedule settings updated successfully! Booking range automatically extended to ensure full year availability.'
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });

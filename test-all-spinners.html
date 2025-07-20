@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test All Admin Button Spinners</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        /* Enhanced loading indicators for ALL buttons */
+        .btn-spinner {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        /* CSS-based spinner icon - more reliable than SVG */
+        .spinner-icon {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            flex-shrink: 0;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Button loading states */
+        .btn:disabled {
+            opacity: 0.8;
+            cursor: not-allowed !important;
+            position: relative;
+        }
+        
+        .btn:disabled .btn-text {
+            display: none;
+        }
+        
+        .btn:disabled .btn-spinner {
+            display: flex;
+        }
+        
+        /* Maintain button colors when disabled */
+        .btn.btn-primary:disabled {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+        
+        .btn.btn-secondary:disabled {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        
+        .btn.btn-warning:disabled {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+        
+        /* Subtle pulse animation for loading text */
+        .btn:disabled .btn-spinner {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Override pulse for spinner icon to keep it spinning */
+        .btn:disabled .spinner-icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 All Admin Button Spinners Test</h1>
+    
+    <div class="test-section">
+        <h2>Schedule Settings</h2>
+        <button id="saveSchedule" class="btn btn-primary">
+            <span class="btn-text">Save Schedule Settings</span>
+            <span class="btn-spinner">
+                <span class="spinner-icon"></span>
+                Saving...
+            </span>
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Pricing Settings</h2>
+        <button id="savePricing" class="btn btn-primary">
+            <span class="btn-text">Save Pricing Settings</span>
+            <span class="btn-spinner">
+                <span class="spinner-icon"></span>
+                Saving...
+            </span>
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Holiday Management</h2>
+        <div class="button-grid">
+            <button id="addHoliday" class="btn btn-primary">
+                <span class="btn-text">Add Holiday</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Adding...
+                </span>
+            </button>
+            <button id="generateHolidays" class="btn btn-secondary">
+                <span class="btn-text">Generate Common Holidays</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Generating...
+                </span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Booking Range Actions</h2>
+        <div class="button-grid">
+            <button id="refreshRangeStatus" class="btn btn-secondary">
+                <span class="btn-text">Refresh Status</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Refreshing...
+                </span>
+            </button>
+            <button id="extendRange" class="btn btn-primary">
+                <span class="btn-text">Extend Range</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Extending...
+                </span>
+            </button>
+            <button id="forceRefresh" class="btn btn-warning">
+                <span class="btn-text">Force Regenerate Schedule</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Regenerating...
+                </span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Schedule Lock Controls</h2>
+        <div class="button-grid">
+            <button id="lockScheduleBtn" class="btn btn-warning">
+                <span class="btn-text">Lock Bookings to Edit Schedule</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Locking...
+                </span>
+            </button>
+            <button id="scheduleUpdateBtn" class="btn btn-secondary">
+                <span class="btn-text">Schedule Update for Later</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Scheduling...
+                </span>
+            </button>
+            <button id="applyChangesBtn" class="btn btn-primary">
+                <span class="btn-text">Unlock Bookings</span>
+                <span class="btn-spinner">
+                    <span class="spinner-icon"></span>
+                    Unlocking...
+                </span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testAllButtons()" class="btn" style="background: #28a745; color: white;">Test All Spinners</button>
+        <button onclick="resetAllButtons()" class="btn" style="background: #dc3545; color: white;">Reset All</button>
+    </div>
+
+    <script>
+        function setButtonLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+
+            const textSpan = button.querySelector('.btn-text');
+            const spinnerSpan = button.querySelector('.btn-spinner');
+
+            if (loading) {
+                button.disabled = true;
+                if (textSpan) textSpan.style.display = 'none';
+                if (spinnerSpan) spinnerSpan.style.display = 'flex';
+            } else {
+                button.disabled = false;
+                if (textSpan) textSpan.style.display = 'inline';
+                if (spinnerSpan) spinnerSpan.style.display = 'none';
+            }
+        }
+        
+        function testAllButtons() {
+            const buttons = [
+                'saveSchedule',
+                'savePricing', 
+                'addHoliday',
+                'generateHolidays',
+                'refreshRangeStatus',
+                'extendRange',
+                'forceRefresh',
+                'lockScheduleBtn',
+                'scheduleUpdateBtn',
+                'applyChangesBtn'
+            ];
+            
+            console.log('🎬 Testing all button spinners...');
+            
+            buttons.forEach((buttonId, index) => {
+                setTimeout(() => {
+                    setButtonLoading(buttonId, true);
+                    console.log(`✨ Testing ${buttonId}`);
+                    
+                    // Reset after 2 seconds
+                    setTimeout(() => {
+                        setButtonLoading(buttonId, false);
+                    }, 2000);
+                }, index * 300); // Stagger the tests
+            });
+        }
+        
+        function resetAllButtons() {
+            const buttons = [
+                'saveSchedule',
+                'savePricing', 
+                'addHoliday',
+                'generateHolidays',
+                'refreshRangeStatus',
+                'extendRange',
+                'forceRefresh',
+                'lockScheduleBtn',
+                'scheduleUpdateBtn',
+                'applyChangesBtn'
+            ];
+            
+            buttons.forEach(buttonId => {
+                setButtonLoading(buttonId, false);
+            });
+            
+            console.log('🔄 All buttons reset');
+        }
+        
+        // Auto-demo on page load
+        setTimeout(() => {
+            console.log('🎬 Auto-demo starting...');
+            testAllButtons();
+        }, 1000);
+    </script>
+</body>
+</html>

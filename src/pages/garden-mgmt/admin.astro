@@ -80,6 +80,79 @@
   .schedule-lock-controls button {
     cursor: pointer !important;
   }
+
+  /* Enhanced loading indicators for ALL buttons */
+  .btn-spinner {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  /* CSS-based spinner icon - more reliable than SVG */
+  .spinner-icon {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Button loading states */
+  .btn:disabled {
+    opacity: 0.8;
+    cursor: not-allowed !important;
+    position: relative;
+  }
+
+  .btn:disabled .btn-text {
+    display: none;
+  }
+
+  .btn:disabled .btn-spinner {
+    display: flex;
+  }
+
+  /* Maintain button colors when disabled */
+  .btn.btn-primary:disabled {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+  }
+
+  .btn.btn-secondary:disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+  }
+
+  .btn.btn-warning:disabled {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+  }
+
+  /* Subtle pulse animation for loading text */
+  .btn:disabled .btn-spinner {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+
+  /* Override pulse for spinner icon to keep it spinning */
+  .btn:disabled .spinner-icon {
+    animation: spin 1s linear infinite;
+  }
 </style>
 
 <script>
@@ -122,15 +195,24 @@
         <div class="lock-action-buttons">
           <button id="lockScheduleBtn" class="btn btn-warning">
             <span class="btn-text">Lock Bookings to Edit Schedule</span>
-            <span class="btn-spinner hidden">⟳</span>
+            <span class="btn-spinner">
+              <span class="spinner-icon"></span>
+              Locking...
+            </span>
           </button>
           <button id="scheduleUpdateBtn" class="btn btn-secondary">
             <span class="btn-text">Schedule Update for Later</span>
-            <span class="btn-spinner hidden">⟳</span>
+            <span class="btn-spinner">
+              <span class="spinner-icon"></span>
+              Scheduling...
+            </span>
           </button>
           <button id="applyChangesBtn" class="btn btn-primary hidden">
             <span class="btn-text">Unlock Bookings</span>
-            <span class="btn-spinner hidden">⟳</span>
+            <span class="btn-spinner">
+              <span class="spinner-icon"></span>
+              Unlocking...
+            </span>
           </button>
         </div>
         
@@ -152,7 +234,10 @@
             <button id="cancelScheduleUpdateBtn" class="btn btn-secondary">Cancel</button>
             <button id="confirmScheduleUpdateBtn" class="btn btn-primary">
               <span class="btn-text">Schedule Update</span>
-              <span class="btn-spinner hidden">⟳</span>
+              <span class="btn-spinner">
+                <span class="spinner-icon"></span>
+                Scheduling...
+              </span>
             </button>
           </div>
         </div>
@@ -388,12 +473,16 @@
     const maxVisitors = (document.getElementById('maxVisitors') as HTMLInputElement)?.value;
     const maxVisitorPasses = (document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement)?.value;
     
-    // Get operating days
-    const operatingDays: string[] = [];
+    // Get operating days as an object with day names as keys (not an array)
+    // This format is required for PostgreSQL's JSONB ? operator used in is_slot_valid_in_schedule
+    const operatingDays: Record<string, boolean> = {};
     document.querySelectorAll('#operatingDays .toggle-chip.active').forEach((chip) => {
       const element = chip as HTMLElement;
       const day = element.dataset.day;
-      if (day) operatingDays.push(day);
+      if (day) {
+        // Store the day name without spaces - database functions trim spaces anyway
+        operatingDays[day] = true;
+      }
     });
     
     // Get time slots
@@ -500,18 +589,18 @@
   function setButtonLoading(buttonId: string, isLoading: boolean) {
     const button = document.getElementById(buttonId);
     if (!button) return;
-    
+
     const textSpan = button.querySelector('.btn-text');
     const spinnerSpan = button.querySelector('.btn-spinner');
-    
+
     if (isLoading) {
       (button as HTMLButtonElement).disabled = true;
-      if (textSpan) textSpan.classList.add('hidden');
-      if (spinnerSpan) spinnerSpan.classList.remove('hidden');
+      if (textSpan) (textSpan as HTMLElement).style.display = 'none';
+      if (spinnerSpan) (spinnerSpan as HTMLElement).style.display = 'flex';
     } else {
       (button as HTMLButtonElement).disabled = false;
-      if (textSpan) textSpan.classList.remove('hidden');
-      if (spinnerSpan) spinnerSpan.classList.add('hidden');
+      if (textSpan) (textSpan as HTMLElement).style.display = 'inline';
+      if (spinnerSpan) (spinnerSpan as HTMLElement).style.display = 'none';
     }
   }
 
@@ -580,7 +669,10 @@
 				<div class="form-group button-group">
 					<button id="savePricing" class="btn btn-primary">
 						<span class="btn-text">Save Pricing Settings</span>
-						<span class="btn-spinner hidden">⟳</span>
+						<span class="btn-spinner">
+							<span class="spinner-icon"></span>
+							Saving...
+						</span>
 					</button>
 				</div>
 			</div>
@@ -612,11 +704,17 @@
 					<div class="admin-actions">
 						<button id="addHoliday" class="btn btn-primary">
 							<span class="btn-text">Add Holiday</span>
-							<span class="btn-spinner hidden">⟳</span>
+							<span class="btn-spinner">
+								<span class="spinner-icon"></span>
+								Adding...
+							</span>
 						</button>
 						<button id="generateHolidays" class="btn btn-secondary">
 							<span class="btn-text">Generate Common Holidays</span>
-							<span class="btn-spinner hidden">⟳</span>
+							<span class="btn-spinner">
+								<span class="spinner-icon"></span>
+								Generating...
+							</span>
 						</button>
 					</div>
 
@@ -650,17 +748,17 @@
 
 					<div class="form-group">
 						<label for="maxBookings">Max Bookings per Slot:</label>
-						<input type="number" id="maxBookings" min="1" max="20" value="3">
+						<input type="number" id="maxBookings" min="1" value="3">
 					</div>
 
 					<div class="form-group">
 						<label for="maxVisitors">Max Bouquets per Slot:</label>
-						<input type="number" id="maxVisitors" min="1" max="50" value="10">
+						<input type="number" id="maxVisitors" min="1" value="10">
 					</div>
 
 					<div class="form-group">
 						<label for="maxVisitorPassesPerBooking">Max Visitor Passes per Booking:</label>
-						<input type="number" id="maxVisitorPassesPerBooking" min="0" max="20" value="8">
+						<input type="number" id="maxVisitorPassesPerBooking" min="0" value="8">
 					</div>
 
 					<div class="form-group">
@@ -728,7 +826,10 @@
 
 					<button id="saveSchedule" class="btn btn-primary">
 						<span class="btn-text">Save Schedule Settings</span>
-						<span class="btn-spinner hidden">⟳</span>
+						<span class="btn-spinner">
+							<span class="spinner-icon"></span>
+							Saving...
+						</span>
 					</button>
 
 					<div id="scheduleMessage" class="hidden"></div>
@@ -766,15 +867,24 @@
 						<div class="range-actions">
 							<button id="refreshRangeStatus" class="btn btn-secondary">
 								<span class="btn-text">Refresh Status</span>
-								<span class="btn-spinner hidden">⟳</span>
+								<span class="btn-spinner">
+									<span class="spinner-icon"></span>
+									Refreshing...
+								</span>
 							</button>
 							<button id="extendRange" class="btn btn-primary">
 								<span class="btn-text">Extend Range</span>
-								<span class="btn-spinner hidden">⟳</span>
+								<span class="btn-spinner">
+									<span class="spinner-icon"></span>
+									Extending...
+								</span>
 							</button>
 							<button id="forceRefresh" class="btn btn-warning">
 								<span class="btn-text">Force Regenerate Schedule</span>
-								<span class="btn-spinner hidden">⟳</span>
+								<span class="btn-spinner">
+									<span class="spinner-icon"></span>
+									Regenerating...
+								</span>
 							</button>
 						</div>
 
@@ -1271,13 +1381,37 @@
 				// Load capacity settings
 				const maxBookingsElement = document.getElementById('maxBookings') as HTMLInputElement;
 				const maxVisitorsElement = document.getElementById('maxVisitors') as HTMLInputElement;
+				const maxVisitorPassesElement = document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement;
 
+				// Parse values that might be double-JSON-encoded
 				if (maxBookingsElement && settings.max_bookings_per_slot) {
-					maxBookingsElement.value = settings.max_bookings_per_slot;
+					let value = settings.max_bookings_per_slot;
+					// Handle double-JSON encoding
+					if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+						value = JSON.parse(value);
+					}
+					maxBookingsElement.value = value;
+					console.log('Set maxBookings to:', value);
 				}
 
 				if (maxVisitorsElement && settings.max_bouquets_per_slot) {
-					maxVisitorsElement.value = settings.max_bouquets_per_slot;
+					let value = settings.max_bouquets_per_slot;
+					// Handle double-JSON encoding
+					if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+						value = JSON.parse(value);
+					}
+					maxVisitorsElement.value = value;
+					console.log('Set maxVisitors to:', value);
+				}
+
+				if (maxVisitorPassesElement && settings.max_visitor_passes_per_booking) {
+					let value = settings.max_visitor_passes_per_booking;
+					// Handle double-JSON encoding
+					if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+						value = JSON.parse(value);
+					}
+					maxVisitorPassesElement.value = value;
+					console.log('Set maxVisitorPassesPerBooking to:', value);
 				}
 
 				// Load seasonal settings
@@ -1287,16 +1421,40 @@
 				const seasonEndDayElement = document.getElementById('seasonEndDay') as HTMLInputElement;
 
 				if (seasonStartMonthElement && settings.season_start_month) {
-					seasonStartMonthElement.value = settings.season_start_month;
+					let value = settings.season_start_month;
+					// Handle double-JSON encoding
+					if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+						value = JSON.parse(value);
+					}
+					seasonStartMonthElement.value = value;
+					console.log('Set seasonStartMonth to:', value);
 				}
 				if (seasonStartDayElement && settings.season_start_day) {
-					seasonStartDayElement.value = settings.season_start_day;
+					let value = settings.season_start_day;
+					// Handle double-JSON encoding
+					if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+						value = JSON.parse(value);
+					}
+					seasonStartDayElement.value = value;
+					console.log('Set seasonStartDay to:', value);
 				}
 				if (seasonEndMonthElement && settings.season_end_month) {
-					seasonEndMonthElement.value = settings.season_end_month;
+					let value = settings.season_end_month;
+					// Handle double-JSON encoding
+					if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+						value = JSON.parse(value);
+					}
+					seasonEndMonthElement.value = value;
+					console.log('Set seasonEndMonth to:', value);
 				}
 				if (seasonEndDayElement && settings.season_end_day) {
-					seasonEndDayElement.value = settings.season_end_day;
+					let value = settings.season_end_day;
+					// Handle double-JSON encoding
+					if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+						value = JSON.parse(value);
+					}
+					seasonEndDayElement.value = value;
+					console.log('Set seasonEndDay to:', value);
 				}
 
 			} catch (error) {
@@ -1334,7 +1492,7 @@
 			}
 
 			// Show loading state
-			setButtonLoading('saveScheduleBtn', true);
+			setButtonLoading('saveSchedule', true);
 
 			try {
 				// Get operating days from active chips
@@ -1382,18 +1540,18 @@
 				const seasonEndDay = parseInt(seasonEndDayInput.value);
 				
 				// Additional validation for numeric values
-				if (isNaN(maxBookings) || maxBookings < 1 || maxBookings > 20) {
-					showMessage(messageDiv, 'Max bookings per slot must be between 1 and 20.', 'error');
+				if (isNaN(maxBookings) || maxBookings < 1) {
+					showMessage(messageDiv, 'Max bookings per slot must be at least 1.', 'error');
 					return;
 				}
-				
-				if (isNaN(maxVisitors) || maxVisitors < 1 || maxVisitors > 50) {
-					showMessage(messageDiv, 'Max bouquets per slot must be between 1 and 50.', 'error');
+
+				if (isNaN(maxVisitors) || maxVisitors < 1) {
+					showMessage(messageDiv, 'Max bouquets per slot must be at least 1.', 'error');
 					return;
 				}
-				
-				if (isNaN(maxVisitorPasses) || maxVisitorPasses < 0 || maxVisitorPasses > 20) {
-					showMessage(messageDiv, 'Max visitor passes per booking must be between 0 and 20.', 'error');
+
+				if (isNaN(maxVisitorPasses) || maxVisitorPasses < 0) {
+					showMessage(messageDiv, 'Max visitor passes per booking must be 0 or greater.', 'error');
 					return;
 				}
 				
@@ -1458,7 +1616,7 @@
 				showMessage(messageDiv, 'Error updating settings.', 'error');
 			} finally {
 				// Hide loading state
-				setButtonLoading('saveScheduleBtn', false);
+				setButtonLoading('saveSchedule', false);
 			}
 		}
 
@@ -1664,7 +1822,6 @@
 
 				const bouquetPriceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
 				const visitorPassPriceInput = document.getElementById('pricePerVisitorPass') as HTMLInputElement;
-				const maxVisitorPassesInput = document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement;
 
 				if (bouquetPriceInput) {
 					bouquetPriceInput.value = data.price_per_bouquet || '35.00';
@@ -1674,9 +1831,8 @@
 					visitorPassPriceInput.value = data.price_per_visitor_pass || '5.00';
 				}
 
-				if (maxVisitorPassesInput) {
-					maxVisitorPassesInput.value = data.max_visitor_passes_per_booking || '20';
-				}
+				// Note: max_visitor_passes_per_booking is now handled by loadScheduleSettings() only
+				// to avoid conflicts between the two loading functions
 
 				console.log('Loaded pricing settings:', data);
 			} catch (error) {
@@ -1684,7 +1840,6 @@
 				// Set fallback values
 				const bouquetPriceInput = document.getElementById('pricePerBouquet') as HTMLInputElement;
 				const visitorPassPriceInput = document.getElementById('pricePerVisitorPass') as HTMLInputElement;
-				const maxVisitorPassesInput = document.getElementById('maxVisitorPassesPerBooking') as HTMLInputElement;
 
 				if (bouquetPriceInput) {
 					bouquetPriceInput.value = '35.00';
@@ -1692,9 +1847,7 @@
 				if (visitorPassPriceInput) {
 					visitorPassPriceInput.value = '5.00';
 				}
-				if (maxVisitorPassesInput) {
-					maxVisitorPassesInput.value = '20';
-				}
+				// Note: max_visitor_passes_per_booking fallback is handled by loadScheduleSettings()
 			}
 		}
 
@@ -1723,12 +1876,12 @@
 			}
 
 			// Validate visitor pass limit
-			if (isNaN(maxVisitorPasses) || maxVisitorPasses < 0 || maxVisitorPasses > 50) {
-				showMessage(messageDiv, 'Visitor pass limit must be between 0 and 50', 'error');
+			if (isNaN(maxVisitorPasses) || maxVisitorPasses < 0) {
+				showMessage(messageDiv, 'Visitor pass limit must be 0 or greater', 'error');
 				return;
 			}
 
-			setButtonLoading('savePricingBtn', true);
+			setButtonLoading('savePricing', true);
 
 			try {
 				const response = await fetch('/api/settings/pricing', {
@@ -1758,7 +1911,7 @@
 				console.error('Error updating pricing:', error);
 				showMessage(messageDiv, 'Failed to update pricing. Please try again.', 'error');
 			} finally {
-				setButtonLoading('savePricingBtn', false);
+				setButtonLoading('savePricing', false);
 			}
 		}
 
