@@ -164,7 +164,7 @@ export const GET: APIRoute = async ({ request, url }) => {
 
     let summaryQuery = supabaseAdmin
       .from('admin_booking_view')
-      .select('payment_status, total_amount, status');
+      .select('payment_status, status');
 
     // Apply same filters to count and summary queries
     if (status !== 'all') {
@@ -219,16 +219,12 @@ export const GET: APIRoute = async ({ request, url }) => {
     const summary = {
       total: count || 0,
       pending: 0,
-      paid: 0,
-      revenue: 0
+      paid: 0
     };
 
     if (summaryData) {
       summary.pending = summaryData.filter(b => b.payment_status === 'pending').length;
       summary.paid = summaryData.filter(b => b.payment_status === 'paid').length;
-      summary.revenue = summaryData
-        .filter(b => b.payment_status === 'paid')
-        .reduce((sum, b) => sum + (parseFloat(b.total_amount) || 0), 0);
     }
 
     return new Response(JSON.stringify({

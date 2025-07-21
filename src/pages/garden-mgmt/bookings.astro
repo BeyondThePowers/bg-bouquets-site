@@ -91,10 +91,6 @@
 					<div class="summary-value" id="paid-bookings">-</div>
 					<div class="summary-label">Paid</div>
 				</div>
-				<div class="summary-card">
-					<div class="summary-value" id="total-revenue">-</div>
-					<div class="summary-label">Revenue</div>
-				</div>
 			</div>
 
 			<!-- Advanced Date Range Filter (shown only for "All Bookings" view) -->
@@ -235,7 +231,6 @@
 		const totalBookingsEl = document.getElementById('total-bookings') as HTMLElement;
 		const pendingPaymentEl = document.getElementById('pending-payment') as HTMLElement;
 		const paidBookingsEl = document.getElementById('paid-bookings') as HTMLElement;
-		const totalRevenueEl = document.getElementById('total-revenue') as HTMLElement;
 
 		// Date range elements
 		const dateRangeFilter = document.getElementById('date-range-filter') as HTMLElement;
@@ -578,7 +573,6 @@
 			if (totalBookingsEl) totalBookingsEl.textContent = summary.total || '0';
 			if (pendingPaymentEl) pendingPaymentEl.textContent = summary.pending || '0';
 			if (paidBookingsEl) paidBookingsEl.textContent = summary.paid || '0';
-			if (totalRevenueEl) totalRevenueEl.textContent = summary.revenue ? `$${summary.revenue}` : '$0';
 		}
 
 		// Render bookings cards
