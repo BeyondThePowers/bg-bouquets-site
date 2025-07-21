@@ -180,7 +180,7 @@
 
 				<div id="bookings-container" style="display: none;">
 					<div class="column-headers">
-						<div>Customer</div>
+						<div>Customer & Reference</div>
 						<div>Date & Time</div>
 						<div>Amount</div>
 						<div>Payment</div>
@@ -643,6 +643,7 @@
 						<div class="customer-info">
 							<div class="customer-name">${booking.full_name}</div>
 							<div class="customer-contact">${booking.email}</div>
+							${booking.booking_reference ? `<div class="booking-reference">${booking.booking_reference}</div>` : ''}
 						</div>
 					</div>
 

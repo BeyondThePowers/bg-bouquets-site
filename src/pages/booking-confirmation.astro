@@ -86,8 +86,14 @@ function formatTime(timeString: string): string {
             <h1 class="text-3xl font-allura mb-2">
               {booking.payment_status === 'paid' ? 'Payment Confirmed!' : 'Booking Confirmed!'}
             </h1>
+            {booking.booking_reference && (
+              <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2 mb-3 inline-block">
+                <p class="text-pink-100 text-sm font-roboto">Booking Reference</p>
+                <p class="text-white text-xl font-mono font-bold tracking-wider">{booking.booking_reference}</p>
+              </div>
+            )}
             <p class="text-pink-100 font-roboto">
-              {booking.payment_status === 'paid' 
+              {booking.payment_status === 'paid'
                 ? 'Thank you for your payment. Your garden visit is all set!'
                 : 'Your booking has been created. Payment confirmation may take a few moments.'
               }
@@ -98,20 +104,29 @@ function formatTime(timeString: string): string {
           <div class="p-8">
             <h2 class="text-xl font-playfair text-charcoal mb-6">Booking Details</h2>
             
+            <!-- Booking Reference (if not shown in header) -->
+            {booking.booking_reference && (
+              <div class="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-pink-200">
+                <label class="block text-sm font-medium text-gray-500 mb-1">Booking Reference</label>
+                <p class="text-charcoal font-mono text-lg font-bold tracking-wider">{booking.booking_reference}</p>
+                <p class="text-xs text-gray-500 mt-1">Please keep this reference for your records and any future correspondence</p>
+              </div>
+            )}
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               <!-- Visit Information -->
               <div class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-500 mb-1">Visitor Name</label>
                   <p class="text-charcoal font-roboto">{booking.full_name}</p>
                 </div>
-                
+
                 <div>
                   <label class="block text-sm font-medium text-gray-500 mb-1">Email</label>
                   <p class="text-charcoal font-roboto">{booking.email}</p>
                 </div>
-                
+
                 <div>
                   <label class="block text-sm font-medium text-gray-500 mb-1">Phone</label>
                   <p class="text-charcoal font-roboto">{booking.phone}</p>

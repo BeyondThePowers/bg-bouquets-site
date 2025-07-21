@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { supabaseAdmin } from '../../lib/supabase-admin';
 import { sendBookingConfirmation, logWebhookAttempt } from '../../services/webhook';
 import { createPaymentLink, validateSquareConfig } from '../../services/square';
+import { generateUniqueBookingReference } from '../../lib/booking-reference';
 
 // Business timezone helper - Alberta, Canada (Mountain Time)
 function getBusinessToday(): string {
@@ -157,6 +158,21 @@ export const POST: APIRoute = async ({ request }) => {
     // For pay_on_arrival, we keep it as 'pending' until manually marked as paid
     const paymentStatus = 'pending';
 
+    // Generate unique booking reference
+    let bookingReference: string;
+    try {
+      bookingReference = await generateUniqueBookingReference(visitDate);
+      console.log('Generated booking reference:', bookingReference);
+    } catch (referenceError) {
+      console.error('Failed to generate booking reference:', referenceError);
+      return new Response(JSON.stringify({
+        error: 'Unable to generate booking reference. Please try again.'
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const { data: insertedBooking, error: insertError } = await supabase.from('bookings').insert({
       full_name: fullName,
       email,
@@ -168,7 +184,8 @@ export const POST: APIRoute = async ({ request }) => {
       total_amount: totalAmount,
       payment_method: paymentMethod,
       payment_status: paymentStatus,
-    }).select('id, created_at, cancellation_token').single();
+      booking_reference: bookingReference, // Add booking reference to insert
+    }).select('id, created_at, cancellation_token, booking_reference').single();
 
     console.log('Insert result:', { insertedBooking, insertError });
 
@@ -183,6 +200,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Prepare booking data for webhook
     const webhookBookingData = {
       id: insertedBooking.id,
+      bookingReference: insertedBooking.booking_reference, // Add booking reference to webhook data
       fullName,
       email,
       phone,

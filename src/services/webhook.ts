@@ -81,6 +81,7 @@ export function createStandardizedPayload(
     event: eventType,
     booking: {
       id: bookingData.id,
+      reference: bookingData.bookingReference || null, // Add booking reference to payload
       customer: {
         name: bookingData.fullName,
         email: bookingData.email,
@@ -159,6 +160,7 @@ export function createStandardizedPayload(
 export function prepareBookingWebhookData(booking: any): BookingData {
   return {
     id: booking.id,
+    bookingReference: booking.booking_reference || booking.bookingReference, // Add booking reference mapping
     fullName: booking.full_name || booking.fullName,
     email: booking.email,
     phone: booking.phone,
@@ -178,6 +180,7 @@ export function prepareBookingWebhookData(booking: any): BookingData {
 // Type definitions
 export interface BookingData {
   id: string;
+  bookingReference?: string; // Add booking reference to interface
   fullName: string;
   email: string;
   phone?: string;
@@ -197,6 +200,7 @@ export interface StandardizedWebhookPayload {
   event: string;
   booking: {
     id: string;
+    reference?: string; // Add booking reference to payload interface
     customer: {
       name: string;
       email: string;

@@ -1350,6 +1350,20 @@ body {
 	min-width: 0;
 }
 
+/* Booking Reference in Customer Info */
+.booking-reference {
+	font-family: 'Courier New', monospace;
+	font-size: 11px;
+	color: var(--admin-gray-500);
+	background-color: var(--admin-gray-100);
+	padding: 2px 6px;
+	border-radius: 3px;
+	margin-top: 2px;
+	display: inline-block;
+	font-weight: 500;
+	letter-spacing: 0.5px;
+}
+
 /* Clean Customer Info */
 .customer-name {
 	font-size: 14px;
