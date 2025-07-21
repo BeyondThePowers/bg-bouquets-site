@@ -75,17 +75,21 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Send cancellation confirmation emails (async, don't block response)
     if (bookingData) {
-      // Prepare booking data for webhooks
+      // Prepare standardized booking data for webhooks - includes all fields for unified payload
       const webhookData = {
         id: bookingData.id,
+        bookingReference: bookingData.booking_reference, // Add booking reference
         fullName: bookingData.full_name,
         email: bookingData.email,
         phone: bookingData.phone,
         visitDate: bookingData.date,
         preferredTime: bookingData.time,
-        numberOfVisitors: bookingData.number_of_visitors,
+        numberOfBouquets: bookingData.number_of_bouquets, // Standardized: use bouquets field
+        numberOfVisitorPasses: bookingData.number_of_visitor_passes, // Add visitor passes
         totalAmount: bookingData.total_amount,
-        paymentMethod: bookingData.payment_method
+        paymentMethod: bookingData.payment_method,
+        cancellationReason: reason || 'No reason provided', // Add cancellation reason
+        cancellationToken: bookingData.cancellation_token
       };
 
       // Send confirmation to customer

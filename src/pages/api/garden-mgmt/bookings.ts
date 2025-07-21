@@ -135,9 +135,9 @@ export const GET: APIRoute = async ({ request, url }) => {
       }
     }
 
-    // Apply search filter
+    // Apply search filter - now includes booking reference
     if (search) {
-      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`);
+      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%,booking_reference.ilike.%${search}%`);
     }
 
     const { data: bookings, error } = await query;
@@ -198,8 +198,8 @@ export const GET: APIRoute = async ({ request, url }) => {
     }
 
     if (search) {
-      countQuery = countQuery.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`);
-      summaryQuery = summaryQuery.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`);
+      countQuery = countQuery.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%,booking_reference.ilike.%${search}%`);
+      summaryQuery = summaryQuery.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%,booking_reference.ilike.%${search}%`);
     }
 
     const [{ count, error: countError }, { data: summaryData, error: summaryError }] = await Promise.all([

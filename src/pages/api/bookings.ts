@@ -158,11 +158,13 @@ export const POST: APIRoute = async ({ request }) => {
     // For pay_on_arrival, we keep it as 'pending' until manually marked as paid
     const paymentStatus = 'pending';
 
-    // Generate unique booking reference
+    // Generate unique booking reference using current date (booking creation date)
+    // This ensures the reference reflects when the booking was made, not when the visit is scheduled
+    const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     let bookingReference: string;
     try {
-      bookingReference = await generateUniqueBookingReference(visitDate);
-      console.log('Generated booking reference:', bookingReference);
+      bookingReference = await generateUniqueBookingReference(currentDate);
+      console.log('Generated booking reference:', bookingReference, 'for creation date:', currentDate);
     } catch (referenceError) {
       console.error('Failed to generate booking reference:', referenceError);
       return new Response(JSON.stringify({
@@ -197,16 +199,16 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Prepare booking data for webhook
+    // Prepare standardized booking data for webhook - includes all fields for unified payload
     const webhookBookingData = {
       id: insertedBooking.id,
-      bookingReference: insertedBooking.booking_reference, // Add booking reference to webhook data
+      bookingReference: insertedBooking.booking_reference, // Booking reference for customer communication
       fullName,
       email,
       phone,
       visitDate,
       preferredTime,
-      numberOfVisitors,
+      numberOfBouquets: numberOfVisitors, // Standardized: numberOfVisitors represents bouquets in booking creation
       numberOfVisitorPasses,
       totalAmount,
       paymentMethod,

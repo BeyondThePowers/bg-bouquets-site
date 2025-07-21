@@ -154,15 +154,17 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Send reschedule confirmation email if requested (async, don't block response)
     if (notifyCustomer && bookingData) {
-      // Prepare data for webhook
+      // Prepare standardized data for webhook - includes all fields for unified payload
       const webhookData = {
         id: bookingData.id,
+        bookingReference: bookingData.booking_reference, // Add booking reference
         fullName: bookingData.full_name,
         email: bookingData.email,
         phone: bookingData.phone,
         visitDate: bookingData.new_date,
         preferredTime: bookingData.new_time,
-        numberOfVisitors: bookingData.number_of_visitors,
+        numberOfBouquets: bookingData.number_of_bouquets, // Standardized: use bouquets field
+        numberOfVisitorPasses: bookingData.number_of_visitor_passes, // Add visitor passes
         totalAmount: bookingData.total_amount,
         paymentMethod: bookingData.payment_method,
         originalDate: bookingData.original_date,

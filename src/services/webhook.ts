@@ -90,9 +90,8 @@ export function createStandardizedPayload(
       visit: {
         date: bookingData.visitDate,
         time: bookingData.preferredTime,
-        bouquets: bookingData.numberOfVisitors || null, // Primary field using bouquet terminology
-        visitors: bookingData.numberOfVisitors || null, // Deprecated: kept for backward compatibility
-        visitorPasses: bookingData.numberOfVisitorPasses || null, // New field for visitor passes
+        bouquets: bookingData.numberOfBouquets || null, // Primary field: number of bouquets
+        visitorPasses: bookingData.numberOfVisitorPasses || null, // Number of additional visitor passes
         amount: bookingData.totalAmount || null,
       },
       payment: {
@@ -114,9 +113,8 @@ export function createStandardizedPayload(
         new: {
           date: bookingData.visitDate,
           time: bookingData.preferredTime,
-          bouquets: bookingData.numberOfVisitors ?? 0, // Primary field using bouquet terminology
-          visitors: bookingData.numberOfVisitors ?? 0, // Deprecated: kept for backward compatibility
-          visitorPasses: bookingData.numberOfVisitorPasses || null, // New field for visitor passes
+          bouquets: bookingData.numberOfBouquets ?? 0, // Primary field: number of bouquets
+          visitorPasses: bookingData.numberOfVisitorPasses || null, // Number of additional visitor passes
           amount: bookingData.totalAmount ?? 0,
         }
       }),
@@ -160,47 +158,61 @@ export function createStandardizedPayload(
 export function prepareBookingWebhookData(booking: any): BookingData {
   return {
     id: booking.id,
-    bookingReference: booking.booking_reference || booking.bookingReference, // Add booking reference mapping
+    bookingReference: booking.booking_reference || booking.bookingReference, // Booking reference mapping
     fullName: booking.full_name || booking.fullName,
     email: booking.email,
     phone: booking.phone,
-    visitDate: booking.visit_date || booking.visitDate,
-    preferredTime: booking.preferred_time || booking.preferredTime,
-    numberOfVisitors: booking.number_of_visitors || booking.numberOfVisitors,
-    numberOfVisitorPasses: booking.number_of_visitor_passes || booking.numberOfVisitorPasses,
+    visitDate: booking.visit_date || booking.visitDate || booking.date,
+    preferredTime: booking.preferred_time || booking.preferredTime || booking.time,
+    numberOfBouquets: booking.number_of_bouquets || booking.numberOfBouquets, // Primary field: bouquets
+    numberOfVisitorPasses: booking.number_of_visitor_passes || booking.numberOfVisitorPasses, // Visitor passes
     totalAmount: booking.total_amount || booking.totalAmount,
     paymentMethod: booking.payment_method || booking.paymentMethod,
     paymentCompletedAt: booking.payment_completed_at || booking.paymentCompletedAt,
     squareOrderId: booking.square_order_id || booking.squareOrderId,
     squarePaymentId: booking.square_payment_id || booking.squarePaymentId,
-    paymentDetails: booking.payment_details || booking.paymentDetails
+    paymentDetails: booking.payment_details || booking.paymentDetails,
+    // Reschedule-specific fields
+    originalDate: booking.original_date || booking.originalDate,
+    originalTime: booking.original_time || booking.originalTime,
+    rescheduleReason: booking.reschedule_reason || booking.rescheduleReason,
+    // Cancellation-specific fields
+    cancellationReason: booking.cancellation_reason || booking.cancellationReason,
+    cancellationToken: booking.cancellation_token || booking.cancellationToken
   };
 }
 
 // Type definitions
 export interface BookingData {
   id: string;
-  bookingReference?: string; // Add booking reference to interface
+  bookingReference?: string; // Booking reference for customer communication
   fullName: string;
   email: string;
   phone?: string;
   visitDate: string;
   preferredTime: string;
-  numberOfVisitors?: number;
-  numberOfVisitorPasses?: number;
+  numberOfBouquets?: number; // Primary field: number of bouquets booked
+  numberOfVisitorPasses?: number; // Number of additional visitor passes
   totalAmount?: number;
   paymentMethod?: string;
   paymentCompletedAt?: string;
   squareOrderId?: string;
   squarePaymentId?: string;
   paymentDetails?: any;
+  // Reschedule-specific fields
+  originalDate?: string;
+  originalTime?: string;
+  rescheduleReason?: string;
+  // Cancellation-specific fields
+  cancellationReason?: string;
+  cancellationToken?: string;
 }
 
 export interface StandardizedWebhookPayload {
   event: string;
   booking: {
     id: string;
-    reference?: string; // Add booking reference to payload interface
+    reference: string | null; // Booking reference (always present, null if not available)
     customer: {
       name: string;
       email: string;
@@ -209,9 +221,8 @@ export interface StandardizedWebhookPayload {
     visit: {
       date: string;
       time: string;
-      bouquets: number | null;
-      visitors: number | null;
-      visitorPasses: number | null;
+      bouquets: number | null; // Primary field: number of bouquets
+      visitorPasses: number | null; // Number of additional visitor passes
       amount: number | null;
     };
     payment: {

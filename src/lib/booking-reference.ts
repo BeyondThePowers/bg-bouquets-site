@@ -1,24 +1,25 @@
 /**
  * Booking Reference Generation System
- * 
+ *
  * Generates human-readable booking reference codes in the format: BG-YYYYMMDD-XXXX
  * Example: BG-20250721-8391
- * 
+ *
  * Features:
  * - Human-friendly: Easy to read, speak, and type (16 characters)
- * - Contextual: Date component allows instant identification
+ * - Contextual: Date component reflects booking creation date (immutable)
  * - Compact: Short enough to be convenient but long enough to be unique
  * - Recognizable: "BG" prefix identifies the business
- * - Sortable: Natural chronological sorting by date component
+ * - Sortable: Natural chronological sorting by creation date
  * - Secure: Doesn't expose internal database IDs
  * - Collision-resistant: 4-digit random suffix provides 10,000 combinations per day
+ * - Immutable: Reference never changes even if visit date is rescheduled
  */
 
 import { supabase } from './supabase';
 
 /**
  * Generate a booking reference code
- * @param date - Date string in YYYY-MM-DD format
+ * @param date - Date string in YYYY-MM-DD format (should be booking creation date, not visit date)
  * @returns Booking reference in format BG-YYYYMMDD-XXXX
  */
 export function generateBookingReference(date: string): string {
@@ -34,7 +35,7 @@ export function generateBookingReference(date: string): string {
 
 /**
  * Generate a unique booking reference with collision handling
- * @param date - Date string in YYYY-MM-DD format
+ * @param date - Date string in YYYY-MM-DD format (should be booking creation date, not visit date)
  * @param maxAttempts - Maximum number of attempts to generate unique reference (default: 10)
  * @returns Promise<string> - Unique booking reference
  * @throws Error if unable to generate unique reference after maxAttempts
@@ -117,17 +118,19 @@ export function formatBookingReferenceForDisplay(reference: string): string {
 
 /**
  * Generate booking references for existing bookings (migration helper)
- * @param bookings - Array of booking objects with id and date
+ * @param bookings - Array of booking objects with id and created_at date
  * @returns Promise<Array<{id: string, reference: string}>> - Generated references
  */
 export async function generateReferencesForExistingBookings(
-  bookings: Array<{ id: string; date: string }>
+  bookings: Array<{ id: string; created_at: string }>
 ): Promise<Array<{ id: string; reference: string; success: boolean; error?: string }>> {
   const results: Array<{ id: string; reference: string; success: boolean; error?: string }> = [];
-  
+
   for (const booking of bookings) {
     try {
-      const reference = await generateUniqueBookingReference(booking.date);
+      // Use creation date (created_at) instead of visit date for reference generation
+      const creationDate = booking.created_at.split('T')[0]; // Extract YYYY-MM-DD from timestamp
+      const reference = await generateUniqueBookingReference(creationDate);
       
       // Update the booking with the new reference
       const { error: updateError } = await supabase
