@@ -75,6 +75,15 @@
 					<button class="payment-filter" data-payment="pay_on_arrival">Pay on Arrival</button>
 					<button class="payment-filter" data-payment="online">Paid Online</button>
 				</div>
+
+				<!-- Past Bookings Toggle -->
+				<div class="past-toggle-container">
+					<label class="toggle-switch" title="Hide bookings from past dates">
+						<input type="checkbox" id="hide-past-toggle" checked>
+						<span class="toggle-slider"></span>
+						<span class="toggle-label">Hide Past Bookings</span>
+					</label>
+				</div>
 			</div>
 
 			<!-- Summary Cards -->
@@ -182,7 +191,14 @@
 					<div class="column-headers">
 						<div>Customer</div>
 						<div>Reference</div>
-						<div>Date & Time</div>
+						<div class="sortable-header" data-sort="visit_datetime" onclick="handleSort('visit_datetime')">
+							Visit Date & Time
+							<span class="sort-indicator" id="sort-visit_datetime"></span>
+						</div>
+						<div class="sortable-header" data-sort="created_at" onclick="handleSort('created_at')">
+							Created
+							<span class="sort-indicator" id="sort-created_at"></span>
+						</div>
 						<div>Amount</div>
 						<div>Payment</div>
 						<div>Status</div>
@@ -210,7 +226,8 @@
 			search: '',
 			period: 'upcoming', // Default to upcoming bookings (today and future)
 			payment: 'all', // Default to all payment types
-			dateRange: null as { start: string; end: string } | null // Custom date range for "all" view
+			dateRange: null as { start: string; end: string } | null, // Custom date range for "all" view
+			hidePast: true // Default to hiding past bookings
 		};
 		const pageSize = 20;
 
@@ -229,6 +246,7 @@
 		const timeFilters = document.querySelectorAll('.time-filter');
 		const statusFilters = document.querySelectorAll('.status-filter');
 		const paymentFilters = document.querySelectorAll('.payment-filter');
+		const hidePastToggle = document.getElementById('hide-past-toggle') as HTMLInputElement;
 		const totalBookingsEl = document.getElementById('total-bookings') as HTMLElement;
 		const pendingPaymentEl = document.getElementById('pending-payment') as HTMLElement;
 		const paidBookingsEl = document.getElementById('paid-bookings') as HTMLElement;
@@ -249,6 +267,10 @@
 		const bookingsGrid = document.getElementById('bookings-grid') as HTMLElement;
 		const pagination = document.getElementById('pagination') as HTMLElement;
 		const pastBookingsInfo = document.getElementById('past-bookings-info') as HTMLElement;
+
+		// Sorting state
+		let currentSortBy = 'visit_datetime';
+		let currentSortOrder = 'proximity';
 
 		// Event listeners
 		if (loginForm) loginForm.addEventListener('submit', handleLogin);
@@ -273,6 +295,11 @@
 		paymentFilters.forEach(filter => {
 			filter.addEventListener('click', handlePaymentFilter);
 		});
+
+		// Hide past bookings toggle listener
+		if (hidePastToggle) {
+			hidePastToggle.addEventListener('change', handleHidePastToggle);
+		}
 
 		// Date range listeners
 		if (dateRangeDisplay) dateRangeDisplay.addEventListener('click', toggleDatePicker);
@@ -304,6 +331,7 @@
 					adminToken = password;
 					if (loginContainer) loginContainer.style.display = 'none';
 					if (adminInterface) adminInterface.style.display = 'block';
+					updateSortIndicators(); // Initialize sort indicators
 					loadBookings();
 				} else {
 					showLoginError('Invalid password');
@@ -401,6 +429,18 @@
 
 			// Update filter and reload
 			currentFilters.payment = payment;
+			currentPage = 0;
+			loadBookings();
+		}
+
+		// Hide past bookings toggle handler
+		function handleHidePastToggle(event: Event): void {
+			const target = event.target as HTMLInputElement;
+
+			// Update filter state
+			currentFilters.hidePast = target.checked;
+
+			// Reset to first page and reload bookings
 			currentPage = 0;
 			loadBookings();
 		}
@@ -519,6 +559,55 @@
 			}
 		}
 
+		// Handle column sorting
+		function handleSort(sortBy: string): void {
+			if (currentSortBy === sortBy) {
+				// Toggle sort order for same column
+				if (currentSortOrder === 'proximity') {
+					currentSortOrder = 'asc';
+				} else if (currentSortOrder === 'asc') {
+					currentSortOrder = 'desc';
+				} else {
+					// Reset to default for visit_datetime, or asc for created_at
+					currentSortOrder = sortBy === 'visit_datetime' ? 'proximity' : 'asc';
+				}
+			} else {
+				// New column selected
+				currentSortBy = sortBy;
+				currentSortOrder = sortBy === 'visit_datetime' ? 'proximity' : 'asc';
+			}
+
+			// Update visual indicators
+			updateSortIndicators();
+
+			// Reset to first page and reload
+			currentPage = 0;
+			loadBookings();
+		}
+
+		// Update sort indicator arrows
+		function updateSortIndicators(): void {
+			// Clear all indicators
+			document.querySelectorAll('.sort-indicator').forEach(indicator => {
+				indicator.textContent = '';
+			});
+
+			// Set current indicator
+			const currentIndicator = document.getElementById(`sort-${currentSortBy}`);
+			if (currentIndicator) {
+				if (currentSortOrder === 'asc') {
+					currentIndicator.textContent = '↑';
+				} else if (currentSortOrder === 'desc') {
+					currentIndicator.textContent = '↓';
+				} else if (currentSortOrder === 'proximity') {
+					currentIndicator.textContent = '⟷'; // proximity indicator
+				}
+			}
+		}
+
+		// Make handleSort globally accessible for onclick handlers
+		(window as any).handleSort = handleSort;
+
 		// Load bookings
 		async function loadBookings(): Promise<void> {
 			if (!adminToken) return;
@@ -533,7 +622,10 @@
 					offset: (currentPage * pageSize).toString(),
 					status: currentFilters.status,
 					period: currentFilters.period,
-					payment: currentFilters.payment
+					payment: currentFilters.payment,
+					sortBy: currentSortBy,
+					sortOrder: currentSortOrder,
+					hidePast: currentFilters.hidePast.toString()
 				});
 
 				if (currentFilters.search) {
@@ -607,9 +699,10 @@
 
 			// Set card classes based on booking status and date
 			card.className = `booking-card ${isPastBooking ? 'past-booking' : ''}`;
+			card.setAttribute('data-booking-id', booking.id); // Add data attribute for notes functionality
 
 			// Status should only be 'Active' or 'Cancelled' - refunds are separate
-			let statusClass, statusText;
+			let statusClass: string, statusText: string;
 			if (booking.status === 'cancelled') {
 				statusClass = 'status-cancelled';
 				statusText = 'Cancelled';
@@ -626,6 +719,19 @@
 				weekday: 'short',
 				month: 'short',
 				day: 'numeric'
+			});
+
+			// Format created date - "Thu, Jun 15 2:30 PM"
+			const createdDate = new Date(booking.created_at);
+			const createdDateFormatted = createdDate.toLocaleDateString('en-US', {
+				weekday: 'short',
+				month: 'short',
+				day: 'numeric'
+			});
+			const createdTimeFormatted = createdDate.toLocaleTimeString('en-US', {
+				hour: 'numeric',
+				minute: '2-digit',
+				hour12: true
 			});
 
 			// Get customer initials for avatar
@@ -653,6 +759,7 @@
 							`<div class="booking-reference">${booking.booking_reference}</div>` :
 							`<div class="booking-reference-empty">No reference</div>`
 						}
+						${booking.has_notes ? `<div class="note-indicator" title="Has admin notes">📝</div>` : ''}
 					</div>
 
 					<!-- Booking Date & Time -->
@@ -660,6 +767,12 @@
 						<div class="datetime-main">${bookingDate}</div>
 						<div class="datetime-time">${booking.time}</div>
 						${booking.reschedule_count > 0 ? `<div class="reschedule-note">Rescheduled ${booking.reschedule_count}x</div>` : ''}
+					</div>
+
+					<!-- Created Date -->
+					<div class="booking-created">
+						<div class="created-main">${createdDateFormatted}</div>
+						<div class="created-time">${createdTimeFormatted}</div>
 					</div>
 
 					<!-- Amount & Bouquets -->
@@ -705,6 +818,9 @@
 								}
 								<button onclick="viewBookingHistory('${booking.id}'); hideActionsMenu('${booking.id}')">
 									View History
+								</button>
+								<button onclick="editBookingNotes('${booking.id}', '${booking.full_name.replace(/'/g, "\\'")}'); hideActionsMenu('${booking.id}')">
+									${booking.has_notes ? 'Edit Note' : 'Add Note'}
 								</button>
 								${booking.status === 'confirmed' && !isPastBooking ? `<button class="danger" onclick="cancelBooking('${booking.id}'); hideActionsMenu('${booking.id}')">Cancel Booking</button>` : ''}
 								${isPastBooking && booking.status === 'confirmed' ? `<div class="past-booking-notice">Past bookings cannot be modified</div>` : ''}
@@ -1117,10 +1233,165 @@
 			}
 		};
 
+		// Booking Notes Functions
+		(window as any).editBookingNotes = async function(bookingId: string, customerName: string): Promise<void> {
+			try {
+				// Show loading state
+				const modalEl = document.getElementById('notesModal');
+				if (modalEl) modalEl.style.display = 'block';
+
+				// Populate basic info
+				const customerNameEl = document.getElementById('notesCustomerName');
+				const bookingIdEl = document.getElementById('notesBookingId') as HTMLInputElement;
+				const textareaEl = document.getElementById('notesTextarea') as HTMLTextAreaElement;
+				const charCountEl = document.getElementById('notesCharCount');
+				const timestampsEl = document.getElementById('notesTimestamps');
+				const createdAtEl = document.getElementById('notesCreatedAt');
+				const updatedAtEl = document.getElementById('notesUpdatedAt');
+
+				// Set up character counter if not already done
+				if (textareaEl && charCountEl && !textareaEl.hasAttribute('data-counter-setup')) {
+					textareaEl.setAttribute('data-counter-setup', 'true');
+					textareaEl.addEventListener('input', function() {
+						const currentLength = textareaEl.value.length;
+						charCountEl.textContent = currentLength.toString();
+
+						// Add visual feedback for character limit
+						if (currentLength > 1800) { // Warning at 90%
+							charCountEl.style.color = currentLength >= 2000 ? '#dc2626' : '#ca8a04';
+						} else {
+							charCountEl.style.color = '';
+						}
+					});
+				}
+
+				if (customerNameEl) customerNameEl.textContent = customerName;
+				if (bookingIdEl) bookingIdEl.value = bookingId;
+
+				// Fetch existing notes
+				const response = await fetch(`/api/garden-mgmt/booking-notes?bookingId=${bookingId}`, {
+					headers: {
+						'Authorization': `Bearer ${adminToken}`
+					}
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					if (data.success) {
+						if (textareaEl) {
+							textareaEl.value = data.data.notes || '';
+							// Update character count
+							if (charCountEl) charCountEl.textContent = (data.data.notes || '').length.toString();
+						}
+
+						// Show timestamps if notes exist
+						if (data.data.hasNotes && timestampsEl && createdAtEl && updatedAtEl) {
+							timestampsEl.style.display = 'block';
+							createdAtEl.textContent = data.data.notesCreatedAt ?
+								new Date(data.data.notesCreatedAt).toLocaleString() : 'Unknown';
+							updatedAtEl.textContent = data.data.notesUpdatedAt ?
+								new Date(data.data.notesUpdatedAt).toLocaleString() : 'Unknown';
+						} else if (timestampsEl) {
+							timestampsEl.style.display = 'none';
+						}
+
+						// Set booking reference if available
+						const bookingRefEl = document.getElementById('notesBookingReference');
+						if (bookingRefEl) {
+							// Try to find booking reference from the current booking data
+							const bookingCard = document.querySelector(`[data-booking-id="${bookingId}"]`);
+							const refElement = bookingCard?.querySelector('.booking-reference');
+							const reference = refElement?.textContent || 'N/A';
+							bookingRefEl.textContent = reference;
+						}
+					}
+				} else {
+					console.error('Failed to fetch booking notes');
+					if (textareaEl) textareaEl.value = '';
+					if (charCountEl) charCountEl.textContent = '0';
+					if (timestampsEl) timestampsEl.style.display = 'none';
+				}
+			} catch (error) {
+				console.error('Error loading booking notes:', error);
+				alert('Error loading notes. Please try again.');
+			}
+		};
+
+		(window as any).closeNotesModal = function(): void {
+			const modalEl = document.getElementById('notesModal');
+			const adminNameEl = document.getElementById('notesAdminName') as HTMLInputElement;
+			const textareaEl = document.getElementById('notesTextarea') as HTMLTextAreaElement;
+			const charCountEl = document.getElementById('notesCharCount');
+			const timestampsEl = document.getElementById('notesTimestamps');
+
+			if (modalEl) modalEl.style.display = 'none';
+			if (adminNameEl) adminNameEl.value = '';
+			if (textareaEl) textareaEl.value = '';
+			if (charCountEl) charCountEl.textContent = '0';
+			if (timestampsEl) timestampsEl.style.display = 'none';
+		};
+
+		(window as any).saveBookingNotes = async function(): Promise<void> {
+			try {
+				const bookingIdEl = document.getElementById('notesBookingId') as HTMLInputElement;
+				const textareaEl = document.getElementById('notesTextarea') as HTMLTextAreaElement;
+				const adminNameEl = document.getElementById('notesAdminName') as HTMLInputElement;
+
+				if (!bookingIdEl || !textareaEl || !adminNameEl) {
+					alert('Missing required form elements');
+					return;
+				}
+
+				const bookingId = bookingIdEl.value;
+				const notes = textareaEl.value.trim();
+				const adminName = adminNameEl.value.trim();
+
+				if (!adminName) {
+					alert('Please enter your admin name');
+					adminNameEl.focus();
+					return;
+				}
+
+				if (notes.length > 2000) {
+					alert('Notes cannot exceed 2000 characters');
+					textareaEl.focus();
+					return;
+				}
+
+				// Save notes
+				const response = await fetch('/api/garden-mgmt/booking-notes', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${adminToken}`
+					},
+					body: JSON.stringify({
+						bookingId,
+						notes: notes || null, // Send null for empty notes
+						adminUser: adminName
+					})
+				});
+
+				const data = await response.json();
+
+				if (response.ok && data.success) {
+					(window as any).closeNotesModal();
+					loadBookings(); // Refresh the booking list to show updated note indicators
+					alert('Notes saved successfully');
+				} else {
+					alert(`Failed to save notes: ${data.error}`);
+				}
+			} catch (error) {
+				console.error('Error saving booking notes:', error);
+				alert('Error saving notes. Please try again.');
+			}
+		};
+
 		// Close modals when clicking outside
 		window.onclick = function(event: Event): void {
 			const refundModal = document.getElementById('refundModal');
 			const paymentModal = document.getElementById('paymentToggleModal');
+			const notesModal = document.getElementById('notesModal');
 
 			if (event.target === refundModal) {
 				(window as any).closeRefundModal();
@@ -1128,6 +1399,10 @@
 
 			if (event.target === paymentModal) {
 				(window as any).closePaymentToggleModal();
+			}
+
+			if (event.target === notesModal) {
+				(window as any).closeNotesModal();
 			}
 		};
 
@@ -1464,6 +1739,55 @@
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" onclick="closePaymentToggleModal()">Cancel</button>
 				<button type="button" class="btn btn-primary" onclick="confirmPaymentToggle()">Confirm</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Booking Notes Modal -->
+	<div id="notesModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Booking Notes</h3>
+				<span class="close" onclick="closeNotesModal()">&times;</span>
+			</div>
+			<div class="modal-body">
+				<div class="booking-info">
+					<p><strong>Customer:</strong> <span id="notesCustomerName"></span></p>
+					<p><strong>Booking:</strong> <span id="notesBookingReference"></span></p>
+				</div>
+
+				<div class="form-group">
+					<label for="notesTextarea">Admin Notes:</label>
+					<textarea
+						id="notesTextarea"
+						placeholder="Add notes about this booking (max 2000 characters)..."
+						maxlength="2000"
+						rows="8"
+					></textarea>
+					<div class="character-count">
+						<span id="notesCharCount">0</span> / 2000 characters
+					</div>
+				</div>
+
+				<div class="notes-timestamps" id="notesTimestamps" style="display: none;">
+					<div class="timestamp-info">
+						<small><strong>Created:</strong> <span id="notesCreatedAt"></span></small>
+					</div>
+					<div class="timestamp-info">
+						<small><strong>Last Updated:</strong> <span id="notesUpdatedAt"></span></small>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="notesAdminName">Your Admin Name:</label>
+					<input type="text" id="notesAdminName" placeholder="Enter your admin name" required />
+				</div>
+
+				<input type="hidden" id="notesBookingId" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" onclick="closeNotesModal()">Cancel</button>
+				<button type="button" class="btn btn-primary" onclick="saveBookingNotes()">Save Notes</button>
 			</div>
 		</div>
 	</div>

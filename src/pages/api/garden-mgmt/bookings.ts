@@ -56,6 +56,13 @@ export const GET: APIRoute = async ({ request, url }) => {
     const customStartDate = url.searchParams.get('startDate');
     const customEndDate = url.searchParams.get('endDate');
 
+    // Parse sorting parameters
+    const sortBy = url.searchParams.get('sortBy') || 'visit_datetime'; // visit_datetime, created_at
+    const sortOrder = url.searchParams.get('sortOrder') || 'proximity'; // asc, desc, proximity
+
+    // Parse hide past bookings parameter
+    const hidePast = url.searchParams.get('hidePast') === 'true';
+
     // Helper function to get date ranges in Mountain Time
     function getDateRange(period: string) {
       const now = new Date();
@@ -95,12 +102,10 @@ export const GET: APIRoute = async ({ request, url }) => {
       }
     }
 
-    // Build query
+    // Build base query
     let query = supabaseAdmin
       .from('admin_booking_view')
       .select('*')
-      .order('date', { ascending: false }) // Newest bookings first
-      .order('time', { ascending: false }) // Latest times first for same date
       .range(offset, offset + limit - 1);
 
     // Apply status filter
@@ -126,6 +131,12 @@ export const GET: APIRoute = async ({ request, url }) => {
       query = query.gte('date', dateRange.start).lte('date', dateRange.end);
     }
 
+    // Apply hide past bookings filter (if enabled and not explicitly viewing past bookings)
+    if (hidePast && period !== 'past') {
+      const today = new Date().toISOString().split('T')[0];
+      query = query.gte('date', today);
+    }
+
     // Apply payment method filter
     if (payment !== 'all') {
       if (payment === 'pay_on_arrival') {
@@ -138,6 +149,24 @@ export const GET: APIRoute = async ({ request, url }) => {
     // Apply search filter - now includes booking reference
     if (search) {
       query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%,booking_reference.ilike.%${search}%`);
+    }
+
+    // Apply sorting - handle different sort options
+    if (sortBy === 'created_at') {
+      // Sort by creation date
+      query = query.order('created_at', { ascending: sortOrder === 'asc' });
+    } else if (sortBy === 'visit_datetime') {
+      if (sortOrder === 'proximity') {
+        // Smart default: sort by proximity to current time
+        // This will be handled in post-processing since we need complex logic
+        query = query.order('date', { ascending: true }).order('time', { ascending: true });
+      } else {
+        // Manual sort by visit date/time
+        query = query.order('date', { ascending: sortOrder === 'asc' }).order('time', { ascending: sortOrder === 'asc' });
+      }
+    } else {
+      // Default fallback sorting
+      query = query.order('date', { ascending: true }).order('time', { ascending: true });
     }
 
     const { data: bookings, error } = await query;
@@ -155,6 +184,46 @@ export const GET: APIRoute = async ({ request, url }) => {
       bookings.forEach(booking => {
         booking.booking_status = booking.status === 'cancelled' ? 'cancelled' : 'active';
       });
+
+      // Apply smart proximity sorting if requested
+      if (sortBy === 'visit_datetime' && sortOrder === 'proximity') {
+        const now = new Date();
+        const currentTime = now.getTime();
+
+        bookings.sort((a, b) => {
+          // Parse booking dates and times
+          const aDateTime = new Date(`${a.date}T${convertTimeToISO(a.time)}`);
+          const bDateTime = new Date(`${b.date}T${convertTimeToISO(b.time)}`);
+
+          // Calculate absolute time difference from now
+          const aDiff = Math.abs(aDateTime.getTime() - currentTime);
+          const bDiff = Math.abs(bDateTime.getTime() - currentTime);
+
+          // Sort by proximity (closest first)
+          if (aDiff !== bDiff) {
+            return aDiff - bDiff;
+          }
+
+          // If same proximity, sort by creation date (newest first)
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+      }
+    }
+
+    // Helper function to convert time format to ISO time
+    function convertTimeToISO(timeStr: string): string {
+      // Convert "10:00 AM" to "10:00:00" format
+      const [time, period] = timeStr.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour24 = parseInt(hours);
+
+      if (period === 'PM' && hour24 !== 12) {
+        hour24 += 12;
+      } else if (period === 'AM' && hour24 === 12) {
+        hour24 = 0;
+      }
+
+      return `${hour24.toString().padStart(2, '0')}:${minutes}:00`;
     }
 
     // Get total count for pagination and summary statistics
