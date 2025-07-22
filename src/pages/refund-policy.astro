@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import NavigationWithRedirects from '../components/NavigationWithRedirects.astro';
 ---
 
 <Layout
@@ -7,6 +8,8 @@ import Layout from '../layouts/Layout.astro';
 	description="Learn about our refund and cancellation policies for garden visits at BG Bouquet Garden. Fair, transparent policies designed with our customers in mind."
 	canonical="https://bgbouquet.com/refund-policy"
 >
+	<!-- Hide the original navigation and replace with redirect-enabled version -->
+	<NavigationWithRedirects />
 	<!-- Hero Section -->
 	<section class="min-h-screen flex items-center py-20 texture-background-home">
 		<div class="max-w-4xl mx-auto px-4 w-full">
@@ -61,19 +64,10 @@ import Layout from '../layouts/Layout.astro';
 				<div class="space-y-6">
 					<div class="border-l-4 border-dusty-rose pl-6">
 						<h3 class="text-xl font-playfair font-semibold text-charcoal mb-2">
-							24+ Hours in Advance
+							Circumstances Out of Your Control
 						</h3>
 						<p class="font-roboto text-charcoal">
-							<strong>Typically eligible for full refund</strong> - Cancel your visit 24 hours or more before your scheduled time for the best chance of receiving a complete refund.
-						</p>
-					</div>
-
-					<div class="border-l-4 border-sage-green pl-6">
-						<h3 class="text-xl font-playfair font-semibold text-charcoal mb-2">
-							Less than 24 Hours
-						</h3>
-						<p class="font-roboto text-charcoal">
-							<strong>May be eligible for partial refund</strong> - Late cancellations may receive a partial refund, depending on circumstances and our ability to fill the time slot.
+							<strong>Typically we do not offer refunds</strong> - However, we remain considerate of problems outside of your control, please contact us directly to discuss your situation.
 						</p>
 					</div>
 
@@ -82,7 +76,7 @@ import Layout from '../layouts/Layout.astro';
 							No-Shows
 						</h3>
 						<p class="font-roboto text-charcoal">
-							<strong>Generally no refund</strong> - If you don't arrive for your scheduled visit without prior notice, refunds are typically not provided.
+							<strong>No refund</strong> - If you don't arrive for your scheduled visit without prior notice, refunds are typically not provided. You may contact us for potential rescheduling.
 						</p>
 					</div>
 
@@ -91,7 +85,7 @@ import Layout from '../layouts/Layout.astro';
 							Weather-Related Cancellations
 						</h3>
 						<p class="font-roboto text-charcoal">
-							<strong>Full refund or reschedule guaranteed</strong> - If we need to cancel due to severe weather conditions, you'll receive a full refund or can reschedule at no charge.
+							<strong>Reschedule guaranteed</strong> - If we need to cancel due to severe weather conditions, you can reschedule or call us to dicsuss a refund.
 						</p>
 					</div>
 				</div>
@@ -153,83 +147,8 @@ import Layout from '../layouts/Layout.astro';
 					<h4 class="text-lg font-playfair font-semibold text-charcoal">How to Reschedule:</h4>
 					<ol class="list-decimal list-inside space-y-2 font-roboto text-charcoal pl-4">
 						<li>Use the reschedule link in your booking confirmation email</li>
-						<li>Contact us directly at info@bgbouquet.com or (555) 123-4567</li>
-						<li>Visit our website and use the "Manage Booking" feature</li>
+						<li>Contact us directly at bev@bgbouquet.com or (403) 393-8285</li>
 					</ol>
-				</div>
-			</div>
-
-			<!-- Special Circumstances -->
-			<div class="bg-white rounded-lg shadow-md p-8 mb-8 vintage-border">
-				<h2 class="text-3xl font-playfair font-bold text-charcoal mb-6">Special Circumstances</h2>
-				
-				<div class="space-y-6">
-					<div>
-						<h3 class="text-lg font-playfair font-semibold text-charcoal mb-2">
-							Medical Emergencies & Family Situations
-						</h3>
-						<p class="font-roboto text-charcoal">
-							We understand that unexpected medical situations and family emergencies arise. While refunds remain at our discretion,
-							we are particularly considerate of genuine emergencies beyond your control. Please contact us directly with documentation
-							when possible - we're committed to finding a fair and compassionate solution.
-						</p>
-					</div>
-
-					<div>
-						<h3 class="text-lg font-playfair font-semibold text-charcoal mb-2">
-							Garden Closure
-						</h3>
-						<p class="font-roboto text-charcoal">
-							If we need to close the garden due to unforeseen circumstances (severe weather, family emergency, equipment failure, etc.),
-							all affected bookings will receive full refunds or the option to reschedule at no charge. This is guaranteed regardless of payment method.
-						</p>
-					</div>
-
-					<div>
-						<h3 class="text-lg font-playfair font-semibold text-charcoal mb-2">
-							Group Bookings & Special Events
-						</h3>
-						<p class="font-roboto text-charcoal">
-							Large group bookings (8+ people) and special events may have different terms and refund policies.
-							Please contact us directly when booking groups to discuss specific arrangements and cancellation terms.
-						</p>
-					</div>
-
-					<div>
-						<h3 class="text-lg font-playfair font-semibold text-charcoal mb-2">
-							Our Commitment to Fairness
-						</h3>
-						<p class="font-roboto text-charcoal">
-							While we reserve the right to make final decisions on refunds, we are committed to treating each situation fairly.
-							We particularly consider circumstances such as: medical emergencies, family crises, travel disruptions due to weather,
-							and other situations genuinely beyond your control.
-						</p>
-					</div>
-				</div>
-			</div>
-
-			<!-- Contact Information -->
-			<div class="bg-dusty-rose text-white rounded-lg shadow-md p-8 mb-8">
-				<h2 class="text-3xl font-playfair font-bold mb-6">Questions About Refunds?</h2>
-				
-				<div class="grid md:grid-cols-2 gap-8">
-					<div>
-						<h3 class="text-xl font-playfair font-semibold mb-4">Contact Us</h3>
-						<div class="space-y-2 font-roboto">
-							<p>📧 info@bgbouquet.com</p>
-							<p>📞 (555) 123-4567</p>
-							<p>🕒 Response time: Within 24 hours</p>
-						</div>
-					</div>
-					
-					<div>
-						<h3 class="text-xl font-playfair font-semibold mb-4">Garden Hours</h3>
-						<div class="space-y-2 font-roboto">
-							<p>Thursday - Saturday</p>
-							<p>10:00 AM - 9:00 PM</p>
-							<p>Closed Sundays - Wednesdays</p>
-						</div>
-					</div>
 				</div>
 			</div>
 
@@ -259,5 +178,26 @@ import Layout from '../layouts/Layout.astro';
 	/* Ensure consistent styling with the rest of the site */
 	.texture-background-home {
 		background: linear-gradient(135deg, var(--color-shabby-pink) 0%, var(--color-shabby-blue) 100%);
+	}
+
+	/* Hide the original navigation from Layout.astro using clip-rect for minimal SEO impact */
+	/* This targets the Navigation component that comes before main content */
+	body > nav:first-of-type {
+		position: absolute !important;
+		clip: rect(1px, 1px, 1px, 1px) !important;
+		width: 1px !important;
+		height: 1px !important;
+		overflow: hidden !important;
+		white-space: nowrap !important;
+	}
+
+	/* Ensure our NavigationWithRedirects component (inside main) is visible and properly positioned */
+	main nav {
+		position: fixed !important;
+		clip: auto !important;
+		width: auto !important;
+		height: auto !important;
+		overflow: visible !important;
+		white-space: normal !important;
 	}
 </style>
