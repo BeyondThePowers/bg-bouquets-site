@@ -2267,6 +2267,7 @@ input[type="number"] {
   #step-3 {
     padding-left: 10px;
     padding-right:10px;
+    margin-bottom:2rem;
   }
 
   .step-indicator {
@@ -2328,4 +2329,209 @@ input[type="number"] {
 /* Hide skeleton when price is loaded */
 .price-loaded .price-skeleton {
   display: none;
+}
+
+
+/*1902x1080 hero flowers*/
+@media screen and (min-width: 1367px) {
+
+  .hero-decorative-flower-right-bottom-2 {
+    position: absolute;
+    z-index: -1;
+    bottom: 280px;
+    right: -120px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+    transform: scaleX(-1);
+  }
+
+  .hero-decorative-flower-left-bottom {
+    position: absolute;
+    z-index: -1;
+    bottom: 280px;
+    left: -120px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+  }
+
+  .hero-decorative-flower-left-bottom-2 {
+    position: absolute;
+    z-index: -1;
+    bottom: -90px;
+    left: -140px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+  }
+
+  .hero-decorative-flower-right-bottom {
+    position: absolute;
+    z-index: -1;
+    bottom: -90px;
+    right: -140px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+  }
+
+  .hero-decorative-flower-right-top {
+    position: absolute;
+    z-index: -1;
+    top: -47vh;
+    right: -284px;
+    height: 100vh;
+    width: auto;
+    pointer-events: none;
+    transform: rotate(-20deg);
+    transform: scaleX(-1);
+  }
+
+  .hero-decorative-flower-right-top-2 {
+    position: absolute;
+      z-index: -1;
+      top: -76vh;
+      left: -394px;
+      height: 80vh;
+      width: auto;
+      pointer-events: none;
+      transform: scaleX(-1) rotate(-16deg);
+  }
+
+
+  .hero-decorative-flower-left-top {
+    position: absolute;
+    z-index: -1;
+    top: -47vh;
+    left: -284px;
+    height: 100vh;
+    width: auto;
+    pointer-events: none;
+    transform: rotate(-20deg);
+  }
+
+  .hero-decorative-flower-left-top-2 {
+    position: absolute;
+    z-index: -1;
+    top: -40vh;
+    left: -394px;
+    height: 80vh;
+    width: auto;
+    pointer-events: none;
+    transform: rotate(-10deg);
+  }
+
+  .what-to-expect-card-decorative-flower {
+    width: 200px;
+    height: auto;
+    aspect-ratio: 200 / 62; /* Use natural aspect ratio of the image */
+    object-fit: contain;
+    pointer-events: none;
+    margin: 1.75rem auto;
+    display: block;
+  }
+
+}
+
+/*2560×1440 hero flowers*/
+@media screen and (min-width: 2500px) {
+
+  .hero-decorative-flower-right-bottom-2 {
+    position: absolute;
+    z-index: -1;
+    bottom: 280px;
+    right: -120px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+    transform: scaleX(-1);
+  }
+
+  .hero-decorative-flower-left-bottom {
+    position: absolute;
+    z-index: -1;
+    bottom: 280px;
+    left: -120px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+  }
+
+  .hero-decorative-flower-left-bottom-2 {
+    position: absolute;
+    z-index: -1;
+    bottom: -90px;
+    left: -140px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+  }
+
+  .hero-decorative-flower-right-bottom {
+    position: absolute;
+    z-index: -1;
+    bottom: -90px;
+    right: -140px;
+    pointer-events: none;
+    height: 40vh;
+    width: auto;
+  }
+
+  .hero-decorative-flower-right-top {
+    position: absolute;
+    z-index: -1;
+    top: -18vh;
+    right: -284px;
+    height: 100vh;
+    width: auto;
+    pointer-events: none;
+    transform: rotate(-20deg);
+    transform: scaleX(-1);
+  }
+
+  .hero-decorative-flower-right-top-2 {
+    position: absolute;
+      z-index: -1;
+      top: -76vh;
+      left: -394px;
+      height: 80vh;
+      width: auto;
+      pointer-events: none;
+      transform: scaleX(-1) rotate(-16deg);
+  }
+
+
+  .hero-decorative-flower-left-top {
+        position: absolute;
+        z-index: -1;
+        top: -30vh;
+        left: -252px;
+        height: 100vh;
+        width: auto;
+        pointer-events: none;
+        transform: rotate(-7deg);
+  }
+
+  .hero-decorative-flower-left-top-2 {
+  position: absolute;
+    z-index: -1;
+    top: -21vh;
+    left: -394px;
+    height: 80vh;
+    width: auto;
+    pointer-events: none;
+    transform: rotate(-10deg);
+  }
+
+  .what-to-expect-card-decorative-flower {
+    width: 200px;
+    height: auto;
+    aspect-ratio: 200 / 62; /* Use natural aspect ratio of the image */
+    object-fit: contain;
+    pointer-events: none;
+    margin: 1.75rem auto;
+    display: block;
+  }
+
 }
