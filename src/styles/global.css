@@ -2252,6 +2252,29 @@ input[type="number"] {
   }
 
   /* Step labels are handled by responsive classes in HTML (hidden md:inline) */
+
+  /* some fixes for small screens */
+
+  #step-progress {
+    margin-bottom: 1rem;
+  }
+
+  .booking-steps-container {
+    gap: 4px;
+  }
+  
+  #step-2,
+  #step-3 {
+    padding-left: 10px;
+    padding-right:10px;
+  }
+
+  .step-indicator {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
 }
 
 .base-price {

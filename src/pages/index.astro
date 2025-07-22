@@ -178,10 +178,6 @@ import Layout from '../layouts/Layout.astro';
 							<p class="text-sm lg:text-base font-roboto text-charcoal">Reserve your perfect flower picking experience.</p>
 						</div>
 
-						<!-- Vintage Wheelbarrow Illustration Placeholder - Smaller on desktop -->
-						<!--<div class="wheel-barrow">
-						</div> -->
-
 						<!-- Schedule Lock State Messages -->
 						<div id="schedule-lock-message" class="hidden mb-6 p-4 rounded-lg border-2 border-amber-400 bg-amber-50">
 							<div class="flex items-start space-x-3">
@@ -214,6 +210,7 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 						</div>
 
+						<!-- Booking Unavailable State Messages -->
 						<div id="booking-unavailable-message" class="hidden mb-6 p-4 rounded-lg border-2 border-red-400 bg-red-50">
 							<div class="flex items-start space-x-3">
 								<div class="flex-shrink-0">
@@ -247,6 +244,7 @@ import Layout from '../layouts/Layout.astro';
 
 						<!-- Modern Multi-Step Booking Form - Unified Width -->
 						<div id="booking-form-container" class="transition-all duration-500 ease-in-out">
+
 							<!-- Step Progress Indicator - Enhanced 3-Step Flow -->
 							<div id="step-progress" class="mb-8" role="progressbar" aria-label="Booking progress" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">
 								<div class="flex items-center justify-center space-x-2 lg:space-x-4 mb-4">
@@ -427,7 +425,7 @@ import Layout from '../layouts/Layout.astro';
 											class="px-6 py-3 vintage-button bg-dusty-rose text-white font-playfair font-semibold rounded-lg transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-dusty-rose focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
 											disabled
 										>
-											Continue to Details (2 of 3)
+											To Details (2/3)
 											<svg class="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 											</svg>
@@ -566,7 +564,7 @@ import Layout from '../layouts/Layout.astro';
 											id="step-2-next"
 											class="px-6 py-3 vintage-button bg-dusty-rose text-white font-playfair font-semibold rounded-lg transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-dusty-rose focus:ring-opacity-50"
 										>
-											Continue to Payment (3 of 3)
+											To Payment (3/3)
 											<svg class="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 											</svg>
