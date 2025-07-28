@@ -24,7 +24,7 @@ const paymentStatus = url.searchParams.get('payment_status') || 'completed';
           </svg>
         </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Booking Confirmed!</h1>
-        <p class="text-gray-600">Thank you for choosing Bluebell Gardens</p>
+        <p class="text-gray-600">Thank you for choosing BG Bouquet!</p>
       </div>
 
       <!-- Booking Details Card -->
@@ -63,10 +63,6 @@ const paymentStatus = url.searchParams.get('payment_status') || 'completed';
           </li>
           <li class="flex items-start">
             <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-            Please arrive 10 minutes before your scheduled time
-          </li>
-          <li class="flex items-start">
-            <span class="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
             Bring comfortable walking shoes and weather-appropriate clothing
           </li>
         </ul>
@@ -79,34 +75,23 @@ const paymentStatus = url.searchParams.get('payment_status') || 'completed';
           If you have any questions about your visit, please don't hesitate to contact us:
         </p>
         <div class="space-y-1 text-pink-700">
-          <p>📧 Email: info@bluebellgardens.ca</p>
-          <p>📞 Phone: (555) 123-4567</p>
+          <p>📧 Email: bev@bgbouquet.com</p>
+          <p>📞 Phone: (403) 393-8285</p>
         </div>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a 
-          href="/" 
+          href="https://bgbouquet.com" 
           class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors text-center"
         >
-          Return to Home
+          Return to main page
         </a>
-        <button 
-          onclick="window.print()" 
-          class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
-        >
-          Print Confirmation
-        </button>
       </div>
 
       <!-- Cancellation Policy -->
       <div class="mt-8 text-center text-sm text-gray-500">
-        <p>
-          Need to cancel or reschedule?
-          <a href="/cancel" class="text-blue-600 hover:underline">Click here</a>
-          or contact us directly.
-        </p>
         <p class="mt-2">
           View our <a href="/refund-policy" class="text-blue-600 hover:underline">refund policy</a>
           for cancellation terms and conditions.
