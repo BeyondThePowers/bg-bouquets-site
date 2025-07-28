@@ -1,6 +1,14 @@
 // src/services/square.ts
 import { ApiClient, OrdersApi, CreateOrderRequest } from 'square-connect';
 
+// Standardized Square product configuration for consistent reporting
+const SQUARE_PRODUCT_CONFIG = {
+  GARDEN_VISIT: {
+    name: 'Garden Visit Experience',
+    category: 'Experience'
+  }
+} as const;
+
 // Square configuration - get from environment
 function getSquareConfig() {
   const config = {
@@ -74,6 +82,35 @@ export interface PaymentLinkResponse {
 }
 
 /**
+ * Create detailed booking note for Square line item
+ * Prioritizes: customer name, visit date, email, booking reference
+ * Format: "Key: Value | Key: Value" for easy parsing
+ */
+function createDetailedBookingNote(booking: BookingDetails): string {
+  try {
+    // Format amount as currency string
+    const formattedAmount = `$${booking.totalAmount.toFixed(2)} CAD`;
+
+    // Create comprehensive note with prioritized fields
+    const note = `Visit: ${booking.visitDate} at ${booking.preferredTime} | Customer: ${booking.fullName} | Email: ${booking.email} | Bouquets: ${booking.numberOfBouquets} | Booking: ${booking.bookingId} | Amount: ${formattedAmount}`;
+
+    // Validate length doesn't exceed Square's 500 character limit
+    if (note.length > 500) {
+      console.warn(`Booking note truncated for booking ${booking.bookingId} (${note.length} chars)`);
+      // Fallback to essential information only
+      const essentialNote = `Visit: ${booking.visitDate} | Customer: ${booking.fullName} | Email: ${booking.email} | Booking: ${booking.bookingId}`;
+      return essentialNote.length > 500 ? essentialNote.substring(0, 497) + '...' : essentialNote;
+    }
+
+    return note;
+  } catch (error) {
+    console.error('Error creating booking note:', error);
+    // Fallback to minimal note with essential cross-reference information
+    return `Booking: ${booking.bookingId} | Visit: ${booking.visitDate} | Customer: ${booking.fullName}`;
+  }
+}
+
+/**
  * Create a Square payment link for a booking
  */
 export async function createPaymentLink(booking: BookingDetails): Promise<PaymentLinkResponse> {
@@ -90,19 +127,23 @@ export async function createPaymentLink(booking: BookingDetails): Promise<Paymen
 
     // Create payment link directly with order data (no need for separate order creation)
 
-    // Now create payment link using the modern Payment Links API
+    // Create detailed booking note for Square Dashboard cross-reference
+    const bookingNote = createDetailedBookingNote(booking);
+
+    // Now create payment link using the modern Payment Links API with standardized product name
     const paymentLinkRequest = {
       idempotency_key: `payment-link-${booking.bookingId}-${Date.now()}`,
-      description: `Garden Visit - ${booking.visitDate} at ${booking.preferredTime}`,
+      description: `${SQUARE_PRODUCT_CONFIG.GARDEN_VISIT.name} - ${booking.visitDate}`,
       order: {
         location_id: config.SQUARE_LOCATION_ID,
         line_items: [{
-          name: `Garden Visit - ${booking.visitDate} at ${booking.preferredTime}`,
+          name: SQUARE_PRODUCT_CONFIG.GARDEN_VISIT.name, // Standardized product name for consistent reporting
           quantity: booking.numberOfBouquets.toString(),
           base_price_money: {
             amount: Math.round(booking.totalAmount / booking.numberOfBouquets * 100), // Convert to cents
             currency: 'CAD'
-          }
+          },
+          note: bookingNote // Detailed booking information for admin cross-reference
         }]
       },
       checkout_options: {

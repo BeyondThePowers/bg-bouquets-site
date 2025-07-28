@@ -214,19 +214,20 @@ Different parts of Square's system were on different API versions, causing compa
 After multiple failed attempts, we discovered that Square's **Payment Links API** was the modern, recommended approach:
 
 ```javascript
-// Final working solution:
+// Final working solution with standardized product names:
 const paymentLinkRequest = {
   idempotency_key: `payment-link-${bookingId}-${Date.now()}`,
-  description: `Garden Visit - ${visitDate} at ${time}`,
+  description: `Garden Visit Experience - ${visitDate}`,
   order: {
     location_id: locationId,
     line_items: [{
-      name: `Garden Visit - ${visitDate} at ${time}`,
-      quantity: "1",
+      name: "Garden Visit Experience", // Standardized for consistent reporting
+      quantity: numberOfBouquets.toString(),
       base_price_money: {
-        amount: totalAmountInCents,
+        amount: Math.round(totalAmount / numberOfBouquets * 100), // Per-bouquet pricing
         currency: "CAD"
-      }
+      },
+      note: `Visit: ${visitDate} at ${time} | Customer: ${fullName} | Email: ${email} | Bouquets: ${numberOfBouquets} | Booking: ${bookingId} | Amount: $${totalAmount.toFixed(2)} CAD`
     }]
   },
   checkout_options: {
