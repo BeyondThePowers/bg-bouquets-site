@@ -1,6 +1,7 @@
 ---
 // src/pages/booking-success.astro
 import Layout from '../layouts/Layout.astro';
+import NavigationWithRedirects from '../components/NavigationWithRedirects.astro';
 
 // Get URL parameters for booking confirmation
 const url = Astro.url;
@@ -12,7 +13,10 @@ const paymentStatus = url.searchParams.get('payment_status') || 'completed';
 // For now, we'll show a generic success message
 ---
 
-<Layout title="Booking Confirmed - Bluebell Gardens">
+<Layout title="Booking Confirmed - BG Bouquet">
+  <!-- DEBUG: This should render NavigationWithRedirects with navigation-with-redirects class -->
+  <NavigationWithRedirects />
+  <!-- DEBUG: Check if this comment appears in the HTML -->
   <main class="min-h-screen bg-gradient-to-b from-blue-50 to-pink-50 py-12">
     <div class="container mx-auto px-4 max-w-2xl">
       
@@ -107,13 +111,35 @@ const paymentStatus = url.searchParams.get('payment_status') || 'completed';
     .no-print {
       display: none !important;
     }
-    
+
     body {
       background: white !important;
     }
-    
+
     .bg-gradient-to-b {
       background: white !important;
     }
+  }
+
+  /* Hide the original navigation from Layout.astro using clip-rect for minimal SEO impact */
+  /* This targets the Navigation component with navigation-original class */
+  .navigation-original {
+    position: absolute !important;
+    clip: rect(1px, 1px, 1px, 1px) !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  /* Ensure our NavigationWithRedirects component is visible and properly positioned */
+  /* This targets the NavigationWithRedirects component with navigation-with-redirects class */
+  .navigation-with-redirects {
+    position: fixed !important;
+    clip: auto !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    white-space: normal !important;
   }
 </style>

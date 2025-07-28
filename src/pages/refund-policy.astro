@@ -181,8 +181,8 @@ import NavigationWithRedirects from '../components/NavigationWithRedirects.astro
 	}
 
 	/* Hide the original navigation from Layout.astro using clip-rect for minimal SEO impact */
-	/* This targets the Navigation component that comes before main content */
-	body > nav:first-of-type {
+	/* This targets the Navigation component with navigation-original class */
+	.navigation-original {
 		position: absolute !important;
 		clip: rect(1px, 1px, 1px, 1px) !important;
 		width: 1px !important;
@@ -191,8 +191,9 @@ import NavigationWithRedirects from '../components/NavigationWithRedirects.astro
 		white-space: nowrap !important;
 	}
 
-	/* Ensure our NavigationWithRedirects component (inside main) is visible and properly positioned */
-	main nav {
+	/* Ensure our NavigationWithRedirects component is visible and properly positioned */
+	/* This targets the NavigationWithRedirects component with navigation-with-redirects class */
+	.navigation-with-redirects {
 		position: fixed !important;
 		clip: auto !important;
 		width: auto !important;
