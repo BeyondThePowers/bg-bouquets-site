@@ -489,9 +489,13 @@ export class FlowerManager {
   }
 }
 
-// Auto-initialize flower manager
+// Auto-initialize flower manager - DISABLED
+// This conflicts with the legacy implementation in index.astro
+// which provides more complete functionality
+/*
 if (typeof window !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     window.flowerManager = new FlowerManager();
   });
 }
+*/

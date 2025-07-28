@@ -1079,7 +1079,7 @@ import Layout from '../layouts/Layout.astro';
 
 						<!-- Filters Section -->
 						<div class="lg:flex-1">
-							<!-- Mobile Filter Button (Hidden on Desktop) -->
+							<!-- Universal Filter Button -->
 							<div class="mt-4">
 								<button id="mobileFilterBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-lg vintage-border font-roboto text-sm" style="background-color: #FAF7F4; color: #333333; border-color: #E8B4B8;" aria-expanded="false" aria-controls="mobileFilters">
 									<div class="flex items-center space-x-2">
@@ -1094,7 +1094,7 @@ import Layout from '../layouts/Layout.astro';
 								</button>
 							</div>
 
-							<!-- Mobile Collapsible Filters -->
+							<!-- Universal Collapsible Filters -->
 							<div id="mobileFilters" class="overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0;">
 								<div class="pt-4 pb-2">
 									<div class="flex flex-col gap-4">
@@ -1112,6 +1112,7 @@ import Layout from '../layouts/Layout.astro';
 													<option value="purple">Purple</option>
 													<option value="orange">Orange</option>
 													<option value="blue">Blue</option>
+													<option value="green">Green</option>
 												</select>
 												<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
 													<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
@@ -1167,79 +1168,7 @@ import Layout from '../layouts/Layout.astro';
 								</div>
 							</div>
 
-							<!-- Desktop Filter Dropdowns (Always Visible) -->
-							<div class="hidden lg:block">
-								<div class="mb-3">
-									<h3 class="text-lg font-playfair font-semibold" style="color: #333333;">Filter Flowers</h3>
-								</div>
-								<div class="flex flex-row gap-3">
-								<div>
-									<div class="mb-2">
-										<label for="desktopColorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
-									</div>
-									<div class="relative">
-										<select id="desktopColorFilter" name="desktopColorFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-28 appearance-none" aria-label="Filter flowers by color">
-											<option value="">All</option>
-											<option value="red">Red</option>
-											<option value="pink">Pink</option>
-											<option value="white">White</option>
-											<option value="yellow">Yellow</option>
-											<option value="purple">Purple</option>
-											<option value="orange">Orange</option>
-											<option value="blue">Blue</option>
-										</select>
-										<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-											<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-											</svg>
-										</div>
-									</div>
-								</div>
 
-								<div>
-									<div class="mb-2">
-										<label for="desktopOccasionFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Occasion</label>
-									</div>
-									<div class="relative">
-										<select id="desktopOccasionFilter" name="desktopOccasionFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by occasion">
-											<option value="">All</option>
-											<option value="wedding">Wedding</option>
-											<option value="birthday">Birthday</option>
-											<option value="anniversary">Anniversary</option>
-											<option value="sympathy">Sympathy</option>
-											<option value="everyday">Everyday</option>
-										</select>
-										<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-											<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-											</svg>
-										</div>
-									</div>
-								</div>
-
-								<div>
-									<div class="mb-2">
-										<label for="desktopSeasonFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Season</label>
-									</div>
-									<div class="relative">
-										<select id="desktopSeasonFilter" name="desktopSeasonFilter" class="inset-input px-3 py-3 pr-8 font-roboto text-sm min-w-32 appearance-none" aria-label="Filter flowers by season">
-											<option value="">All Year</option>
-											<option value="current">Available Now</option>
-											<option value="6">June</option>
-											<option value="7">July</option>
-											<option value="8">August</option>
-											<option value="9">September</option>
-											<option value="10">October</option>
-										</select>
-										<div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-											<svg class="w-4 h-4" style="color: #999;" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-											</svg>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
 				</div>
 			</div>
 
@@ -4217,7 +4146,7 @@ import Layout from '../layouts/Layout.astro';
 		const searchClear = document.getElementById('searchClear') as HTMLElement;
 		const searchSuggestions = document.getElementById('searchSuggestions') as HTMLElement;
 
-		// Mobile filter elements
+		// Universal filter elements (used on both mobile and desktop)
 		const mobileFilterBtn = document.getElementById('mobileFilterBtn') as HTMLButtonElement;
 		const mobileFilters = document.getElementById('mobileFilters') as HTMLElement;
 		const mobileFilterText = document.getElementById('mobileFilterText') as HTMLElement;
@@ -4226,10 +4155,7 @@ import Layout from '../layouts/Layout.astro';
 		const occasionFilter = document.getElementById('occasionFilter') as HTMLSelectElement;
 		const seasonFilter = document.getElementById('seasonFilter') as HTMLSelectElement;
 
-		// Desktop filter elements
-		const desktopColorFilter = document.getElementById('desktopColorFilter') as HTMLSelectElement;
-		const desktopOccasionFilter = document.getElementById('desktopOccasionFilter') as HTMLSelectElement;
-		const desktopSeasonFilter = document.getElementById('desktopSeasonFilter') as HTMLSelectElement;
+
 
 		const mobileCarousel = document.getElementById('mobileCarousel') as HTMLElement;
 		const desktopGrid = document.getElementById('desktopGrid') as HTMLElement;
@@ -4269,15 +4195,10 @@ import Layout from '../layouts/Layout.astro';
 			// Mobile filter toggle
 			mobileFilterBtn?.addEventListener('click', toggleMobileFilters);
 
-			// Mobile filter functionality
+			// Universal filter functionality (works on both mobile and desktop)
 			colorFilter?.addEventListener('change', applyFilters);
 			occasionFilter?.addEventListener('change', applyFilters);
 			seasonFilter?.addEventListener('change', applyFilters);
-
-			// Desktop filter functionality
-			desktopColorFilter?.addEventListener('change', applyFilters);
-			desktopOccasionFilter?.addEventListener('change', applyFilters);
-			desktopSeasonFilter?.addEventListener('change', applyFilters);
 
 			// Carousel controls
 			prevBtn?.addEventListener('click', () => navigateCarousel(-1));
@@ -4384,17 +4305,10 @@ import Layout from '../layouts/Layout.astro';
 		function getActiveFilterCount() {
 			let count = 0;
 
-			// Check mobile filters (when on mobile)
-			if (window.innerWidth < 1024) {
-				if (colorFilter?.value) count++;
-				if (occasionFilter?.value) count++;
-				if (seasonFilter?.value) count++;
-			} else {
-				// Check desktop filters (when on desktop)
-				if (desktopColorFilter?.value) count++;
-				if (desktopOccasionFilter?.value) count++;
-				if (desktopSeasonFilter?.value) count++;
-			}
+			// Check universal filter values
+			if (colorFilter?.value) count++;
+			if (occasionFilter?.value) count++;
+			if (seasonFilter?.value) count++;
 
 			return count;
 		}
@@ -4411,19 +4325,14 @@ import Layout from '../layouts/Layout.astro';
 		function applyFilters() {
 			const query = searchInput?.value.toLowerCase() || '';
 
-			// Get filter values based on screen size
-			let color, occasion, season;
-			if (window.innerWidth < 1024) {
-				// Mobile filters
-				color = colorFilter?.value || '';
-				occasion = occasionFilter?.value || '';
-				season = seasonFilter?.value || '';
-			} else {
-				// Desktop filters
-				color = desktopColorFilter?.value || '';
-				occasion = desktopOccasionFilter?.value || '';
-				season = desktopSeasonFilter?.value || '';
-			}
+			// Get filter values from universal filter elements
+			const color = colorFilter?.value || '';
+			const occasion = occasionFilter?.value || '';
+			const season = seasonFilter?.value || '';
+
+
+
+
 
 			// Get current month for "Available Now" filter
 			const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-indexed
@@ -4533,15 +4442,10 @@ import Layout from '../layouts/Layout.astro';
 			searchClear?.classList.add('hidden');
 			hideSuggestions();
 
-			// Reset mobile filters
+			// Reset universal filters
 			if (colorFilter) colorFilter.value = '';
 			if (occasionFilter) occasionFilter.value = '';
 			if (seasonFilter) seasonFilter.value = '';
-
-			// Reset desktop filters
-			if (desktopColorFilter) desktopColorFilter.value = '';
-			if (desktopOccasionFilter) desktopOccasionFilter.value = '';
-			if (desktopSeasonFilter) desktopSeasonFilter.value = '';
 
 			applyFilters();
 		}
@@ -4725,7 +4629,7 @@ import Layout from '../layouts/Layout.astro';
 		}
 
 		function disableFiltersAndControls() {
-			// Disable mobile filters
+			// Disable universal filters
 			if (colorFilter) {
 				colorFilter.disabled = true;
 				colorFilter.style.opacity = '0.5';
@@ -4742,24 +4646,7 @@ import Layout from '../layouts/Layout.astro';
 				seasonFilter.style.cursor = 'not-allowed';
 			}
 
-			// Disable desktop filters
-			if (desktopColorFilter) {
-				desktopColorFilter.disabled = true;
-				desktopColorFilter.style.opacity = '0.5';
-				desktopColorFilter.style.cursor = 'not-allowed';
-			}
-			if (desktopOccasionFilter) {
-				desktopOccasionFilter.disabled = true;
-				desktopOccasionFilter.style.opacity = '0.5';
-				desktopOccasionFilter.style.cursor = 'not-allowed';
-			}
-			if (desktopSeasonFilter) {
-				desktopSeasonFilter.disabled = true;
-				desktopSeasonFilter.style.opacity = '0.5';
-				desktopSeasonFilter.style.cursor = 'not-allowed';
-			}
-
-			// Disable mobile filter button
+			// Disable filter button
 			if (mobileFilterBtn) {
 				mobileFilterBtn.disabled = true;
 				mobileFilterBtn.style.opacity = '0.5';
@@ -4768,7 +4655,7 @@ import Layout from '../layouts/Layout.astro';
 		}
 
 		function enableFiltersAndControls() {
-			// Enable mobile filters
+			// Enable universal filters
 			if (colorFilter) {
 				colorFilter.disabled = false;
 				colorFilter.style.opacity = '1';
@@ -4785,24 +4672,7 @@ import Layout from '../layouts/Layout.astro';
 				seasonFilter.style.cursor = 'pointer';
 			}
 
-			// Enable desktop filters
-			if (desktopColorFilter) {
-				desktopColorFilter.disabled = false;
-				desktopColorFilter.style.opacity = '1';
-				desktopColorFilter.style.cursor = 'pointer';
-			}
-			if (desktopOccasionFilter) {
-				desktopOccasionFilter.disabled = false;
-				desktopOccasionFilter.style.opacity = '1';
-				desktopOccasionFilter.style.cursor = 'pointer';
-			}
-			if (desktopSeasonFilter) {
-				desktopSeasonFilter.disabled = false;
-				desktopSeasonFilter.style.opacity = '1';
-				desktopSeasonFilter.style.cursor = 'pointer';
-			}
-
-			// Enable mobile filter button
+			// Enable filter button
 			if (mobileFilterBtn) {
 				mobileFilterBtn.disabled = false;
 				mobileFilterBtn.style.opacity = '1';
@@ -5090,17 +4960,16 @@ import Layout from '../layouts/Layout.astro';
 	async function initializeModernFeatures() {
 		try {
 			// Only load if modules are supported
-			if ('noModule' in HTMLScriptElement.prototype) return;
+			if (!('noModule' in HTMLScriptElement.prototype)) return;
 
-			// Dynamic imports for code splitting
-			const [{ BookingManager }, { FlowerManager }] = await Promise.all([
-				import('../scripts/booking.ts'),
-				import('../scripts/flowers.js')
-			]);
+			// Dynamic imports for code splitting - only load BookingManager for now
+			// FlowerManager is incomplete and conflicts with legacy implementation
+			const { BookingManager } = await import('../scripts/client/booking.ts');
 
 			// Initialize modern implementations
 			new BookingManager();
-			new FlowerManager();
+			// Note: FlowerManager disabled due to incomplete implementation
+			// Legacy flower implementation in this file provides full functionality
 
 			console.log('Modern modular features loaded');
 		} catch (error) {
