@@ -22,7 +22,7 @@ import Layout from '../layouts/Layout.astro';
 						<p class="text-xl md:text-2xl font-roboto text-charcoal leading-relaxed center-mobile-text">
 							A U-pick fresh-cut flower bouquet experience for everyone! Perfect for relaxing, having fun, and making joyful memories near the sunny foothills of Southern Alberta.
 						</p>
-
+					
 					<!-- Key Information -->
 					<div class="shabby-card p-6 distressed-shadow">
 						<h2 class="text-xl font-playfair font-bold text-charcoal mb-4 relative center-mobile-text keep-centered">
@@ -4951,32 +4951,8 @@ import Layout from '../layouts/Layout.astro';
 	}
 </script>
 
-<!-- Modern modular approach for better performance -->
-<script type="module" is:inline>
-	// Import modular functionality for better code splitting
-	// Note: This is a progressive enhancement - the legacy code above provides fallback
-
-	// Lazy load modules when needed
-	async function initializeModernFeatures() {
-		try {
-			// Only load if modules are supported
-			if (!('noModule' in HTMLScriptElement.prototype)) return;
-
-			// Dynamic imports for code splitting - only load BookingManager for now
-			// FlowerManager is incomplete and conflicts with legacy implementation
-			const { BookingManager } = await import('../scripts/client/booking.ts');
-
-			// Initialize modern implementations
-			new BookingManager();
-			// Note: FlowerManager disabled due to incomplete implementation
-			// Legacy flower implementation in this file provides full functionality
-
-			console.log('Modern modular features loaded');
-		} catch (error) {
-			console.log('Falling back to legacy implementation:', error);
-		}
-	}
-
+<!-- Map Navigation Functions -->
+<script is:inline>
 	// Map Navigation Functions
 	function openMaps() {
 		// Default to Google Maps
@@ -5002,11 +4978,4 @@ import Layout from '../layouts/Layout.astro';
 	window.openMaps = openMaps;
 	window.openGoogleMaps = openGoogleMaps;
 	window.openAppleMaps = openAppleMaps;
-
-	// Initialize when DOM is ready
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initializeModernFeatures);
-	} else {
-		initializeModernFeatures();
-	}
 </script>

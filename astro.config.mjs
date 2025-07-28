@@ -14,11 +14,7 @@ export default defineConfig({
         output: {
           manualChunks: {
             // Split vendor code for better caching
-            vendor: ['@supabase/supabase-js'],
-            // Split booking functionality
-            booking: ['./src/scripts/booking.ts'],
-            // Split flower functionality
-            flowers: ['./src/scripts/flowers.js'],
+            vendor: ['@supabase/supabase-js']
           }
         }
       },
