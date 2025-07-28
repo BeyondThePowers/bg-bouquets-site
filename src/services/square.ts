@@ -42,14 +42,19 @@ function getSquareClient() {
   // Initialize Square API client
   const apiClient = new ApiClient();
 
-  // Determine environment based on access token
-  const isSandbox = config.SQUARE_ACCESS_TOKEN.startsWith('EAAAl');
+  // Determine environment based on access token and force sandbox override
+  // Emergency rollback: SQUARE_FORCE_SANDBOX=true forces sandbox mode even with production credentials
+  const forceSandbox = (process.env.SQUARE_FORCE_SANDBOX || import.meta.env.SQUARE_FORCE_SANDBOX) === 'true';
+  const isSandbox = config.SQUARE_ACCESS_TOKEN.startsWith('EAAAl') || forceSandbox;
   apiClient.basePath = isSandbox
     ? 'https://connect.squareupsandbox.com'
     : 'https://connect.squareup.com';
 
   console.log('Square environment:', isSandbox ? 'sandbox' : 'production');
   console.log('Square base path:', apiClient.basePath);
+  if (forceSandbox) {
+    console.log('⚠️  EMERGENCY ROLLBACK: SQUARE_FORCE_SANDBOX=true - Using sandbox mode with production credentials');
+  }
 
   // Set authentication
   apiClient.authentications['oauth2'].accessToken = config.SQUARE_ACCESS_TOKEN;
