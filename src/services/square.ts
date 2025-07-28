@@ -42,18 +42,27 @@ function getSquareClient() {
   // Initialize Square API client
   const apiClient = new ApiClient();
 
-  // Determine environment based on access token and force sandbox override
+  // Determine environment based on force sandbox override or explicit environment setting
   // Emergency rollback: SQUARE_FORCE_SANDBOX=true forces sandbox mode even with production credentials
   const forceSandbox = (process.env.SQUARE_FORCE_SANDBOX || import.meta.env.SQUARE_FORCE_SANDBOX) === 'true';
-  const isSandbox = config.SQUARE_ACCESS_TOKEN.startsWith('EAAAl') || forceSandbox;
+
+  // Use explicit environment setting if available, otherwise default to production
+  // This fixes the issue where both sandbox and production tokens can start with 'EAAAl'
+  const explicitEnvironment = process.env.SQUARE_ENVIRONMENT || import.meta.env.SQUARE_ENVIRONMENT;
+  const isSandbox = forceSandbox || explicitEnvironment === 'sandbox';
+
   apiClient.basePath = isSandbox
     ? 'https://connect.squareupsandbox.com'
     : 'https://connect.squareup.com';
 
   console.log('Square environment:', isSandbox ? 'sandbox' : 'production');
   console.log('Square base path:', apiClient.basePath);
+  console.log('Access token prefix:', config.SQUARE_ACCESS_TOKEN?.substring(0, 10) + '...');
   if (forceSandbox) {
     console.log('⚠️  EMERGENCY ROLLBACK: SQUARE_FORCE_SANDBOX=true - Using sandbox mode with production credentials');
+  }
+  if (explicitEnvironment) {
+    console.log('Using explicit environment setting:', explicitEnvironment);
   }
 
   // Set authentication
