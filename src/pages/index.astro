@@ -706,7 +706,22 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 						</form>
 
-						<!-- Success Message (Hidden by default) -->
+					</div>
+
+					<!-- Custom Booking Information Message -->
+					<!-- Always visible informational message for users needing custom booking times -->
+					<div class="mt-6 p-4 bg-shabby-blue bg-opacity-20 rounded-lg border border-shabby-blue border-opacity-30 beyond-regular-hours">
+						<div class="text-center">
+							<p class="text-lg font-roboto text-charcoal mb-2">
+								<strong class="font-playfair">Need to book outside our regular hours?</strong>
+							</p>
+							<p class="text-sm font-roboto text-charcoal mb-3">
+								Call us at <a href="tel:+14033938285" class="font-semibold text-dusty-rose hover:text-dusty-rose-dark transition-colors duration-200">(403) 393-8285</a> to discuss custom arrangements, or use our <a href="#contact" class="font-semibold text-dusty-rose hover:text-dusty-rose-dark transition-colors duration-200">contact form below</a>.
+							</p>
+						</div>
+					</div>
+
+					<!-- Success Message (Hidden by default) -->
 						<div id="booking-success" class="hidden transition-all duration-500 ease-in-out opacity-0 transform translate-y-4">
 							<div class="text-center space-y-6 py-8">
 								<!-- Success Icon -->
