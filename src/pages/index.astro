@@ -784,6 +784,26 @@ import Layout from '../layouts/Layout.astro';
 
 	</section>
 
+	<!-- Experience Modal - Neutral full-screen image viewer -->
+	<div id="experience-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-90" role="dialog" aria-modal="true" aria-label="Full size image viewer" style="display: none; align-items: center; justify-content: center;">
+		<div class="relative max-w-full max-h-full p-4">
+			<!-- Close button -->
+			<button id="experience-modal-close" class="absolute top-2 right-2 z-10 w-10 h-10 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full flex items-center justify-center transition-colors duration-200" aria-label="Close image viewer">
+				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+				</svg>
+			</button>
+
+			<!-- Image container with skeleton loader -->
+			<div id="experience-modal-content" class="relative">
+				<!-- Skeleton loader (shown while image loads) -->
+				<div id="experience-modal-skeleton" class="w-96 h-72 bg-gray-300 animate-pulse rounded"></div>
+				<!-- Full-size image (hidden until loaded) -->
+				<img id="experience-modal-image" class="hidden max-w-full max-h-[90vh] object-contain rounded" alt="" />
+			</div>
+		</div>
+	</div>
+
 	<!-- What to Expect Section -->
 	<section id="what-to-expect" class="py-20" style="position: relative;">
 
@@ -906,8 +926,41 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 			</div>
 
+			<!-- Experience Gallery - Minimal image showcase -->
+			<div class="experience-gallery mt-16">
+				<!-- Mobile Carousel View -->
+				<div class="lg:hidden">
+					<div class="overflow-x-auto scrollbar-hide touch-scroll" style="scroll-snap-type: x mandatory; scroll-behavior: smooth;">
+						<div class="flex gap-4 px-4 pb-2" id="experience-carousel-track" role="region" aria-label="Garden experience photos">
+							<!-- Experience images will be inserted here by JavaScript -->
+						</div>
+					</div>
+
+					<!-- Mobile Carousel Controls -->
+					<div class="flex justify-between items-center mt-6 px-4" role="group" aria-label="Photo navigation">
+						<button id="experience-prev-btn" class="p-3 rounded-lg vintage-border min-w-12 min-h-12" style="background-color: #FAF7F4; color: #E8B4B8;" disabled aria-label="Previous photo">
+							<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+								<path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+							</svg>
+						</button>
+
+						<button id="experience-next-btn" class="p-3 rounded-lg vintage-border min-w-12 min-h-12" style="background-color: #FAF7F4; color: #E8B4B8;" aria-label="Next photo">
+							<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+								<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+							</svg>
+						</button>
+					</div>
+				</div>
+
+				<!-- Desktop Grid View -->
+				<div class="experience-desktop-grid" id="experience-desktop-grid">
+					<!-- Grid images will be inserted here by JavaScript -->
+				</div>
+			</div>
+
+
 			<!-- Experience Highlights -->
-			<div class="grid lg:grid-cols-3 gap-12 mb-12">
+			<div class="grid lg:grid-cols-3 gap-12 mb-12 lg:mt-[7rem]">
 				<div class="text-center">
 					<div class="w-16 h-16 rounded-sm flex items-center justify-center mx-auto mb-4">
 					<svg
@@ -990,12 +1043,14 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 
 			<!-- Call to Action -->
-			<div class="text-center mt-12">
+			<div class="text-center">
 				<p class="font-roboto text-lg mb-6" style="color: #333333;">Ready to create your perfect bouquet?</p>
 				<a href="#pricing" class="vintage-button px-8 py-4 text-lg font-playfair font-semibold inline-block rounded-sm">
 					Book My Bouquet Experience!
 				</a>
 			</div>
+
+
 		</div>
 
 	</section>
@@ -4993,4 +5048,329 @@ import Layout from '../layouts/Layout.astro';
 	window.openMaps = openMaps;
 	window.openGoogleMaps = openGoogleMaps;
 	window.openAppleMaps = openAppleMaps;
+
+	// ============================================================================
+	// EXPERIENCE GALLERY FUNCTIONALITY
+	// ============================================================================
+
+	// Experience gallery variables
+	const experienceImages = [
+		'BG_Bouquet_u_pick-experience_1.webp',
+		'BG_Bouquet_u_pick-experience_2.webp',
+		'BG_Bouquet_u_pick-experience_3.webp',
+		'BG_Bouquet_u_pick-experience_4.webp',
+		'BG_Bouquet_u_pick-experience_5.webp',
+		'BG_Bouquet_u_pick-experience_6.webp',
+		'BG_Bouquet_u_pick-experience_7.webp',
+		'BG_Bouquet_u_pick-experience_8.webp'
+	];
+
+	let currentExperienceIndex = 0;
+
+	// Experience gallery elements - will be initialized in DOMContentLoaded
+	let experienceCarouselTrack, experienceDesktopGrid, experiencePrevBtn, experienceNextBtn;
+	let experienceModal, experienceModalImage, experienceModalSkeleton, experienceModalClose;
+
+	// Initialize experience gallery when page loads
+	document.addEventListener('DOMContentLoaded', function() {
+		initializeExperienceGallery();
+	});
+
+	function initializeExperienceGallery() {
+		// Get DOM elements
+		experienceCarouselTrack = document.getElementById('experience-carousel-track');
+		experienceDesktopGrid = document.getElementById('experience-desktop-grid');
+		experiencePrevBtn = document.getElementById('experience-prev-btn');
+		experienceNextBtn = document.getElementById('experience-next-btn');
+		experienceModal = document.getElementById('experience-modal');
+		experienceModalImage = document.getElementById('experience-modal-image');
+		experienceModalSkeleton = document.getElementById('experience-modal-skeleton');
+		experienceModalClose = document.getElementById('experience-modal-close');
+
+		// Debug: Check if elements are found
+		console.log('Experience Gallery Debug:', {
+			carouselTrack: !!experienceCarouselTrack,
+			desktopGrid: !!experienceDesktopGrid,
+			prevBtn: !!experiencePrevBtn,
+			nextBtn: !!experienceNextBtn
+		});
+
+		if (!experienceCarouselTrack || !experienceDesktopGrid) {
+			console.error('Experience gallery elements not found');
+			return;
+		}
+
+		// Create mobile carousel images
+		experienceCarouselTrack.innerHTML = experienceImages.map((image, index) =>
+			createExperienceImage(image, index, false)
+		).join('');
+
+		// Create desktop grid images
+		experienceDesktopGrid.innerHTML = experienceImages.map((image, index) =>
+			createExperienceImage(image, index, true)
+		).join('');
+
+		// Setup mobile carousel controls
+		setupExperienceCarouselControls();
+
+		// Setup modal functionality
+		setupExperienceModal();
+
+		// Setup lazy loading for gallery
+		setupExperienceLazyLoading();
+	}
+
+	function createExperienceImage(imageName, index, isDesktop) {
+		const imagePath = `/images/experience/${imageName}`;
+		const containerClass = isDesktop ? '' : 'flex-shrink-0 w-full';
+
+		return `
+			<div class="${containerClass}">
+				<img
+					class="experience-image"
+					src="${imagePath}"
+					alt="Garden experience photo ${index + 1}"
+					loading="lazy"
+					data-index="${index}"
+					data-full-src="${imagePath}"
+				/>
+			</div>
+		`;
+	}
+
+	function setupExperienceCarouselControls() {
+		if (!experiencePrevBtn || !experienceNextBtn) return;
+
+		// Previous button
+		experiencePrevBtn.addEventListener('click', () => {
+			navigateExperienceCarousel(-1);
+		});
+
+		// Next button
+		experienceNextBtn.addEventListener('click', () => {
+			navigateExperienceCarousel(1);
+		});
+
+		// Update button states
+		updateExperienceCarouselControls();
+	}
+
+	function navigateExperienceCarousel(direction) {
+		const newIndex = currentExperienceIndex + direction;
+
+		// Only navigate if within bounds (no looping)
+		if (newIndex >= 0 && newIndex < experienceImages.length) {
+			currentExperienceIndex = newIndex;
+			scrollToCurrentExperienceImage();
+			updateExperienceCarouselControls();
+		}
+	}
+
+	function scrollToCurrentExperienceImage() {
+		const carouselContainer = experienceCarouselTrack?.parentElement;
+		if (carouselContainer && experienceImages.length > 0) {
+			const imageWidth = carouselContainer.clientWidth;
+			const scrollPosition = currentExperienceIndex * imageWidth;
+
+			carouselContainer.scrollTo({
+				left: scrollPosition,
+				behavior: 'smooth'
+			});
+		}
+	}
+
+	function updateExperienceCarouselControls() {
+		if (!experiencePrevBtn || !experienceNextBtn) return;
+
+		// Update previous button
+		experiencePrevBtn.disabled = currentExperienceIndex === 0;
+		experiencePrevBtn.style.opacity = currentExperienceIndex === 0 ? '0.5' : '1';
+
+		// Update next button
+		experienceNextBtn.disabled = currentExperienceIndex === experienceImages.length - 1;
+		experienceNextBtn.style.opacity = currentExperienceIndex === experienceImages.length - 1 ? '0.5' : '1';
+	}
+
+	function setupExperienceModal() {
+		if (!experienceModal || !experienceModalClose) return;
+
+		// Close modal on close button click
+		experienceModalClose.addEventListener('click', closeExperienceModal);
+
+		// Close modal on backdrop click
+		experienceModal.addEventListener('click', (e) => {
+			if (e.target === experienceModal) {
+				closeExperienceModal();
+			}
+		});
+
+		// Close modal on escape key
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && experienceModal.classList.contains('show')) {
+				closeExperienceModal();
+			}
+		});
+
+		// Add click listeners to all experience images
+		document.addEventListener('click', (e) => {
+			if (e.target.classList.contains('experience-image')) {
+				const fullSrc = e.target.dataset.fullSrc;
+				const alt = e.target.alt;
+				openExperienceModal(fullSrc, alt);
+			}
+		});
+	}
+
+	function openExperienceModal(imageSrc, imageAlt) {
+		if (!experienceModal || !experienceModalImage || !experienceModalSkeleton) return;
+
+		// Show modal
+		experienceModal.classList.add('show');
+		document.body.style.overflow = 'hidden'; // Prevent background scrolling
+
+		// Show skeleton loader
+		experienceModalSkeleton.classList.remove('hidden');
+		experienceModalSkeleton.classList.add('experience-skeleton');
+		experienceModalImage.classList.add('hidden');
+
+		// Load full-size image
+		const fullImage = new Image();
+		fullImage.onload = () => {
+			// Hide skeleton and show image
+			experienceModalSkeleton.classList.add('hidden');
+			experienceModalSkeleton.classList.remove('experience-skeleton');
+
+			experienceModalImage.src = imageSrc;
+			experienceModalImage.alt = imageAlt;
+			experienceModalImage.classList.remove('hidden');
+		};
+
+		fullImage.onerror = () => {
+			// Hide skeleton on error
+			experienceModalSkeleton.classList.add('hidden');
+			experienceModalSkeleton.classList.remove('experience-skeleton');
+		};
+
+		fullImage.src = imageSrc;
+	}
+
+	function closeExperienceModal() {
+		if (!experienceModal) return;
+
+		experienceModal.classList.remove('show');
+		document.body.style.overflow = ''; // Restore scrolling
+
+		// Reset modal content
+		if (experienceModalImage) {
+			experienceModalImage.src = '';
+			experienceModalImage.alt = '';
+		}
+	}
+
+	function setupExperienceLazyLoading() {
+		// Use intersection observer to lazy load gallery when it comes into view
+		if ('IntersectionObserver' in window) {
+			const galleryObserver = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						// Gallery is visible, images will load via their loading="lazy" attribute
+						galleryObserver.unobserve(entry.target);
+					}
+				});
+			}, {
+				rootMargin: '200px 0px' // Start loading 200px before gallery enters viewport
+			});
+
+			const experienceGallery = document.querySelector('.experience-gallery');
+			if (experienceGallery) {
+				galleryObserver.observe(experienceGallery);
+			}
+		}
+	}
+
 </script>
+
+<style>
+	/* ============================================================================
+	   EXPERIENCE GALLERY STYLING
+	   ============================================================================ */
+
+	/* Experience gallery container - edge to edge */
+	.experience-gallery {
+		width: 100vw;
+		margin-left: calc(-50vw + 50%);
+		padding: 0 1rem;
+	}
+
+	/* Experience image styling - 4:3 aspect ratio */
+	.experience-image {
+		aspect-ratio: 4/3;
+		width: 100%;
+		object-fit: cover;
+		cursor: pointer;
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		border-radius: 0.5rem;
+	}
+
+	/* Desktop hover effects - subtle like flower cards */
+	@media (min-width: 1024px) {
+		.experience-image:hover {
+			transform: scale(1.05);
+			box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+		}
+	}
+
+	/* Mobile carousel - full width images */
+	.experience-gallery .flex > div {
+		flex-shrink: 0;
+		width: calc(100vw - 2rem);
+		scroll-snap-align: center;
+		scroll-snap-stop: always;
+	}
+
+	/* Desktop grid - hidden on mobile, grid on desktop */
+	.experience-desktop-grid {
+		display: none;
+	}
+
+	@media (min-width: 1024px) {
+		.experience-desktop-grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 1rem;
+		}
+	}
+
+	@media (min-width: 1280px) {
+		.experience-desktop-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	@media (min-width: 1536px) {
+		.experience-desktop-grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+
+	/* Experience modal styling - completely neutral */
+	#experience-modal.show {
+		display: flex !important;
+	}
+
+	/* Skeleton loader for modal images */
+	.experience-skeleton {
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background-size: 200% 100%;
+		animation: experience-skeleton-loading 1.5s infinite;
+	}
+
+	@keyframes experience-skeleton-loading {
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
+		}
+	}
+</style>

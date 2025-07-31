@@ -95,13 +95,13 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { price_per_bouquet, price_per_visitor_pass, max_visitor_passes_per_booking } = await request.json();
 
-    // Validate bouquet price
+    // Validate bouquet price - minimum $0.01 for payment testing, no maximum limit
     if (price_per_bouquet !== undefined) {
       const bouquetPrice = parseFloat(price_per_bouquet);
-      if (isNaN(bouquetPrice) || bouquetPrice < 1 || bouquetPrice > 200) {
+      if (isNaN(bouquetPrice) || bouquetPrice < 0.01) {
         return new Response(JSON.stringify({
           success: false,
-          error: 'Bouquet price must be between $1.00 and $200.00'
+          error: 'Bouquet price must be at least $0.01'
         }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -109,13 +109,13 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    // Validate visitor pass price
+    // Validate visitor pass price - minimum $0.01 for payment testing, no maximum limit
     if (price_per_visitor_pass !== undefined) {
       const visitorPrice = parseFloat(price_per_visitor_pass);
-      if (isNaN(visitorPrice) || visitorPrice < 0 || visitorPrice > 100) {
+      if (isNaN(visitorPrice) || visitorPrice < 0.01) {
         return new Response(JSON.stringify({
           success: false,
-          error: 'Visitor pass price must be between $0.00 and $100.00'
+          error: 'Visitor pass price must be at least $0.01'
         }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' }

@@ -1648,15 +1648,15 @@
 			const visitorPassPrice = parseFloat(visitorPassPriceInput.value);
 			const maxVisitorPasses = parseInt(maxVisitorPassesInput.value);
 
-			// Validate bouquet price
-			if (isNaN(bouquetPrice) || bouquetPrice < 1 || bouquetPrice > 200) {
-				showMessage(messageDiv, 'Bouquet price must be between $1.00 and $200.00', 'error');
+			// Validate bouquet price - minimum $0.01 for payment testing, no maximum limit
+			if (isNaN(bouquetPrice) || bouquetPrice < 0.01) {
+				showMessage(messageDiv, 'Bouquet price must be at least $0.01', 'error');
 				return;
 			}
 
-			// Validate visitor pass price
-			if (isNaN(visitorPassPrice) || visitorPassPrice < 0 || visitorPassPrice > 100) {
-				showMessage(messageDiv, 'Visitor pass price must be between $0.00 and $100.00', 'error');
+			// Validate visitor pass price - minimum $0.01 for payment testing, no maximum limit
+			if (isNaN(visitorPassPrice) || visitorPassPrice < 0.01) {
+				showMessage(messageDiv, 'Visitor pass price must be at least $0.01', 'error');
 				return;
 			}
 
