@@ -788,10 +788,10 @@ import Layout from '../layouts/Layout.astro';
 	<!-- z-70 ensures modal appears above navigation (z-60) -->
 	<div id="experience-modal" class="hidden fixed inset-0 z-70 bg-black bg-opacity-90" role="dialog" aria-modal="true" aria-label="Full size image viewer" style="display: none; align-items: center; justify-content: center;">
 		<div class="relative max-w-full max-h-full p-4">
-			<!-- Close button with explicit white stroke for visibility -->
-			<button id="experience-modal-close" class="absolute top-2 right-2 z-10 w-10 h-10 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full flex items-center justify-center transition-colors duration-200" aria-label="Close image viewer">
-				<svg class="w-6 h-6 text-white" fill="none" stroke="white" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+			<!-- Close button with enhanced visibility -->
+			<button id="experience-modal-close" class="absolute top-2 right-2 z-10 w-12 h-12 bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full flex items-center justify-center transition-all duration-200 border-2 border-white border-opacity-30" aria-label="Close image viewer">
+				<svg class="w-6 h-6" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
 				</svg>
 			</button>
 
@@ -5146,10 +5146,10 @@ import Layout from '../layouts/Layout.astro';
 
 	function createExperienceImage(imageName, index, isDesktop) {
 		const imagePath = `/images/experience/${imageName}`;
-		const containerClass = isDesktop ? '' : 'flex-shrink-0 w-full';
+		const containerClass = isDesktop ? 'cursor-pointer' : 'flex-shrink-0 w-full cursor-pointer';
 
 		return `
-			<div class="${containerClass}">
+			<div class="${containerClass}" style="cursor: pointer;">
 				<img
 					class="experience-image"
 					src="${imagePath}"
@@ -5157,6 +5157,7 @@ import Layout from '../layouts/Layout.astro';
 					loading="lazy"
 					data-index="${index}"
 					data-full-src="${imagePath}"
+					style="cursor: pointer;"
 				/>
 			</div>
 		`;
@@ -5334,6 +5335,12 @@ import Layout from '../layouts/Layout.astro';
 		cursor: pointer !important; /* Ensure pointer cursor shows on hover */
 		transition: transform 0.3s ease, box-shadow 0.3s ease;
 		border-radius: 0.5rem;
+	}
+
+	/* Ensure cursor pointer on image containers as well */
+	.experience-gallery img,
+	.experience-gallery .experience-image {
+		cursor: pointer !important;
 	}
 
 	/* Desktop hover effects - subtle like flower cards */
