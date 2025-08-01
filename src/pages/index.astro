@@ -1169,7 +1169,8 @@ import Layout from '../layouts/Layout.astro';
 							<div id="mobileFilters" class="overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0;">
 								<div class="pt-4 pb-2">
 									<div class="flex flex-col gap-4">
-										<div>
+										<!-- TEMPORARILY HIDDEN: Color filter - business needs time to prepare content -->
+										<div style="display: none;">
 											<div class="mb-2">
 												<label for="colorFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Color</label>
 											</div>
@@ -1193,7 +1194,8 @@ import Layout from '../layouts/Layout.astro';
 											</div>
 										</div>
 
-										<div>
+										<!-- TEMPORARILY HIDDEN: Occasion filter - business needs time to prepare content -->
+										<div style="display: none;">
 											<div class="mb-2">
 												<label for="occasionFilter" class="text-sm font-playfair font-semibold" style="color: #333333;">Occasion</label>
 											</div>
@@ -4295,8 +4297,9 @@ import Layout from '../layouts/Layout.astro';
 			mobileFilterBtn?.addEventListener('click', toggleMobileFilters);
 
 			// Universal filter functionality (works on both mobile and desktop)
-			colorFilter?.addEventListener('change', applyFilters);
-			occasionFilter?.addEventListener('change', applyFilters);
+			// TEMPORARILY DISABLED: Color and occasion filters hidden
+			// colorFilter?.addEventListener('change', applyFilters);
+			// occasionFilter?.addEventListener('change', applyFilters);
 			seasonFilter?.addEventListener('change', applyFilters);
 
 			// Carousel controls
@@ -4405,8 +4408,9 @@ import Layout from '../layouts/Layout.astro';
 			let count = 0;
 
 			// Check universal filter values
-			if (colorFilter?.value) count++;
-			if (occasionFilter?.value) count++;
+			// TEMPORARILY DISABLED: Color and occasion filters hidden
+			// if (colorFilter?.value) count++;
+			// if (occasionFilter?.value) count++;
 			if (seasonFilter?.value) count++;
 
 			return count;
@@ -4425,8 +4429,9 @@ import Layout from '../layouts/Layout.astro';
 			const query = searchInput?.value.toLowerCase() || '';
 
 			// Get filter values from universal filter elements
-			const color = colorFilter?.value || '';
-			const occasion = occasionFilter?.value || '';
+			// TEMPORARILY DISABLED: Color and occasion filters hidden
+			// const color = colorFilter?.value || '';
+			// const occasion = occasionFilter?.value || '';
 			const season = seasonFilter?.value || '';
 
 
@@ -4445,23 +4450,25 @@ import Layout from '../layouts/Layout.astro';
 				// If we have name matches, apply other filters
 				if (filteredFlowers.length > 0) {
 					filteredFlowers = filteredFlowers.filter(flower => {
-						const matchesColor = !color || flower.colors.includes(color);
-						const matchesOccasion = !occasion || flower.occasions.includes(occasion);
+						// TEMPORARILY DISABLED: Color and occasion filtering
+						// const matchesColor = !color || flower.colors.includes(color);
+						// const matchesOccasion = !occasion || flower.occasions.includes(occasion);
 						const matchesSeason = !season ||
 							(season === 'current' ? flower.months.includes(currentMonth) :
 							 flower.months.includes(parseInt(season)));
-						return matchesColor && matchesOccasion && matchesSeason;
+						return matchesSeason; // Only season filtering active
 					});
 				}
 			} else {
 				// No search query: show all flowers with filters applied
 				filteredFlowers = flowers.filter(flower => {
-					const matchesColor = !color || flower.colors.includes(color);
-					const matchesOccasion = !occasion || flower.occasions.includes(occasion);
+					// TEMPORARILY DISABLED: Color and occasion filtering
+					// const matchesColor = !color || flower.colors.includes(color);
+					// const matchesOccasion = !occasion || flower.occasions.includes(occasion);
 					const matchesSeason = !season ||
 						(season === 'current' ? flower.months.includes(currentMonth) :
 						 flower.months.includes(parseInt(season)));
-					return matchesColor && matchesOccasion && matchesSeason;
+					return matchesSeason; // Only season filtering active
 				});
 			}
 
@@ -4542,8 +4549,9 @@ import Layout from '../layouts/Layout.astro';
 			hideSuggestions();
 
 			// Reset universal filters
-			if (colorFilter) colorFilter.value = '';
-			if (occasionFilter) occasionFilter.value = '';
+			// TEMPORARILY DISABLED: Color and occasion filters hidden
+			// if (colorFilter) colorFilter.value = '';
+			// if (occasionFilter) occasionFilter.value = '';
 			if (seasonFilter) seasonFilter.value = '';
 
 			applyFilters();
@@ -4755,16 +4763,17 @@ import Layout from '../layouts/Layout.astro';
 
 		function enableFiltersAndControls() {
 			// Enable universal filters
-			if (colorFilter) {
-				colorFilter.disabled = false;
-				colorFilter.style.opacity = '1';
-				colorFilter.style.cursor = 'pointer';
-			}
-			if (occasionFilter) {
-				occasionFilter.disabled = false;
-				occasionFilter.style.opacity = '1';
-				occasionFilter.style.cursor = 'pointer';
-			}
+			// TEMPORARILY DISABLED: Color and occasion filters hidden
+			// if (colorFilter) {
+			// 	colorFilter.disabled = false;
+			// 	colorFilter.style.opacity = '1';
+			// 	colorFilter.style.cursor = 'pointer';
+			// }
+			// if (occasionFilter) {
+			// 	occasionFilter.disabled = false;
+			// 	occasionFilter.style.opacity = '1';
+			// 	occasionFilter.style.cursor = 'pointer';
+			// }
 			if (seasonFilter) {
 				seasonFilter.disabled = false;
 				seasonFilter.style.opacity = '1';
@@ -4800,14 +4809,17 @@ import Layout from '../layouts/Layout.astro';
 							<p class="text-sm font-roboto leading-relaxed" style="color: #666; line-height: 1.4;">${flower.description}</p>
 						</div>
 
-						<!-- Color palette -->
+						<!-- TEMPORARILY HIDDEN: Color palette - business needs time to prepare content -->
+						<!--
 						<div class="flex flex-wrap gap-1.5">
 							${flower.colors.map((color: string) => `
 								<div class="w-4 h-4 rounded-full" style="background-color: ${getColorHex(color)}; ${color.toLowerCase() === 'white' ? 'border: 1px solid #E8B4B8;' : ''}" title="${color}"></div>
 							`).join('')}
 						</div>
+						-->
 
-						<!-- Occasions tags -->
+						<!-- TEMPORARILY HIDDEN: Occasions tags - business needs time to prepare content -->
+						<!--
 						<div class="flex flex-wrap gap-1.5 pt-2">
 							${flower.occasions.slice(0, 3).map((occasion: string) => `
 								<span class="px-2.5 py-1 rounded-full text-xs font-roboto font-medium capitalize transition-colors duration-200 hover:bg-dusty-rose" style="background-color: #FAF7F4; color: #333333; border: 1px solid #E8B4B8;">
@@ -4815,6 +4827,7 @@ import Layout from '../layouts/Layout.astro';
 								</span>
 							`).join('')}
 						</div>
+						-->
 
 						<!-- Seasonal availability -->
 						<div class="pt-2 border-t border-shabby-pink">
