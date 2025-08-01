@@ -2544,3 +2544,8 @@ input[type="number"] {
 .beyond-regular-hours a {
   color: var(--color-dusty-rose-accessible);
 }
+
+#booking-success {
+  max-width: 800px;
+  margin: 0 auto;
+}
