@@ -785,11 +785,12 @@ import Layout from '../layouts/Layout.astro';
 	</section>
 
 	<!-- Experience Modal - Neutral full-screen image viewer -->
-	<div id="experience-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-90" role="dialog" aria-modal="true" aria-label="Full size image viewer" style="display: none; align-items: center; justify-content: center;">
+	<!-- z-70 ensures modal appears above navigation (z-60) -->
+	<div id="experience-modal" class="hidden fixed inset-0 z-70 bg-black bg-opacity-90" role="dialog" aria-modal="true" aria-label="Full size image viewer" style="display: none; align-items: center; justify-content: center;">
 		<div class="relative max-w-full max-h-full p-4">
-			<!-- Close button -->
+			<!-- Close button with explicit white stroke for visibility -->
 			<button id="experience-modal-close" class="absolute top-2 right-2 z-10 w-10 h-10 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full flex items-center justify-center transition-colors duration-200" aria-label="Close image viewer">
-				<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-6 h-6 text-white" fill="none" stroke="white" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 				</svg>
 			</button>
@@ -5330,7 +5331,7 @@ import Layout from '../layouts/Layout.astro';
 		aspect-ratio: 4/3;
 		width: 100%;
 		object-fit: cover;
-		cursor: pointer;
+		cursor: pointer !important; /* Ensure pointer cursor shows on hover */
 		transition: transform 0.3s ease, box-shadow 0.3s ease;
 		border-radius: 0.5rem;
 	}
