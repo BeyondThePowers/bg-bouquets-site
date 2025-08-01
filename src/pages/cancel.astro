@@ -14,6 +14,9 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Allura&family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+	<!-- Import global CSS for calendar day styling -->
+	<link rel="stylesheet" href="/src/styles/global.css">
+
 	<style>
 		:root {
 			/* Shabby Chic CSS Variables - Match Global Variables */
@@ -194,7 +197,7 @@
 			padding: 12px 24px;
 			border: none;
 			border-radius: 6px;
-			font-family: inherit;
+			font-family: var(--font-playfair); /* Use Playfair Display for all buttons to match site standard */
 			font-size: 1rem;
 			font-weight: 600;
 			cursor: pointer;
@@ -222,20 +225,72 @@
 			transform: none;
 		}
 
+		.btn-cancel:focus:not(:focus-visible) {
+			outline: none;
+		}
+
+		.btn-cancel:focus-visible {
+			outline: 2px solid var(--color-dusty-rose);
+			outline-offset: 2px;
+		}
+
+		/* Primary buttons - Match site standard (black/charcoal like vintage-button) */
 		.btn-primary {
-			background-color: var(--color-dusty-rose);
+			background: linear-gradient(135deg, var(--color-charcoal) 0%, #2a2a2a 100%);
+			border: 1px solid var(--color-charcoal);
 			color: white;
+			/* font-family inherited from .btn class */
+			font-weight: 600;
+			text-shadow: none;
+			position: relative;
+			overflow: hidden;
+		}
+
+		/* Add the same shine effect as vintage-button */
+		.btn-primary::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+			transition: left 0.5s;
+		}
+
+		.btn-primary:hover::before {
+			left: 100%;
 		}
 
 		.btn-primary:hover {
-			background-color: var(--color-dusty-rose-dark);
-			transform: translateY(-2px);
+			transform: translateY(-1px);
+			box-shadow: 0 6px 12px rgba(51, 51, 51, 0.3);
+			background: linear-gradient(135deg, #2a2a2a 0%, var(--color-charcoal) 100%);
+		}
+
+		.btn-primary:active {
+			transform: translateY(0);
 		}
 
 		.btn-primary:disabled {
 			background-color: #6c757d;
 			cursor: not-allowed;
 			transform: none;
+			opacity: 0.6;
+		}
+
+		.btn-primary:disabled::before {
+			display: none; /* Remove shine effect when disabled */
+		}
+
+		/* Focus styles for accessibility - Match site standards */
+		.btn-primary:focus:not(:focus-visible) {
+			outline: none;
+		}
+
+		.btn-primary:focus-visible {
+			outline: 2px solid var(--color-dusty-rose);
+			outline-offset: 2px;
 		}
 
 		.btn-secondary {
@@ -246,6 +301,15 @@
 
 		.btn-secondary:hover {
 			background-color: var(--color-shabby-pink);
+		}
+
+		.btn-secondary:focus:not(:focus-visible) {
+			outline: none;
+		}
+
+		.btn-secondary:focus-visible {
+			outline: 2px solid var(--color-dusty-rose);
+			outline-offset: 2px;
 		}
 
 		.error {
@@ -409,52 +473,9 @@
 			z-index: 1;
 		}
 
-		.calendar-day {
-			aspect-ratio: 1;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 0.375rem; /* Match main calendar border radius */
-			cursor: pointer;
-			transition: all 0.2s ease; /* Match main calendar transition */
-			font-weight: 600; /* Match main calendar font weight */
-			font-family: var(--font-playfair); /* Use Playfair Display like main calendar */
-			width: 100%;
-			min-height: 42px; /* Match main calendar minimum height */
-			position: relative;
-			margin: 1px; /* Small margin like main calendar */
-			justify-self: center;
-			box-sizing: border-box;
-		}
-
-		.calendar-day.available {
-			border: 1px solid var(--color-dusty-rose); /* Match main calendar available border */
-			color: var(--color-charcoal); /* Match main calendar text color */
-			background-color: white;
-		}
-
-		.calendar-day.available:hover {
-			background-color: rgba(232, 180, 184, 0.2); /* Match main calendar hover */
-			transform: scale(1.05); /* Match main calendar hover transform */
-		}
-
-		.calendar-day.selected {
-			background-color: var(--color-dusty-rose-dark) !important; /* Match main calendar selected */
-			border: 3px solid var(--color-dusty-rose-darker) !important;
-			color: white !important;
-			transform: scale(1.05) !important;
-			font-weight: 700 !important; /* Bolder text for better contrast */
-			font-size: 1.1em !important; /* Slightly larger text */
-			box-shadow: 0 6px 16px rgba(184, 120, 126, 0.4); /* Match main calendar shadow */
-			z-index: 10 !important; /* Ensure selected date appears above others */
-		}
-
-		.calendar-day.unavailable {
-			background-color: #f9fafb; /* Match main calendar unavailable background */
-			color: #d1d5db; /* Match main calendar unavailable text */
-			cursor: not-allowed;
-			border: 1px solid #e5e7eb; /* Match main calendar unavailable border */
-		}
+		/* Calendar day styling - Use global CSS from global.css instead of duplicating */
+		/* The .calendar-day, .calendar-day.available, .calendar-day.selected, .calendar-day.unavailable classes
+		   are defined in global.css and will be used automatically */
 
 		.calendar-day.current-booking {
 			background: #fef3c7;
@@ -527,7 +548,7 @@
 			}
 		}
 
-		/* Time Selection - Aligned with Main Booking Calendar */
+		/* Time Selection - Exactly Match Main Booking Calendar */
 		.time-section {
 			margin-bottom: 24px;
 		}
@@ -553,48 +574,83 @@
 			}
 		}
 
-		.time-slot {
-			border: 2px solid var(--color-shabby-pink); /* Match main calendar time slot border */
-			background: var(--color-cream); /* Match main calendar time slot background */
-			padding: 0.625rem; /* More compact like main calendar */
-			border-radius: 0.5rem;
-			cursor: pointer;
-			transition: all 0.3s ease; /* Match main calendar transition */
-			text-align: center;
-			min-height: 60px; /* Match main calendar time slot height */
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-family: var(--font-playfair); /* Use Playfair Display */
-			font-weight: 600; /* Match main calendar font weight */
-		}
+		/* Time slot card styling - Use global CSS from global.css instead of duplicating */
+		/* The .time-slot-card, .time-slot-card:hover, .time-slot-card.selected, .time-slot-card.unavailable classes
+		   are defined in global.css and will be used automatically */
 
-		.time-slot:hover {
-			background-color: rgba(232, 180, 184, 0.2); /* Match main calendar hover */
-			border-color: var(--color-dusty-rose); /* Match main calendar hover border */
-			transform: scale(1.02); /* Subtle hover transform */
-		}
-
-		.time-slot.selected {
-			background-color: var(--color-dusty-rose-dark) !important; /* Match main calendar selected */
-			color: white !important;
-			border-color: var(--color-dusty-rose-darker) !important;
-			transform: scale(1.02) !important;
-			box-shadow: 0 4px 8px rgba(184, 120, 126, 0.3); /* Match main calendar shadow */
-		}
-
-		.time-slot.unavailable {
-			background: #f9fafb; /* Match main calendar unavailable background */
-			color: #d1d5db; /* Match main calendar unavailable text */
-			cursor: not-allowed;
-			border: 1px solid #e5e7eb; /* Match main calendar unavailable border */
-		}
-
-		.time-slot.current-booking {
+		/* Only add custom styling for current booking state which is specific to reschedule page */
+		.time-slot-card.current-booking {
 			background: #fef3c7; /* Keep existing current booking styling */
 			color: #92400e;
 			border-color: #fbbf24;
 			cursor: not-allowed;
+		}
+
+		/* Time slot content styling - Replace Tailwind classes with proper CSS */
+		.time-slot-time {
+			font-family: var(--font-playfair);
+			font-weight: 600;
+			font-size: 1.125rem; /* text-lg equivalent */
+			color: inherit;
+			margin-bottom: 0.25rem; /* mt-1 equivalent */
+		}
+
+		.time-slot-status {
+			font-family: var(--font-roboto);
+			font-size: 0.875rem; /* text-sm equivalent */
+			color: inherit;
+			opacity: 0.8;
+		}
+
+		/* No available times message styling */
+		.no-times-container {
+			text-align: center;
+			padding: 2rem 1rem;
+		}
+
+		.no-times-icon {
+			margin-bottom: 0.5rem;
+			color: var(--color-status-neutral, #64748b);
+		}
+
+		.no-times-icon svg {
+			width: 3rem;
+			height: 3rem;
+			margin: 0 auto;
+			display: block;
+		}
+
+		.no-times-title {
+			font-family: var(--font-playfair);
+			font-weight: 500;
+			color: var(--color-charcoal);
+			margin-bottom: 0.25rem;
+			font-size: 1rem;
+		}
+
+		.no-times-description {
+			font-family: var(--font-roboto);
+			font-size: 0.875rem;
+			color: var(--color-status-neutral, #64748b);
+		}
+
+		/* Action prompt styling - Replace inline style */
+		.action-prompt {
+			font-size: 1.1rem;
+			margin-bottom: 25px;
+			color: var(--color-charcoal);
+			font-family: var(--font-roboto);
+		}
+
+		/* Mobile responsive styling for time slot content */
+		@media (max-width: 767px) {
+			.time-slot-time {
+				font-size: 1rem; /* Slightly smaller on mobile */
+			}
+
+			.time-slot-status {
+				font-size: 0.8rem; /* Slightly smaller on mobile */
+			}
 		}
 
 		/* Selection Summary - Aligned with Shabby Chic Theme */
@@ -665,13 +721,7 @@
 				margin: 0; /* Remove any margins */
 			}
 
-			.calendar-day {
-				min-height: 32px; /* Reduced for better mobile fit like main calendar */
-				height: 32px; /* Fixed height for consistency */
-				max-width: 32px; /* Prevent horizontal overflow */
-				font-size: 0.75rem; /* Smaller font for compact layout */
-				border-width: 1px; /* Thinner borders on mobile */
-			}
+			/* Calendar day mobile styling is handled by global.css */
 
 			.weekday {
 				padding: 4px 1px; /* Reduced padding for compact layout like main calendar */
@@ -683,11 +733,7 @@
 				gap: 0.75rem;
 			}
 
-			.time-slot {
-				padding: 0.625rem; /* More compact like main calendar */
-				font-size: 0.9rem;
-				min-height: 60px; /* Match main calendar time slot height */
-			}
+
 
 			.current-booking-details {
 				flex-direction: column;
@@ -703,7 +749,7 @@
 			}
 		}
 
-		/* Galaxy S25 and similar phone optimizations - Match Main Calendar */
+		/* Mobile responsive optimizations - Calendar day styling handled by global.css */
 		@media (max-width: 430px) {
 			.container {
 				margin: 5px;
@@ -717,14 +763,6 @@
 				padding: 0.25rem; /* Minimal padding */
 			}
 
-			.calendar-day {
-				min-height: 45px; /* Ultra-compact for very small phones */
-				height: 45px;
-				max-width: 45px; /* Strict width limit */
-				font-size: 0.8rem; /* Smaller but still readable */
-				border-width: 0.5px; /* Thinner borders to save space */
-			}
-
 			.weekday {
 				padding: 2px 0px; /* Minimal padding */
 				font-size: 0.6rem; /* Very small headers */
@@ -736,29 +774,11 @@
 			}
 		}
 
-		/* Ultra-small phones (iPhone SE, etc.) - Match Main Calendar */
+		/* Ultra-small phones (iPhone SE, etc.) */
 		@media (max-width: 375px) {
-			.calendar-day {
-				min-height: 42px; /* Maximum compactness */
-				height: 42px;
-				max-width: 42px;
-				font-size: 0.8rem;
-				border-radius: 0.25rem; /* Smaller border radius */
-			}
-
 			.weekday {
 				font-size: 0.55rem;
 				padding: 1px 0;
-			}
-		}
-
-		/* Extra small phones - Match Main Calendar */
-		@media (max-width: 320px) {
-			.calendar-day {
-				min-height: 22px; /* Absolute minimum */
-				height: 22px;
-				max-width: 22px;
-				font-size: 0.55rem;
 			}
 		}
 
@@ -921,7 +941,7 @@
 				</div>
 
 				<div style="text-align: center; margin: 30px 0;">
-					<p style="font-size: 1.1rem; margin-bottom: 25px; color: var(--color-charcoal); font-family: var(--font-roboto);">
+					<p class="action-prompt">
 						What would you like to do with your booking?
 					</p>
 				</div>
@@ -933,9 +953,6 @@
 					<button id="cancel-btn" class="btn btn-cancel">
 						Cancel Booking
 					</button>
-					<a href="/" class="btn btn-secondary">
-						Keep Booking
-					</a>
 				</div>
 			</div>
 
@@ -1737,7 +1754,7 @@
 			showTimeSlots(date);
 		}
 
-		// Show available time slots for selected date
+		// Show available time slots for selected date - Match Main Booking Calendar Exactly
 		function showTimeSlots(date: string): void {
 			if (!availabilityData || !timeSlots || !timeSelection) return;
 
@@ -1749,41 +1766,76 @@
 			// Show time selection section
 			timeSelection.style.display = 'block';
 
+			if (availableTimes.length === 0) {
+				// Show "no slots available" message with proper CSS classes
+				timeSlots.innerHTML = `
+					<div class="no-times-container">
+						<div class="no-times-icon">
+							<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+							</svg>
+						</div>
+						<h4 class="no-times-title">No available times</h4>
+						<p class="no-times-description">This date is fully booked. Please select another date.</p>
+					</div>
+				`;
+				return;
+			}
+
 			availableTimes.forEach((time: string) => {
-				const timeButton = document.createElement('button');
-				timeButton.type = 'button';
-				timeButton.className = 'time-slot';
-				timeButton.textContent = time;
+				const card = document.createElement('div');
+				card.className = 'time-slot-card'; // Use time-slot-card class like main calendar
+				card.setAttribute('role', 'radio');
+				card.setAttribute('aria-checked', 'false');
+				card.setAttribute('tabindex', '0');
+				card.setAttribute('aria-label', `Select ${time} time slot`);
+
+				// Use proper CSS classes instead of Tailwind
+				card.innerHTML = `
+					<div class="time-slot-time">${time}</div>
+					<div class="time-slot-status">Available</div>
+				`;
 
 				// Check if this is the current booking time
 				if (currentBookingData && date === currentBookingData.date && time === currentBookingData.time) {
-					timeButton.className += ' current-booking';
-					timeButton.title = 'Current booking time';
-					timeButton.disabled = true;
+					card.className += ' current-booking';
+					card.title = 'Current booking time';
+					card.setAttribute('aria-disabled', 'true');
+					// Update the inner HTML for current booking with proper CSS classes
+					card.innerHTML = `
+						<div class="time-slot-time">${time}</div>
+						<div class="time-slot-status">Current booking</div>
+					`;
 				} else {
-					timeButton.addEventListener('click', () => selectTime(time));
+					// Click handler like main calendar
+					const selectTimeSlot = () => {
+						// Remove selection from other cards
+						document.querySelectorAll('.time-slot-card').forEach(c => {
+							c.classList.remove('selected');
+							c.setAttribute('aria-checked', 'false');
+						});
+						// Select this card
+						card.classList.add('selected');
+						card.setAttribute('aria-checked', 'true');
+						selectTime(time);
+					};
+
+					card.addEventListener('click', selectTimeSlot);
+					card.addEventListener('keydown', (e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+							selectTimeSlot();
+						}
+					});
 				}
 
-				timeSlots.appendChild(timeButton);
+				timeSlots.appendChild(card);
 			});
 		}
 
-		// Select time slot
+		// Select time slot - Updated for time-slot-card class
 		function selectTime(time: string): void {
 			selectedTime = time;
-
-			// Update time selection UI
-			document.querySelectorAll('.time-slot').forEach((btn: Element) => {
-				btn.classList.remove('selected');
-			});
-
-			// Find and highlight selected time
-			const timeButtons = timeSlots.querySelectorAll('.time-slot');
-			timeButtons.forEach((btn: Element) => {
-				if (btn.textContent === time) {
-					btn.classList.add('selected');
-				}
-			});
 
 			// Show selection summary
 			updateSelectionSummary();
