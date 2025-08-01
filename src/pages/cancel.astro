@@ -9,11 +9,37 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Cancel Booking - BG Bouquet</title>
 
+	<!-- Font Imports for Shabby Chic Theme -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Allura&family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 	<style>
 		:root {
+			/* Shabby Chic CSS Variables - Match Global Variables */
+			--color-shabby-pink: #F8E7E8;
+			--color-shabby-blue: #EFF9FA;
+			--color-dusty-rose: #E8B4B8;
+			--color-dusty-rose-dark: #D4969B; /* Better contrast for text */
+			--color-dusty-rose-darker: #B8787E; /* Even better contrast */
+			--color-dusty-rose-accessible: #D4969B; /* WCAG AA large text */
+			--color-dusty-rose-light: #F5E1E3; /* Subtle backgrounds */
+			--color-sage-green: #B8C5B8;
+			--color-lavender: #E8E0F0;
+			--color-cream: #FAF7F4;
+			--color-charcoal: #333333;
+			--color-soft-white: #FEFEFE;
+
+			/* Font stacks with fallbacks */
+			--font-allura: 'Allura', 'Dancing Script', 'Brush Script MT', cursive;
+			--font-playfair: 'Playfair Display', 'Times New Roman', 'Georgia', serif;
+			--font-abril-fatface: 'Abril Fatface', 'Playfair Display', 'Times New Roman', 'Georgia', serif;
+			--font-roboto: 'Roboto','comic sans ms', 'Helvetica Neue', 'Arial', sans-serif;
+
+			/* Legacy variables for backward compatibility */
 			--shabby-pink: #F8E7E8;
 			--shabby-blue: #EFF9FA;
-			--cream: #FEFCF8;
+			--cream: #FAF7F4;
 			--charcoal: #333333;
 			--rose: #E8B4B8;
 		}
@@ -25,9 +51,9 @@
 		}
 
 		body {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-			background-color: var(--cream);
-			color: var(--charcoal);
+			font-family: var(--font-roboto); /* Use Roboto font family */
+			background-color: var(--color-cream); /* Use updated CSS variable */
+			color: var(--color-charcoal); /* Use updated CSS variable */
 			line-height: 1.6;
 			min-height: 100vh;
 			display: flex;
@@ -46,22 +72,24 @@
 		}
 
 		.header {
-			background: linear-gradient(135deg, var(--shabby-pink), var(--shabby-blue));
+			background: linear-gradient(135deg, var(--color-shabby-pink), var(--color-shabby-blue));
 			padding: 40px 30px;
 			text-align: center;
 		}
 
 		.header h1 {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+			font-family: var(--font-allura); /* Use Allura for main heading */
 			font-size: 3rem;
 			font-weight: 700;
-			color: var(--charcoal);
+			color: var(--color-charcoal);
 			margin-bottom: 10px;
 		}
 
 		.header p {
 			font-size: 1.1rem;
+			color: var(--color-charcoal);
 			opacity: 0.8;
+			font-family: var(--font-roboto); /* Use Roboto for subtitle */
 		}
 
 		.content {
@@ -76,8 +104,8 @@
 		.spinner {
 			width: 40px;
 			height: 40px;
-			border: 4px solid var(--shabby-pink);
-			border-top: 4px solid var(--rose);
+			border: 4px solid var(--color-shabby-pink);
+			border-top: 4px solid var(--color-dusty-rose);
 			border-radius: 50%;
 			animation: spin 1s linear infinite;
 			margin: 0 auto 20px;
@@ -89,18 +117,18 @@
 		}
 
 		.booking-details {
-			background: var(--shabby-blue);
+			background: var(--color-shabby-blue);
 			padding: 25px;
 			border-radius: 8px;
 			margin-bottom: 30px;
 		}
 
 		.booking-details h3 {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+			font-family: var(--font-playfair); /* Use Playfair Display */
 			font-size: 1.5rem;
 			font-weight: 600;
 			margin-bottom: 15px;
-			color: var(--charcoal);
+			color: var(--color-charcoal);
 		}
 
 		.detail-row {
@@ -117,12 +145,15 @@
 
 		.detail-label {
 			font-weight: 500;
-			color: var(--charcoal);
+			color: var(--color-charcoal);
+			font-family: var(--font-roboto); /* Use Roboto for labels */
 		}
 
 		.detail-value {
-			font-weight: 400;
+			font-weight: 600;
 			text-align: right;
+			color: var(--color-charcoal);
+			font-family: var(--font-playfair); /* Use Playfair Display for values */
 		}
 
 		.form-group {
@@ -133,7 +164,8 @@
 			display: block;
 			margin-bottom: 8px;
 			font-weight: 500;
-			color: var(--charcoal);
+			color: var(--color-charcoal);
+			font-family: var(--font-roboto); /* Use Roboto for labels */
 		}
 
 		.form-group textarea {
@@ -149,7 +181,7 @@
 
 		.form-group textarea:focus {
 			outline: none;
-			border-color: var(--rose);
+			border-color: var(--color-dusty-rose);
 		}
 
 		.button-group {
@@ -191,12 +223,12 @@
 		}
 
 		.btn-primary {
-			background-color: var(--rose);
+			background-color: var(--color-dusty-rose);
 			color: white;
 		}
 
 		.btn-primary:hover {
-			background-color: #d49ca0;
+			background-color: var(--color-dusty-rose-dark);
 			transform: translateY(-2px);
 		}
 
@@ -207,13 +239,13 @@
 		}
 
 		.btn-secondary {
-			background-color: var(--cream);
-			color: var(--charcoal);
-			border: 2px solid var(--charcoal);
+			background-color: var(--color-cream);
+			color: var(--color-charcoal);
+			border: 2px solid var(--color-charcoal);
 		}
 
 		.btn-secondary:hover {
-			background-color: var(--shabby-pink);
+			background-color: var(--color-shabby-pink);
 		}
 
 		.error {
@@ -889,7 +921,7 @@
 				</div>
 
 				<div style="text-align: center; margin: 30px 0;">
-					<p style="font-size: 1.1rem; margin-bottom: 25px; color: var(--charcoal);">
+					<p style="font-size: 1.1rem; margin-bottom: 25px; color: var(--color-charcoal); font-family: var(--font-roboto);">
 						What would you like to do with your booking?
 					</p>
 				</div>
