@@ -3761,7 +3761,16 @@ import Layout from '../layouts/Layout.astro';
 			}
 			if (successVisitors) {
 				const bouquetText = booking.numberOfVisitors === 1 ? 'bouquet' : 'bouquets';
-				successVisitors.textContent = `${booking.numberOfVisitors} ${bouquetText} ($${booking.totalAmount} CAD)`;
+				let visitorsText = `${booking.numberOfVisitors} ${bouquetText}`;
+				
+				// Add visitor passes if any were purchased
+				if (booking.numberOfVisitorPasses && booking.numberOfVisitorPasses > 0) {
+					const passText = booking.numberOfVisitorPasses === 1 ? 'visitor pass' : 'visitor passes';
+					visitorsText += `, ${booking.numberOfVisitorPasses} ${passText}`;
+				}
+				
+				visitorsText += ` ($${booking.totalAmount} CAD)`;
+				successVisitors.textContent = visitorsText;
 			}
 			if (successEmailMessage) {
 				let emailMessage = message || 'You\'ll receive a confirmation email shortly.';
