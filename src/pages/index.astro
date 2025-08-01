@@ -3764,7 +3764,9 @@ import Layout from '../layouts/Layout.astro';
 				successVisitors.textContent = `${booking.numberOfVisitors} ${bouquetText} ($${booking.totalAmount} CAD)`;
 			}
 			if (successEmailMessage) {
-				successEmailMessage.textContent = message || 'You\'ll receive a confirmation email shortly.';
+				let emailMessage = message || 'You\'ll receive a confirmation email shortly.';
+				emailMessage += ' If you don\'t see it in your inbox within a few minutes, please check your junk or spam folder.';
+				successEmailMessage.textContent = emailMessage;
 			}
 
 			// Smooth transition: form fades out, then success message fades in
