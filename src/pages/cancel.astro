@@ -240,7 +240,7 @@
 			margin-bottom: 10px;
 		}
 
-		/* Modern Reschedule Form Styles */
+		/* Modern Reschedule Form Styles - Aligned with Shabby Chic Theme */
 		.reschedule-header {
 			text-align: center;
 			margin-bottom: 24px;
@@ -249,96 +249,106 @@
 		.reschedule-header h3 {
 			font-size: 1.5rem;
 			font-weight: 600;
-			color: #1e293b;
+			color: var(--color-charcoal); /* Use consistent charcoal color */
 			margin-bottom: 4px;
+			font-family: var(--font-playfair); /* Use Playfair Display */
 		}
 
 		.reschedule-header p {
-			color: #64748b;
+			color: #64748b; /* Keep existing subtle color for description */
 			font-size: 0.9rem;
+			font-family: var(--font-roboto); /* Use Roboto for body text */
 		}
 
 		.current-booking-card {
-			background: #f1f5f9;
-			border: 1px solid #e2e8f0;
-			border-radius: 8px;
-			padding: 16px;
+			background: rgba(248, 231, 232, 0.15); /* Light dusty rose background */
+			border: 1px solid var(--color-dusty-rose-light); /* Match shabby chic border */
+			border-radius: 0.5rem;
+			padding: 1rem;
 			margin-bottom: 24px;
 			text-align: center;
 		}
 
 		.current-booking-label {
 			font-size: 0.8rem;
-			color: #64748b;
+			color: #64748b; /* Keep existing subtle color */
 			margin-bottom: 4px;
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
+			font-family: var(--font-roboto); /* Use Roboto for labels */
 		}
 
 		.current-booking-details {
 			font-weight: 600;
-			color: #1e293b;
+			color: var(--color-charcoal); /* Use consistent charcoal color */
 			display: flex;
 			justify-content: center;
 			gap: 12px;
 			flex-wrap: wrap;
+			font-family: var(--font-playfair); /* Use Playfair Display for emphasis */
 		}
 
-		/* Calendar Styles */
+		/* Calendar Styles - Aligned with Main Booking Calendar (Shabby Chic Theme) */
 		.calendar-section {
 			background: white;
-			border: 1px solid #e2e8f0;
+			border: 2px solid var(--color-dusty-rose); /* Match main calendar border */
 			border-radius: 12px;
-			padding: 20px;
+			padding: 24px; /* Increase padding to match main calendar */
 			margin-bottom: 24px;
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Match main calendar shadow */
 		}
 
 		.calendar-header {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			margin-bottom: 20px;
+			margin-bottom: 24px; /* Increase margin to match main calendar */
 		}
 
 		.calendar-title {
-			font-size: 1.1rem;
+			font-size: 1.25rem; /* Increase size to match main calendar */
 			font-weight: 600;
-			color: #1e293b;
+			color: var(--color-charcoal); /* Use consistent charcoal color */
 			margin: 0;
+			font-family: var(--font-playfair); /* Ensure Playfair Display is used */
 		}
 
 		.calendar-nav {
-			background: none;
-			border: none;
-			padding: 8px;
-			border-radius: 6px;
+			background: rgba(248, 231, 232, 0.1) !important; /* Match main calendar nav buttons */
+			border: 1px solid transparent !important;
+			border-radius: 50% !important; /* Round shape like main calendar */
+			width: 2.5rem !important; /* Fixed width like main calendar */
+			height: 2.5rem !important; /* Fixed height like main calendar */
+			padding: 0 !important; /* Override any padding */
 			cursor: pointer;
-			color: #475569;
-			transition: all 0.15s ease;
-			display: flex;
-			align-items: center;
-			justify-content: center;
+			color: var(--color-charcoal); /* Match main calendar icon color */
+			transition: all 0.2s ease; /* Match main calendar transition */
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			flex-shrink: 0 !important; /* Prevent shrinking */
 		}
 
 		.calendar-nav:hover {
-			background: #f1f5f9;
-			color: #1e293b;
+			background: var(--color-dusty-rose) !important; /* Match main calendar hover */
+			border-color: var(--color-dusty-rose) !important;
+			color: white !important; /* Match main calendar hover text color */
 		}
 
 		.calendar-nav:disabled {
-			opacity: 0.4;
+			opacity: 0.5; /* Match main calendar disabled opacity */
 			cursor: not-allowed;
 		}
 
 		.calendar-nav:disabled:hover {
-			background: none;
-			color: #475569;
+			background: rgba(248, 231, 232, 0.1) !important; /* Revert to default on disabled hover */
+			color: var(--color-charcoal) !important;
 		}
 
 		.calendar-weekdays {
 			display: grid;
 			grid-template-columns: repeat(7, 1fr);
-			gap: 4px;
+			gap: 0.25rem; /* Match main calendar gap */
 			margin-bottom: 8px;
 		}
 
@@ -346,16 +356,25 @@
 			text-align: center;
 			font-size: 0.75rem;
 			font-weight: 500;
-			color: #64748b;
+			color: #64748b; /* Keep existing weekday color for consistency */
 			padding: 8px 4px;
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
+			font-family: var(--font-roboto); /* Use Roboto for weekday headers like main calendar */
+			pointer-events: none; /* Allow touch events to pass through like main calendar */
 		}
 
 		.calendar-grid {
 			display: grid;
 			grid-template-columns: repeat(7, 1fr);
-			gap: 4px;
+			gap: 0.25rem; /* Match main calendar gap */
+			justify-content: center; /* Match main calendar centering */
+			max-width: 100%;
+			width: 100%;
+			touch-action: pan-x; /* Enable horizontal swipe gestures like main calendar */
+			user-select: none; /* Prevent text selection during swipes */
+			position: relative;
+			z-index: 1;
 		}
 
 		.calendar-day {
@@ -363,38 +382,46 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			border-radius: 8px;
-			font-size: 0.9rem;
-			font-weight: 500;
+			border-radius: 0.375rem; /* Match main calendar border radius */
 			cursor: pointer;
-			transition: all 0.15s ease;
-			min-height: 44px;
-			border: 1px solid transparent;
+			transition: all 0.2s ease; /* Match main calendar transition */
+			font-weight: 600; /* Match main calendar font weight */
+			font-family: var(--font-playfair); /* Use Playfair Display like main calendar */
+			width: 100%;
+			min-height: 42px; /* Match main calendar minimum height */
+			position: relative;
+			margin: 1px; /* Small margin like main calendar */
+			justify-self: center;
+			box-sizing: border-box;
 		}
 
 		.calendar-day.available {
-			background: white;
-			color: #1e293b;
-			border-color: #e2e8f0;
+			border: 1px solid var(--color-dusty-rose); /* Match main calendar available border */
+			color: var(--color-charcoal); /* Match main calendar text color */
+			background-color: white;
 		}
 
 		.calendar-day.available:hover {
-			background: #3b82f6;
-			color: white;
-			border-color: #3b82f6;
+			background-color: rgba(232, 180, 184, 0.2); /* Match main calendar hover */
+			transform: scale(1.05); /* Match main calendar hover transform */
 		}
 
 		.calendar-day.selected {
-			background: #3b82f6;
-			color: white;
-			border-color: #3b82f6;
+			background-color: var(--color-dusty-rose-dark) !important; /* Match main calendar selected */
+			border: 3px solid var(--color-dusty-rose-darker) !important;
+			color: white !important;
+			transform: scale(1.05) !important;
+			font-weight: 700 !important; /* Bolder text for better contrast */
+			font-size: 1.1em !important; /* Slightly larger text */
+			box-shadow: 0 6px 16px rgba(184, 120, 126, 0.4); /* Match main calendar shadow */
+			z-index: 10 !important; /* Ensure selected date appears above others */
 		}
 
 		.calendar-day.unavailable {
-			background: #f8fafc;
-			color: #cbd5e1;
+			background-color: #f9fafb; /* Match main calendar unavailable background */
+			color: #d1d5db; /* Match main calendar unavailable text */
 			cursor: not-allowed;
-			border-color: transparent;
+			border: 1px solid #e5e7eb; /* Match main calendar unavailable border */
 		}
 
 		.calendar-day.current-booking {
@@ -410,7 +437,65 @@
 			min-height: 44px;
 		}
 
-		/* Time Selection */
+		/* Calendar Help Text Styling - Match Main Calendar */
+		.calendar-help-text {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			padding: 1rem;
+			background: rgba(248, 231, 232, 0.3); /* Very light dusty rose background */
+			border-radius: 0.5rem;
+			border: 1px solid var(--color-dusty-rose-light);
+			margin-top: 0.5rem;
+			font-family: var(--font-roboto);
+		}
+
+		.help-step {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			font-size: 0.875rem;
+			color: var(--color-charcoal);
+		}
+
+		.step-number {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.5rem;
+			height: 1.5rem;
+			background: var(--color-dusty-rose);
+			color: white;
+			border-radius: 50%;
+			font-weight: 600;
+			font-size: 0.75rem;
+			flex-shrink: 0;
+		}
+
+		.step-text {
+			font-weight: 500;
+		}
+
+		/* Mobile optimization for help text */
+		@media (max-width: 767px) {
+			.calendar-help-text {
+				padding: 0.75rem;
+				gap: 0.375rem;
+			}
+
+			.help-step {
+				font-size: 0.8rem;
+				gap: 0.5rem;
+			}
+
+			.step-number {
+				width: 1.25rem;
+				height: 1.25rem;
+				font-size: 0.7rem;
+			}
+		}
+
+		/* Time Selection - Aligned with Main Booking Calendar */
 		.time-section {
 			margin-bottom: 24px;
 		}
@@ -418,62 +503,74 @@
 		.time-section-title {
 			font-size: 1rem;
 			font-weight: 600;
-			color: #1e293b;
+			color: var(--color-charcoal); /* Use consistent charcoal color */
 			margin-bottom: 12px;
+			font-family: var(--font-playfair); /* Use Playfair Display for consistency */
 		}
 
 		.time-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-			gap: 8px;
+			grid-template-columns: 1fr; /* Single column on mobile like main calendar */
+			gap: 0.75rem; /* Match main calendar time slot gap */
+		}
+
+		/* Desktop: Two columns for time slots like main calendar */
+		@media (min-width: 768px) {
+			.time-grid {
+				grid-template-columns: 1fr 1fr; /* Two columns on desktop */
+			}
 		}
 
 		.time-slot {
-			padding: 12px 16px;
-			border: 1px solid #e2e8f0;
-			border-radius: 8px;
-			text-align: center;
+			border: 2px solid var(--color-shabby-pink); /* Match main calendar time slot border */
+			background: var(--color-cream); /* Match main calendar time slot background */
+			padding: 0.625rem; /* More compact like main calendar */
+			border-radius: 0.5rem;
 			cursor: pointer;
-			transition: all 0.15s ease;
-			background: white;
-			font-weight: 500;
-			min-height: 44px;
+			transition: all 0.3s ease; /* Match main calendar transition */
+			text-align: center;
+			min-height: 60px; /* Match main calendar time slot height */
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			font-family: var(--font-playfair); /* Use Playfair Display */
+			font-weight: 600; /* Match main calendar font weight */
 		}
 
 		.time-slot:hover {
-			border-color: #3b82f6;
-			background: #eff6ff;
+			background-color: rgba(232, 180, 184, 0.2); /* Match main calendar hover */
+			border-color: var(--color-dusty-rose); /* Match main calendar hover border */
+			transform: scale(1.02); /* Subtle hover transform */
 		}
 
 		.time-slot.selected {
-			background: #3b82f6;
-			color: white;
-			border-color: #3b82f6;
+			background-color: var(--color-dusty-rose-dark) !important; /* Match main calendar selected */
+			color: white !important;
+			border-color: var(--color-dusty-rose-darker) !important;
+			transform: scale(1.02) !important;
+			box-shadow: 0 4px 8px rgba(184, 120, 126, 0.3); /* Match main calendar shadow */
 		}
 
 		.time-slot.unavailable {
-			background: #f8fafc;
-			color: #cbd5e1;
+			background: #f9fafb; /* Match main calendar unavailable background */
+			color: #d1d5db; /* Match main calendar unavailable text */
 			cursor: not-allowed;
-			border-color: #f1f5f9;
+			border: 1px solid #e5e7eb; /* Match main calendar unavailable border */
 		}
 
 		.time-slot.current-booking {
-			background: #fef3c7;
+			background: #fef3c7; /* Keep existing current booking styling */
 			color: #92400e;
 			border-color: #fbbf24;
 			cursor: not-allowed;
 		}
 
-		/* Selection Summary */
+		/* Selection Summary - Aligned with Shabby Chic Theme */
 		.selection-summary {
-			background: #ecfdf5;
-			border: 1px solid #bbf7d0;
-			border-radius: 8px;
-			padding: 16px;
+			background: rgba(248, 231, 232, 0.3); /* Light dusty rose background like main calendar help text */
+			border: 1px solid var(--color-dusty-rose-light); /* Match main calendar border */
+			border-radius: 0.5rem;
+			padding: 1rem;
 			margin-bottom: 24px;
 		}
 
@@ -487,18 +584,20 @@
 
 		.summary-label {
 			font-size: 0.9rem;
-			color: #166534;
+			color: var(--color-charcoal); /* Use consistent charcoal color */
 			font-weight: 500;
+			font-family: var(--font-roboto); /* Use Roboto for consistency */
 		}
 
 		.summary-text {
 			font-size: 0.9rem;
-			color: #166534;
+			color: var(--color-charcoal); /* Use consistent charcoal color */
 			font-weight: 600;
+			font-family: var(--font-playfair); /* Use Playfair Display for emphasis */
 		}
 
-		/* Mobile Responsive */
-		@media (max-width: 768px) {
+		/* Mobile Responsive - Aligned with Main Calendar Design */
+		@media (max-width: 767px) {
 			.container {
 				margin: 10px;
 				max-width: none;
@@ -522,36 +621,40 @@
 			}
 
 			.calendar-section {
-				padding: 16px;
-			}
-
-			.calendar-nav {
-				padding: 12px; /* Larger touch target */
+				padding: 0.5rem; /* More compact padding on mobile like main calendar */
+				margin: 0; /* Remove any margins */
 			}
 
 			.calendar-grid {
-				gap: 2px;
+				grid-template-columns: repeat(7, minmax(0, 1fr)); /* Prevent column overflow like main calendar */
+				gap: 1px; /* Minimal gap for mobile like main calendar */
+				width: 100%; /* Use full available width */
+				padding: 0 2px; /* Reduced side padding */
+				margin: 0; /* Remove any margins */
 			}
 
 			.calendar-day {
-				font-size: 0.85rem;
-				min-height: 48px; /* Better touch target */
+				min-height: 32px; /* Reduced for better mobile fit like main calendar */
+				height: 32px; /* Fixed height for consistency */
+				max-width: 32px; /* Prevent horizontal overflow */
+				font-size: 0.75rem; /* Smaller font for compact layout */
+				border-width: 1px; /* Thinner borders on mobile */
 			}
 
 			.weekday {
-				font-size: 0.7rem;
-				padding: 6px 2px;
+				padding: 4px 1px; /* Reduced padding for compact layout like main calendar */
+				font-size: 0.65rem; /* Smaller font size */
 			}
 
 			.time-grid {
-				grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-				gap: 8px;
+				grid-template-columns: 1fr; /* Single column on mobile like main calendar */
+				gap: 0.75rem;
 			}
 
 			.time-slot {
-				padding: 12px;
+				padding: 0.625rem; /* More compact like main calendar */
 				font-size: 0.9rem;
-				min-height: 48px; /* Better touch target */
+				min-height: 60px; /* Match main calendar time slot height */
 			}
 
 			.current-booking-details {
@@ -568,8 +671,8 @@
 			}
 		}
 
-		/* Extra small screens */
-		@media (max-width: 480px) {
+		/* Galaxy S25 and similar phone optimizations - Match Main Calendar */
+		@media (max-width: 430px) {
 			.container {
 				margin: 5px;
 			}
@@ -579,19 +682,159 @@
 			}
 
 			.calendar-section {
-				padding: 12px;
+				padding: 0.25rem; /* Minimal padding */
 			}
 
-			.time-grid {
-				grid-template-columns: 1fr 1fr; /* Two columns on very small screens */
+			.calendar-day {
+				min-height: 45px; /* Ultra-compact for very small phones */
+				height: 45px;
+				max-width: 45px; /* Strict width limit */
+				font-size: 0.8rem; /* Smaller but still readable */
+				border-width: 0.5px; /* Thinner borders to save space */
 			}
 
-			.calendar-title {
-				font-size: 1rem;
+			.weekday {
+				padding: 2px 0px; /* Minimal padding */
+				font-size: 0.6rem; /* Very small headers */
 			}
 
-			.reschedule-header h3 {
-				font-size: 1.1rem;
+			.calendar-grid {
+				gap: 0px; /* No gaps at all */
+				padding: 0; /* No side padding */
+			}
+		}
+
+		/* Ultra-small phones (iPhone SE, etc.) - Match Main Calendar */
+		@media (max-width: 375px) {
+			.calendar-day {
+				min-height: 42px; /* Maximum compactness */
+				height: 42px;
+				max-width: 42px;
+				font-size: 0.8rem;
+				border-radius: 0.25rem; /* Smaller border radius */
+			}
+
+			.weekday {
+				font-size: 0.55rem;
+				padding: 1px 0;
+			}
+		}
+
+		/* Extra small phones - Match Main Calendar */
+		@media (max-width: 320px) {
+			.calendar-day {
+				min-height: 22px; /* Absolute minimum */
+				height: 22px;
+				max-width: 22px;
+				font-size: 0.55rem;
+			}
+		}
+
+		/* Swipe gesture visual feedback - Match Main Calendar */
+		.calendar-grid {
+			touch-action: pan-y; /* Allow vertical scrolling but capture horizontal swipes */
+			user-select: none; /* Prevent text selection during swipes */
+			position: relative;
+			overflow: hidden;
+		}
+
+		/* Calendar container for slide animations */
+		.calendar-section {
+			position: relative;
+			overflow: hidden;
+		}
+
+		/* Slide animation states with smooth, gentle transitions */
+		.calendar-grid.slide-left {
+			animation: slideOutLeft 0.3s ease-out;
+		}
+
+		.calendar-grid.slide-right {
+			animation: slideOutRight 0.3s ease-out;
+		}
+
+		.calendar-grid.slide-in-left {
+			animation: slideInLeft 0.3s ease-out;
+		}
+
+		.calendar-grid.slide-in-right {
+			animation: slideInRight 0.3s ease-out;
+		}
+
+		/* Smooth slide animations without jarring effects */
+		@keyframes slideOutLeft {
+			0% {
+				transform: translateX(0);
+				opacity: 1;
+			}
+			100% {
+				transform: translateX(-100%);
+				opacity: 0.3;
+			}
+		}
+
+		@keyframes slideOutRight {
+			0% {
+				transform: translateX(0);
+				opacity: 1;
+			}
+			100% {
+				transform: translateX(100%);
+				opacity: 0.3;
+			}
+		}
+
+		@keyframes slideInLeft {
+			0% {
+				transform: translateX(100%);
+				opacity: 0.3;
+			}
+			100% {
+				transform: translateX(0);
+				opacity: 1;
+			}
+		}
+
+		@keyframes slideInRight {
+			0% {
+				transform: translateX(-100%);
+				opacity: 0.3;
+			}
+			100% {
+				transform: translateX(0);
+				opacity: 1;
+			}
+		}
+
+		/* Swipe feedback pulse animation */
+		.swipe-feedback {
+			animation: swipePulse 0.1s ease-out;
+		}
+
+		@keyframes swipePulse {
+			0% {
+				transform: scale(1);
+			}
+			50% {
+				transform: scale(1.005);
+			}
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		/* Mobile swipe hint - only show on touch devices */
+		@media (hover: none) and (pointer: coarse) {
+			.calendar-help-text::after {
+				content: "💡 Tip: Swipe left or right to navigate months";
+				display: block;
+				margin-top: 0.5rem;
+				padding-top: 0.5rem;
+				border-top: 1px solid rgba(232, 180, 184, 0.3);
+				font-size: 0.75rem;
+				color: #64748b;
+				font-style: italic;
+				text-align: center;
 			}
 		}
 	</style>
