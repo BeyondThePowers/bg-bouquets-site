@@ -158,6 +158,18 @@ async function handlePaymentEvent(webhookData: any) {
     if (status === 'COMPLETED') {
       console.log('Payment completed, updating booking status');
       
+      // Check if we already processed this payment completion to prevent duplicate webhooks
+      const { data: existingPayment, error: paymentCheckError } = await supabaseAdmin
+        .from('bookings')
+        .select('payment_completed_at, square_payment_id')
+        .eq('id', booking.id)
+        .single();
+
+      if (existingPayment?.square_payment_id === paymentId && existingPayment?.payment_completed_at) {
+        console.log('Payment already processed for booking:', booking.id, 'payment:', paymentId);
+        return; // Skip duplicate processing
+      }
+      
       // Update booking to paid status
       const { error: updateError } = await supabaseAdmin
         .from('bookings')
