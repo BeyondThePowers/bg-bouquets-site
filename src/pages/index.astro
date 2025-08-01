@@ -2260,6 +2260,17 @@ import Layout from '../layouts/Layout.astro';
 		let selectedTime = '';
 		let isInitializing = false;
 
+		// Price calculation utilities to ensure consistent decimal precision
+		function calculatePrice(quantity: number, unitPrice: number): number {
+			// Use integer arithmetic to avoid floating-point precision errors
+			return Math.round(quantity * unitPrice * 100) / 100;
+		}
+
+		function formatPrice(amount: number): string {
+			// Ensure exactly 2 decimal places for all price displays
+			return amount.toFixed(2);
+		}
+
 		// Business timezone helper - Alberta, Canada (Mountain Time)
 		function getBusinessToday(): string {
 			return new Date().toLocaleDateString('en-CA', {
@@ -2503,23 +2514,24 @@ import Layout from '../layouts/Layout.astro';
 			const bouquetCount = parseInt(bouquetsSelect.value) || 1;
 			const visitorPassCount = parseInt(visitorPassesSelect.value) || 0;
 
-			const bouquetTotal = bouquetCount * currentBouquetPrice;
-			const visitorPassTotal = visitorPassCount * currentVisitorPassPrice;
-			const grandTotal = bouquetTotal + visitorPassTotal;
+			// Calculate prices using utility functions for consistent precision
+			const bouquetTotal = calculatePrice(bouquetCount, currentBouquetPrice);
+			const visitorPassTotal = calculatePrice(visitorPassCount, currentVisitorPassPrice);
+			const grandTotal = calculatePrice(1, bouquetTotal + visitorPassTotal);
 
-			// Update bouquet counter price with pulse animation
+			// Update bouquet counter price with pulse animation - now with consistent 2 decimal places
 			if (counterPrice) {
 				counterPrice.classList.add('updating');
 				counterPrice.classList.add('price-loaded');
-				counterPrice.textContent = `$${bouquetTotal} CAD`;
+				counterPrice.textContent = `$${formatPrice(bouquetTotal)} CAD`;
 				setTimeout(() => counterPrice.classList.remove('updating'), 500);
 			}
 
-			// Update visitor pass counter price with pulse animation
+			// Update visitor pass counter price with pulse animation - now with consistent 2 decimal places
 			if (visitorCounterPrice) {
 				visitorCounterPrice.classList.add('updating');
 				visitorCounterPrice.classList.add('price-loaded');
-				visitorCounterPrice.textContent = `$${visitorPassTotal} CAD`;
+				visitorCounterPrice.textContent = `$${formatPrice(visitorPassTotal)} CAD`;
 				setTimeout(() => visitorCounterPrice.classList.remove('updating'), 500);
 			}
 
@@ -2527,7 +2539,7 @@ import Layout from '../layouts/Layout.astro';
 			if (bookingTotalPrice) {
 				bookingTotalPrice.classList.add('updating');
 				bookingTotalPrice.classList.add('price-loaded');
-				bookingTotalPrice.textContent = `$${grandTotal.toFixed(2)} CAD`;
+				bookingTotalPrice.textContent = `$${formatPrice(grandTotal)} CAD`;
 				setTimeout(() => bookingTotalPrice.classList.remove('updating'), 500);
 			}
 
@@ -2535,7 +2547,7 @@ import Layout from '../layouts/Layout.astro';
 			if (bookingTotalPriceStep2) {
 				bookingTotalPriceStep2.classList.add('updating');
 				bookingTotalPriceStep2.classList.add('price-loaded');
-				bookingTotalPriceStep2.textContent = `$${grandTotal.toFixed(2)} CAD`;
+				bookingTotalPriceStep2.textContent = `$${formatPrice(grandTotal)} CAD`;
 				setTimeout(() => bookingTotalPriceStep2.classList.remove('updating'), 500);
 			}
 
@@ -3634,10 +3646,10 @@ import Layout from '../layouts/Layout.astro';
 			const numberOfVisitorPasses = parseInt(formData.get('numberOfVisitorPasses') as string) || 0;
 			const paymentMethod = formData.get('paymentMethod') as string || 'pay_on_arrival';
 
-			// Calculate total amount
-			const bouquetTotal = numberOfBouquets * currentBouquetPrice;
-			const visitorPassTotal = numberOfVisitorPasses * currentVisitorPassPrice;
-			const totalAmount = bouquetTotal + visitorPassTotal;
+			// Calculate total amount using consistent precision utilities
+			const bouquetTotal = calculatePrice(numberOfBouquets, currentBouquetPrice);
+			const visitorPassTotal = calculatePrice(numberOfVisitorPasses, currentVisitorPassPrice);
+			const totalAmount = calculatePrice(1, bouquetTotal + visitorPassTotal);
 
 			const booking = {
 				fullName: formData.get('fullName'),
@@ -3769,7 +3781,7 @@ import Layout from '../layouts/Layout.astro';
 					visitorsText += `, ${booking.numberOfVisitorPasses} ${passText}`;
 				}
 				
-				visitorsText += ` ($${parseFloat(booking.totalAmount).toFixed(2)} CAD)`;
+				visitorsText += ` ($${formatPrice(parseFloat(booking.totalAmount))} CAD)`;
 				successVisitors.textContent = visitorsText;
 			}
 			if (successEmailMessage) {
