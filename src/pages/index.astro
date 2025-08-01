@@ -3769,7 +3769,7 @@ import Layout from '../layouts/Layout.astro';
 					visitorsText += `, ${booking.numberOfVisitorPasses} ${passText}`;
 				}
 				
-				visitorsText += ` ($${booking.totalAmount} CAD)`;
+				visitorsText += ` ($${parseFloat(booking.totalAmount).toFixed(2)} CAD)`;
 				successVisitors.textContent = visitorsText;
 			}
 			if (successEmailMessage) {
