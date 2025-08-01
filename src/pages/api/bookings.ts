@@ -87,7 +87,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Basic server-side validation
-    if (!fullName || !email || !phone || !visitDate || !preferredTime || !numberOfVisitors) {
+    if (!fullName || !email || !visitDate || !preferredTime || !numberOfVisitors) {
       console.log('Validation failed - missing fields');
       return new Response(JSON.stringify({ error: 'Missing required fields.' }), {
         status: 400,
