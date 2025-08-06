@@ -971,6 +971,12 @@ input[type="number"] {
   .total-amount {
     font-size: 1.75rem; /* Larger on desktop */
   }
+
+  .beyond-regular-hours {
+    margin: 5rem auto 0rem auto;
+    max-width: max-content;
+  }
+
 }
 
 /* Mobile responsive adjustments */
@@ -1964,6 +1970,11 @@ input[type="number"] {
     padding-bottom: 6rem;
   }
 
+.beyond-regular-hours {
+  margin: 0rem auto 5rem auto;
+  max-width: 90%;
+}
+
 }
 
 @media (max-width: 640px) {
@@ -2534,11 +2545,6 @@ input[type="number"] {
     display: block;
   }
 
-}
-
-.beyond-regular-hours {
-  margin: 5rem auto 0rem auto;
-  max-width: max-content;
 }
 
 .beyond-regular-hours a {
