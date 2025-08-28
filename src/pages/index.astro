@@ -1077,7 +1077,7 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 
 			<!-- Seasonal Information -->
-			<div class="max-w-4xl mx-auto mb-12">
+			<div class="max-w-4xl mx-auto mb-12 seasonal-information">
 				<div class="shabby-card p-6 text-center">
 					<div class="flex items-center justify-center gap-2 mb-4">
 						<svg class="w-5 h-5" style="color: #E8B4B8;" fill="currentColor" viewBox="0 0 20 20">
@@ -1153,7 +1153,7 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 
 						<!-- Filters Section -->
-						<div class="lg:flex-1">
+						<div class="lg:flex-1 filters-section">
 							<!-- Universal Filter Button -->
 							<div class="mt-4">
 								<button id="mobileFilterBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-lg vintage-border font-roboto text-sm" style="background-color: #FAF7F4; color: #333333; border-color: #E8B4B8;" aria-expanded="false" aria-controls="mobileFilters">
@@ -4834,7 +4834,7 @@ import Layout from '../layouts/Layout.astro';
 						-->
 
 						<!-- Seasonal availability -->
-						<div class="pt-2 border-t border-shabby-pink">
+						<div class="pt-2 border-t border-shabby-pink seasonal-availability">
 							<div class="text-xs font-roboto" style="color: #666;">
 								${getSeasonalDisplay(flower)}
 							</div>
