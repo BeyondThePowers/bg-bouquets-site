@@ -137,85 +137,108 @@ async function performForceRefresh() {
       }
     }
 
-    // Step 3: Generate dates manually for the next 400 days (over 1 year)
-    const daysToGenerate = 400;
-    const generatedDays = [];
-    const generatedSlots = [];
+    // Step 3: Generate dates in batches to avoid timeouts
+    const totalDaysToGenerate = 400;
+    const batchSize = 100;
+    const totalGeneratedDays = [];
+    const totalGeneratedSlots = [];
 
-    for (let i = 0; i < daysToGenerate; i++) {
-      const currentDate = new Date();
-      currentDate.setDate(currentDate.getDate() + i);
-      const dateStr = currentDate.toISOString().split('T')[0];
+    // Pre-fetch all holidays to avoid repeated database queries
+    const { data: allHolidays } = await supabaseAdmin
+      .from('holidays')
+      .select('date')
+      .eq('is_disabled', false);
 
-      // Get day name (lowercase)
-      const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const holidayDates = new Set(allHolidays?.map(h => h.date) || []);
+    console.log(`Loaded ${holidayDates.size} holidays for batch processing`);
 
-      // Check if this date is within the season
-      const withinSeason = isWithinSeason(currentDate);
+    // Process in batches
+    for (let batchStart = 0; batchStart < totalDaysToGenerate; batchStart += batchSize) {
+      const batchEnd = Math.min(batchStart + batchSize, totalDaysToGenerate);
+      const batchNumber = Math.floor(batchStart / batchSize) + 1;
+      const totalBatches = Math.ceil(totalDaysToGenerate / batchSize);
 
-      // Check if this date is a holiday
-      const { data: holidayCheck } = await supabaseAdmin
-        .from('holidays')
-        .select('id')
-        .eq('date', dateStr)
-        .eq('is_disabled', false)
-        .single();
+      console.log(`Processing batch ${batchNumber}/${totalBatches}: days ${batchStart}-${batchEnd-1}`);
 
-      const isHoliday = !!holidayCheck;
+      const batchDays = [];
+      const batchSlots = [];
 
-      // Check if this day is an operating day, within season, and not a holiday
-      const isOpen = operatingDays.includes(dayName) && withinSeason && !isHoliday;
-      
-      // Insert open day
-      generatedDays.push({
-        date: dateStr,
-        is_open: isOpen
-      });
-      
-      // If it's open, generate time slots
-      if (isOpen) {
-        for (const timeSlot of timeSlots) {
-          generatedSlots.push({
-            date: dateStr,
-            time: timeSlot,
-            max_bouquets: maxBouquets,
-            max_bookings: maxBookings
-          });
+      for (let i = batchStart; i < batchEnd; i++) {
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + i);
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        // Get day name (lowercase)
+        const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+
+        // Check if this date is within the season
+        const withinSeason = isWithinSeason(currentDate);
+
+        // Check if this date is a holiday (using pre-fetched data)
+        const isHoliday = holidayDates.has(dateStr);
+
+        // Check if this day is an operating day, within season, and not a holiday
+        const isOpen = operatingDays.includes(dayName) && withinSeason && !isHoliday;
+
+        // Add to batch
+        batchDays.push({
+          date: dateStr,
+          is_open: isOpen
+        });
+
+        // If it's open, generate time slots
+        if (isOpen) {
+          for (const timeSlot of timeSlots) {
+            batchSlots.push({
+              date: dateStr,
+              time: timeSlot,
+              max_bouquets: maxBouquets,
+              max_bookings: maxBookings
+            });
+          }
         }
       }
-    }
-    
-    console.log(`Generated ${generatedDays.length} days and ${generatedSlots.length} time slots`);
-    
-    // Step 4: Insert the generated data
-    if (generatedDays.length > 0) {
-      const { error: insertDaysError } = await supabaseAdmin
-        .from('open_days')
-        .insert(generatedDays);
-      
-      if (insertDaysError) {
-        console.error('Error inserting open days:', insertDaysError);
-        throw new Error('Failed to insert open days: ' + insertDaysError.message);
+
+      console.log(`Batch ${batchNumber}: Generated ${batchDays.length} days, ${batchSlots.length} slots`);
+
+      // Insert batch data
+      if (batchDays.length > 0) {
+        const { error: insertDaysError } = await supabaseAdmin
+          .from('open_days')
+          .insert(batchDays);
+
+        if (insertDaysError) {
+          console.error(`Error inserting batch ${batchNumber} open days:`, insertDaysError);
+          throw new Error(`Failed to insert batch ${batchNumber} open days: ` + insertDaysError.message);
+        }
       }
-    }
-    
-    if (generatedSlots.length > 0) {
-      const { error: insertSlotsError } = await supabaseAdmin
-        .from('time_slots')
-        .insert(generatedSlots);
-      
-      if (insertSlotsError) {
-        console.error('Error inserting time slots:', insertSlotsError);
-        throw new Error('Failed to insert time slots: ' + insertSlotsError.message);
+
+      if (batchSlots.length > 0) {
+        const { error: insertSlotsError } = await supabaseAdmin
+          .from('time_slots')
+          .insert(batchSlots);
+
+        if (insertSlotsError) {
+          console.error(`Error inserting batch ${batchNumber} time slots:`, insertSlotsError);
+          throw new Error(`Failed to insert batch ${batchNumber} time slots: ` + insertSlotsError.message);
+        }
       }
+
+      // Add to totals
+      totalGeneratedDays.push(...batchDays);
+      totalGeneratedSlots.push(...batchSlots);
+
+      console.log(`Batch ${batchNumber} completed successfully`);
     }
+
+    console.log(`All batches completed! Total: ${totalGeneratedDays.length} days, ${totalGeneratedSlots.length} slots`);
     
     // Return success result
     return {
       success: true,
       message: 'Force refresh completed successfully',
-      generatedDays: generatedDays.length,
-      generatedSlots: generatedSlots.length
+      generatedDays: totalGeneratedDays.length,
+      generatedSlots: totalGeneratedSlots.length
     };
   } catch (error) {
     console.error('Force refresh error:', error);
