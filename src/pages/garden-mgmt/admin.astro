@@ -191,7 +191,7 @@
         </div>
         
         <div class="lock-action-buttons">
-          <button id="lockScheduleBtn" class="btn btn-warning" onclick="lockSchedule()">
+          <button id="lockScheduleBtn" class="btn btn-warning">
             Disable Bookings to Edit Schedule
           </button>
 
@@ -351,11 +351,15 @@
       }
     } catch (error) {
       console.error('Error toggling schedule lock:', error);
-      showLockMessage(`Error: ${error.message || 'Unknown error occurred'}`, 'error');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      showLockMessage(`Error: ${errorMessage}`, 'error');
     } finally {
       setLockButtonLoading(false);
     }
   }
+
+  // Make lockSchedule available globally for any onclick handlers
+  window.lockSchedule = lockSchedule;
 
 
 
@@ -1124,7 +1128,7 @@
 					const chipElement = chip as HTMLElement;
 					const dayValue = chipElement.dataset.day;
 					chipElement.classList.remove('active'); // Clear existing state
-					if (operatingDays.includes(dayValue)) {
+					if (dayValue && operatingDays.includes(dayValue)) {
 						chipElement.classList.add('active');
 						console.log('Activated day:', dayValue, 'Classes:', chipElement.className); // Debug log
 					} else {
@@ -1160,7 +1164,7 @@
 					const chipElement = chip as HTMLElement;
 					const timeValue = chipElement.dataset.time;
 					chipElement.classList.remove('active'); // Clear existing state
-					if (timeSlots.includes(timeValue)) {
+					if (timeValue && timeSlots.includes(timeValue)) {
 						chipElement.classList.add('active');
 						console.log('Activated time slot:', timeValue, 'Classes:', chipElement.className); // Debug log
 					} else {

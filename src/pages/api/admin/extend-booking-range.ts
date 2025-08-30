@@ -139,7 +139,7 @@ async function performForceRefresh() {
 
     // Step 3: Generate dates in batches to avoid timeouts
     const totalDaysToGenerate = 400;
-    const batchSize = 100;
+    const batchSize = 30;
     const totalGeneratedDays = [];
     const totalGeneratedSlots = [];
 
